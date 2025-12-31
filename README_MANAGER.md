@@ -136,3 +136,37 @@ These are markdown files - open with any text editor or markdown viewer.
 3. **Compare:** Run multiple ideas through validate to compare
 4. **Chain tasks:** Validate idea first, then review the architecture you design
 5. **Artifacts are yours:** Copy/paste from artifacts into design docs
+
+---
+
+## Advanced Features (Optional)
+
+### Multi-Agent Supervisor System
+
+**Status:** Implemented but disabled by default (Phase 3)
+
+**What it does:**
+- Automatically routes simple tasks to free AI (Ollama)
+- Routes complex tasks to premium AI (Claude Code) - if configured
+- Adds quality checks before running tasks
+- Automatically generates test plans and documentation
+- Reviews code quality and finds bugs
+
+**Why disabled by default:**
+- Adds 15-90 seconds of processing time
+- Requires additional configuration
+- Most users don't need it initially
+
+**How to enable:**
+See [SUPERVISOR_GUIDE.md](SUPERVISOR_GUIDE.md) for complete setup instructions.
+
+**Recommended for:**
+- Production code generation
+- Teams needing quality gates
+- Projects requiring documentation
+- Cost optimization (80% free AI usage)
+
+**Not recommended for:**
+- Quick idea validation
+- Rapid prototyping
+- Learning the system

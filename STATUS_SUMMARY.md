@@ -5,6 +5,7 @@
 **Phase 1 Review:** See PHASE_1_DELIVERY_REVIEW.md
 **Phase 2:** Code generation + Enhanced review system
 **Phase 3:** Multi-Agent Supervisor with Quality Gates + Smart Routing
+**Next Session:** See NEXT_SESSION.md for setup instructions
 
 ---
 
