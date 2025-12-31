@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"ai-studio/orchestrator/api"
-	"ai-studio/orchestrator/config"
+	"ai-studio/orchestrator/supervisor"
 	"ai-studio/orchestrator/task"
 )
 
@@ -19,21 +19,31 @@ func main() {
 	port := flag.Int("port", 8080, "Server port")
 	flag.Parse()
 
-	// Load configuration
-	cfg, err := config.Load()
+	// Load configuration with supervisor settings
+	baseConfig, supervisorConfig, err := supervisor.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Initialize task manager
-	taskMgr := task.NewManager(cfg)
+	// Initialize base task manager
+	baseMgr := task.NewManager(baseConfig)
+
+	// Wrap with supervisor if enabled
+	var taskMgr api.TaskManager
+	if supervisorConfig.Enabled {
+		taskMgr = supervisor.NewSupervisedTaskManager(baseMgr, baseConfig, supervisorConfig)
+		log.Printf("✓ Supervisor enabled (complexity threshold: %d)", supervisorConfig.ComplexityThreshold)
+	} else {
+		taskMgr = baseMgr
+		log.Printf("Supervisor disabled - using standard task manager")
+	}
 
 	switch *mode {
 	case "server":
 		// Start HTTP server
 		server := api.NewServer(taskMgr, *port)
 		log.Printf("Starting AI Studio Orchestrator on port %d", *port)
-		log.Printf("Models: %v", cfg.Models)
+		log.Printf("Models: %v", baseConfig.Models)
 		if err := server.Start(); err != nil {
 			log.Fatalf("Server failed: %v", err)
 		}

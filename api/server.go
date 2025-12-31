@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"ai-studio/orchestrator/llm"
 	"ai-studio/orchestrator/task"
 )
 
@@ -48,9 +49,17 @@ When discussing addictive mechanics, emphasize ethical design that creates compe
 
 Respond conversationally but with expertise. Keep answers focused and practical.`
 
+// TaskManager interface for both standard and supervised managers
+type TaskManager interface {
+	ExecuteTask(taskType, input string) (*task.Result, error)
+	Ping() error
+	GetHistory(taskType string) []task.Result
+	GetClient() *llm.Client
+}
+
 // Server handles HTTP API requests
 type Server struct {
-	taskMgr       *task.Manager
+	taskMgr       TaskManager
 	port          int
 	mux           *http.ServeMux
 	conversations map[string]*Conversation
@@ -85,7 +94,7 @@ type ErrorResponse struct {
 }
 
 // NewServer creates a new API server
-func NewServer(taskMgr *task.Manager, port int) *Server {
+func NewServer(taskMgr TaskManager, port int) *Server {
 	s := &Server{
 		taskMgr:       taskMgr,
 		port:          port,

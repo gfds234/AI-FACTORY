@@ -1,0 +1,39 @@
+{
+  "ollama_url": "http://localhost:11434",
+  "models": {
+    "code": "deepseek-coder:6.7b-instruct",
+    "review": "llama3:8b",
+    "validate": "mistral:7b-instruct-v0.2-q4_K_M"
+  },
+  "artifacts_dir": "./artifacts",
+  "max_retries": 2,
+  "timeout_seconds": 120,
+  "supervisor": {
+    "enabled": false,
+    "quality_gates": {
+      "requirements_check": false,
+      "tech_stack_approval": false,
+      "scope_validation": false
+    },
+    "agents": {
+      "requirements": {
+        "enabled": false,
+        "model": "mistral:7b-instruct-v0.2-q4_K_M"
+      },
+      "qa": {
+        "enabled": false,
+        "model": "llama3:8b"
+      },
+      "testing": {
+        "enabled": false,
+        "model": "deepseek-coder:6.7b-instruct"
+      },
+      "documentation": {
+        "enabled": false,
+        "model": "mistral:7b-instruct-v0.2-q4_K_M"
+      }
+    },
+    "complexity_threshold": 7,
+    "claude_code_endpoint": ""
+  }
+}
