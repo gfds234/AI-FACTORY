@@ -62,7 +62,7 @@ func NewSupervisedTaskManager(baseMgr *task.Manager, cfg *config.Config, supervi
 }
 
 // ExecuteTask runs the full supervised execution pipeline
-func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (*task.Result, error) {
+func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (interface{}, error) {
 	startTime := time.Now()
 
 	result := &SupervisedResult{
@@ -75,8 +75,8 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (*task.Res
 		if err := stm.runQualityGates(taskType, input, result); err != nil {
 			result.Error = err.Error()
 			result.TotalDuration = time.Since(startTime).Seconds()
-			// Return as task.Result for interface compatibility
-			return result.Result, err
+			// Return full SupervisedResult even on error
+			return result, err
 		}
 	}
 
@@ -94,13 +94,22 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (*task.Res
 	if complexity.RecommendedRoute == "claude_code" && stm.claudeCodeClient != nil {
 		baseResult, err = stm.executeWithClaudeCode(taskType, input)
 	} else {
-		baseResult, err = stm.baseManager.ExecuteTask(taskType, input)
+		execResult, execErr := stm.baseManager.ExecuteTask(taskType, input)
+		err = execErr
+		if execErr == nil {
+			// Type assert the result back to *task.Result
+			var ok bool
+			baseResult, ok = execResult.(*task.Result)
+			if !ok {
+				err = fmt.Errorf("unexpected result type from base manager")
+			}
+		}
 	}
 
 	if err != nil {
 		result.Error = err.Error()
 		result.TotalDuration = time.Since(startTime).Seconds()
-		return result.Result, err
+		return result, err
 	}
 
 	// Merge base result
@@ -113,8 +122,8 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (*task.Res
 
 	result.TotalDuration = time.Since(startTime).Seconds()
 
-	// Return as task.Result for interface compatibility
-	return result.Result, nil
+	// Return full SupervisedResult with all metadata
+	return result, nil
 }
 
 // runQualityGates executes pre-execution quality gates

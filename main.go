@@ -65,8 +65,13 @@ func main() {
 			log.Fatalf("Task execution failed: %v", err)
 		}
 
-		fmt.Printf("\n=== Task Result ===\n%s\n", result.Output)
-		fmt.Printf("\nArtifact saved: %s\n", result.ArtifactPath)
+		// Extract output from result (handle both standard and supervised results)
+		if taskResult, ok := result.(*task.Result); ok {
+			fmt.Printf("\n=== Task Result ===\n%s\n", taskResult.Output)
+			fmt.Printf("\nArtifact saved: %s\n", taskResult.ArtifactPath)
+		} else {
+			fmt.Printf("\n=== Task Result ===\n%+v\n", result)
+		}
 
 	default:
 		log.Fatalf("Unknown mode: %s", *mode)

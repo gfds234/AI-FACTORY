@@ -43,7 +43,7 @@ func NewManager(cfg *config.Config) *Manager {
 }
 
 // ExecuteTask routes and executes a task
-func (m *Manager) ExecuteTask(taskType, input string) (*Result, error) {
+func (m *Manager) ExecuteTask(taskType, input string) (interface{}, error) {
 	start := time.Now()
 	result := &Result{
 		TaskType:  taskType,

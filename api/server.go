@@ -51,7 +51,7 @@ Respond conversationally but with expertise. Keep answers focused and practical.
 
 // TaskManager interface for both standard and supervised managers
 type TaskManager interface {
-	ExecuteTask(taskType, input string) (*task.Result, error)
+	ExecuteTask(taskType, input string) (interface{}, error)
 	Ping() error
 	GetHistory(taskType string) []task.Result
 	GetClient() *llm.Client
@@ -182,14 +182,20 @@ func (s *Server) handleTask(w http.ResponseWriter, r *http.Request) {
 	// Execute task
 	log.Printf("Executing task: type=%s, input_length=%d", req.TaskType, len(req.Input))
 	result, err := s.taskMgr.ExecuteTask(req.TaskType, req.Input)
-	
+
 	if err != nil {
 		log.Printf("Task execution failed: %v", err)
 		s.respondError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("Task completed: duration=%.2fs, artifact=%s", result.Duration, result.ArtifactPath)
+	// Log completion (extract duration/artifact from base task.Result)
+	if taskResult, ok := result.(*task.Result); ok {
+		log.Printf("Task completed: duration=%.2fs, artifact=%s", taskResult.Duration, taskResult.ArtifactPath)
+	} else {
+		log.Printf("Task completed (supervisor mode)")
+	}
+
 	s.respondJSON(w, result)
 }
 
