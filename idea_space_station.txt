@@ -1,0 +1,13 @@
+A cooperative multiplayer game where players are members of a space station crew dealing with escalating system failures. Each player has a specialized role (engineer, medic, navigator, captain) and must coordinate to keep the station operational while uncovering a mystery about why systems are failing.
+
+The game features:
+- Asymmetric roles with unique abilities and responsibilities
+- Real-time crisis management requiring team coordination
+- Procedurally generated failure cascades for replayability
+- Story elements revealed through investigation during calm periods
+- Session length: 45-60 minutes
+
+Target platform: PC (Steam)
+Target audience: 18-35 year olds who enjoy cooperative games like Keep Talking and Nobody Explodes, FTL, or Among Us
+
+Technical scope: Unity, 2D top-down perspective, 4-player online multiplayer

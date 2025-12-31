@@ -1,0 +1,51 @@
+================================================================================
+                    AI STUDIO - MANAGER INTERFACE
+                         ** START HERE **
+================================================================================
+
+HOW TO USE (3 STEPS):
+
+  1. Double-click:  start-manager.bat
+
+  2. Wait for browser to open (shows web interface)
+
+  3. Type your game idea or architecture, click button, wait for results
+
+
+THAT'S IT. No terminal, no commands, no technical knowledge needed.
+
+================================================================================
+
+WHAT YOU GET:
+
+  ✓ Validate game ideas in 4-50 seconds
+  ✓ Review technical architectures
+  ✓ All results auto-saved to artifacts/ folder
+  ✓ Copy/paste friendly output
+
+
+FIRST TIME SETUP:
+
+  None. Just double-click start-manager.bat and go.
+
+
+IF SOMETHING BREAKS:
+
+  1. Read: README_MANAGER.md (troubleshooting section)
+  2. Or just restart: close everything, double-click start-manager.bat again
+
+
+DAILY WORKFLOW:
+
+  Morning:    Double-click start-manager.bat
+  All day:    Use web interface as needed
+  Evening:    Close terminal window
+  Anytime:    Check artifacts/ folder for saved results
+
+
+================================================================================
+
+                        You're ready to go!
+                   Double-click: start-manager.bat
+
+================================================================================

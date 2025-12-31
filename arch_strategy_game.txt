@@ -1,0 +1,61 @@
+# Turn-Based Strategy Game Architecture
+
+## Overview
+2D hex-grid turn-based strategy game inspired by XCOM and Into the Breach. Players control 3-4 units against AI opponents in tactical battles.
+
+## Technology Stack
+- **Engine:** Godot 4.2
+- **Language:** GDScript
+- **Platform:** PC (Windows/Linux), future mobile port
+- **Networking:** None (single-player only for MVP)
+
+## Core Systems
+
+### 1. Hex Grid System
+- Axial coordinate system for hex tiles
+- Grid stored as Dictionary<Vector2i, TileData>
+- Pathfinding using A* with movement cost per tile type
+- Line-of-sight using bresenham-style hex raycasting
+
+**Rationale:** Dictionary allows sparse grids, axial coords simplify math vs offset
+
+### 2. Turn Management
+- Finite state machine: PlayerTurn → AITurn → ResolutionPhase → NextTurn
+- Action queue system - all actions queued, then resolved simultaneously
+- Undo buffer stores game state snapshots for turn rewind feature
+
+**Concern:** Simultaneous resolution may cause unexpected interactions
+
+### 3. Unit System
+- Component-based: Unit = Stats + Abilities + StatusEffects
+- Abilities defined in JSON, loaded at runtime
+- Status effects applied through observer pattern
+
+**Rationale:** JSON definitions allow modding, observer pattern decouples systems
+
+### 4. AI Opponent
+- Utility-based AI scoring possible actions
+- Minimax with alpha-beta pruning for critical decisions
+- Difficulty scaling via scoring weights
+
+**Concern:** Minimax depth limited to 2-3 ply due to performance on low-end systems
+
+### 5. Save System
+- Full game state serialized to JSON
+- Autosave every turn
+- Cloud sync via Steam API (post-MVP)
+
+## Performance Targets
+- 60 FPS on GTX 1060 / equivalent
+- Turn processing < 500ms for AI
+- Load time < 3 seconds
+
+## Risk Areas
+1. Pathfinding performance with large grids (> 30x30)
+2. Save file size growth with many status effects
+3. AI decision time on complex board states
+
+## Questions
+- Is simultaneous action resolution necessary or should we use sequential?
+- Should we implement entity pooling for units/effects or rely on Godot's GC?
+- Mobile port implications for touch controls on hex grid?

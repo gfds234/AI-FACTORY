@@ -1,0 +1,37 @@
+# Binaries
+orchestrator
+orchestrator.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Runtime generated files
+config.json
+artifacts/
+
+# Go build cache
+*.test
+*.out
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code internal
+.claude/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
