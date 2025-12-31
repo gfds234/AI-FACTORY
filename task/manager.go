@@ -111,6 +111,8 @@ func (m *Manager) buildPrompt(taskType, input string) (string, error) {
 		return m.buildValidationPrompt(input), nil
 	case "review":
 		return m.buildReviewPrompt(input), nil
+	case "code":
+		return m.buildCodePrompt(input), nil
 	default:
 		return "", fmt.Errorf("unknown task type: %s", taskType)
 	}
@@ -148,32 +150,119 @@ Be direct and honest. Focus on actionable insights.`, input)
 
 // buildReviewPrompt creates prompt for architecture review
 func (m *Manager) buildReviewPrompt(input string) string {
-	return fmt.Sprintf(`You are a senior game architect. Review the following technical architecture and provide detailed feedback.
+	return fmt.Sprintf(`You are a senior software architect and technical reviewer. Review the following architecture, code, or technical proposal.
 
-Architecture Document:
+Document to Review:
 %s
 
 Provide your review in the following format:
 
-## Architecture Summary
-[1-2 sentence overview]
+## Summary
+[1-2 sentence overview of what's being reviewed]
 
-## Strengths
-- [List key architectural strengths]
+## Tech Stack Analysis
+- [Evaluate technology choices - are they appropriate?]
+- [Are there better alternatives for this use case?]
+- [Consider: performance, maintainability, ecosystem, learning curve]
+
+## Architecture Assessment
+- [Evaluate overall design and structure]
+- [Identify architectural strengths]
 
 ## Risk Assessment
-- [Identify technical risks, performance concerns, or scalability issues]
+- [Technical risks, performance concerns, scalability issues]
+- [Security considerations]
+- [Maintenance and long-term viability]
+
+## Code Quality (if applicable)
+- [Code structure, readability, best practices]
+- [Potential bugs or issues]
 
 ## Recommendations
-- [Specific improvements or alternatives]
+- [Specific improvements with rationale]
+- [Alternative approaches to consider]
 
-## Implementation Notes
-[Any important considerations for implementation]
+## Standards Compliance
+- [Does this meet production standards?]
+- [What needs to change before approval?]
 
 ## Verdict
-[Overall assessment: Approved, Needs Revision, or Major Concerns]
+[Overall assessment: Approved, Approved with Changes, Needs Revision, or Rejected]
 
-Be specific and technical. Focus on practical implications.`, input)
+Be specific and technical. Focus on practical implications and real-world viability.`, input)
+}
+
+// buildCodePrompt creates prompt for code generation with intelligent tech stack selection
+func (m *Manager) buildCodePrompt(input string) string {
+	return fmt.Sprintf(`You are an expert full-stack software architect with deep knowledge across multiple domains:
+
+**Game Development:**
+- Unity/C#, Godot/GDScript, Unreal/C++
+- 2D/3D engines, game mechanics, physics
+
+**Mobile Development:**
+- Flutter/Dart (cross-platform)
+- React Native, Swift (iOS), Kotlin (Android)
+
+**Web Development:**
+- React/TypeScript, Vue, Next.js
+- Node.js, Python FastAPI, Go backends
+
+**Desktop Applications:**
+- Electron, Python/Tkinter, C#/.NET, Rust
+
+**Backend Services:**
+- Go, Python, Node.js
+- REST APIs, databases, authentication
+
+Project Request:
+%s
+
+Your task:
+1. **Analyze the request** to determine:
+   - Project type (game, mobile app, web app, backend, desktop tool, etc.)
+   - Complexity level (prototype, MVP, production)
+   - Target platform(s)
+   - Key requirements
+
+2. **Select optimal tech stack:**
+   - Choose the BEST language and framework for this specific use case
+   - Prioritize: solo developer friendliness, modern ecosystem, cross-platform when beneficial
+   - Consider: performance needs, learning curve, maintenance
+
+3. **Generate production-quality code:**
+   - Follow best practices for chosen language
+   - Include comments explaining key decisions
+   - Structure code clearly and maintainably
+   - Include error handling where appropriate
+
+4. **Provide complete output in this format:**
+
+## Tech Stack Decision
+**Project Type:** [Game/Mobile/Web/Backend/Desktop/etc.]
+**Language:** [Chosen language]
+**Framework/Engine:** [Chosen framework]
+**Rationale:** [2-3 sentences explaining why this stack is optimal for this request]
+
+## Implementation
+
+` + "```" + `[language]
+[Your complete, production-quality code here]
+[Include comments explaining architecture and key decisions]
+` + "```" + `
+
+## Project Structure
+[Explain file/folder organization if this would be multi-file]
+
+## Setup Instructions
+1. [Step-by-step instructions to run this code]
+2. [Required dependencies/tools]
+3. [How to test/verify it works]
+
+## Next Steps
+[What to implement next to expand this project]
+
+Focus on practical, working code that a solo developer can immediately use and understand.`, input)
 }
 
 // saveArtifact saves the task result to a file

@@ -534,6 +534,7 @@
 
         <div class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('tasks')">Tasks</button>
+            <button class="tab-btn" onclick="switchTab('code')">Generate Code</button>
             <button class="tab-btn" onclick="switchTab('chat')">Chat</button>
             <button class="tab-btn" onclick="switchTab('history')">History</button>
         </div>
@@ -605,6 +606,54 @@ Example:
         </div>
         <!-- End Tasks Tab -->
 
+        <!-- Code Generation Tab -->
+        <div id="code-tab" class="tab-panel">
+            <div class="task-card" style="max-width: 900px; margin: 0 auto;">
+                <h2>Generate Code</h2>
+                <p>AI will analyze your request, choose the optimal tech stack (language/framework), and generate production-quality code.</p>
+                <p style="font-size: 14px; color: #888; margin-top: 10px;">
+                    <strong>Works for:</strong> Games • Mobile Apps • Web Apps • Backend APIs • Desktop Tools
+                </p>
+                <textarea id="codeInput" placeholder="Describe what you want to build...
+
+Examples:
+• A roguelike game where you play as a virus infecting a human body
+• Mobile app to track daily habits with charts and reminders
+• REST API for user authentication with JWT tokens
+• Desktop tool to batch resize and convert images
+• 2D platformer with wall-jumping mechanics
+
+The AI will choose the best language and framework for your specific needs." rows="8"></textarea>
+                <button onclick="submitTask('code')" id="codeBtn">Generate Code</button>
+                <div style="margin-top: 15px; padding: 12px; background: #2a2a2a; border-radius: 4px; font-size: 13px;">
+                    <strong>💡 Tip:</strong> After generation, use the "Review Architecture" task to evaluate the tech stack choices and code quality.
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="codeLoading" style="display: none;">
+                <div class="spinner"></div>
+                <div>Generating code... This may take 10-60 seconds for complex projects.</div>
+            </div>
+
+            <!-- Code Results Section -->
+            <div class="result-section" id="codeResults" style="display: none;">
+                <div class="result-header">
+                    <h2>Generated Code</h2>
+                    <div>
+                        <button onclick="copyCodeResults()" class="btn-secondary btn-small">Copy All</button>
+                        <button onclick="closeCodeResults()" class="btn-secondary btn-small">Close</button>
+                    </div>
+                </div>
+                <div class="result-meta">
+                    <div class="meta-item">Model: <span id="codeResultModel"></span></div>
+                    <div class="meta-item">Duration: <span id="codeResultDuration"></span>s</div>
+                </div>
+                <div class="result-content" id="codeResultContent"></div>
+            </div>
+        </div>
+        <!-- End Code Generation Tab -->
+
         <!-- Chat Tab -->
         <div id="chat-tab" class="tab-panel">
             <div class="chat-container">
@@ -635,6 +684,7 @@ Example:
                         <option value="all">All Tasks</option>
                         <option value="validate">Validate Only</option>
                         <option value="review">Review Only</option>
+                        <option value="code">Code Only</option>
                         <option value="chat">Chat Only</option>
                     </select>
                     <button onclick="exportHistory()">Export as Markdown</button>
@@ -672,8 +722,12 @@ Example:
 
         // Submit task
         async function submitTask(taskType) {
-            const inputId = taskType === 'validate' ? 'validateInput' : 'reviewInput';
-            const btnId = taskType === 'validate' ? 'validateBtn' : 'reviewBtn';
+            // Map task types to input/button IDs
+            const inputId = `${taskType}Input`;
+            const btnId = `${taskType}Btn`;
+            const loadingId = taskType === 'code' ? 'codeLoading' : 'loading';
+            const resultsId = taskType === 'code' ? 'codeResults' : 'results';
+
             const input = document.getElementById(inputId).value.trim();
 
             if (!input) {
@@ -683,14 +737,23 @@ Example:
 
             // Hide previous results and errors
             hideError();
-            document.getElementById('results').classList.remove('visible');
+            if (taskType === 'code') {
+                document.getElementById('codeResults').style.display = 'none';
+            } else {
+                document.getElementById('results').classList.remove('visible');
+            }
 
             // Show loading
-            document.getElementById('loading').classList.add('visible');
+            if (taskType === 'code') {
+                document.getElementById('codeLoading').style.display = 'flex';
+            } else {
+                document.getElementById('loading').classList.add('visible');
+            }
 
-            // Disable buttons
+            // Disable all task buttons
             document.getElementById('validateBtn').disabled = true;
             document.getElementById('reviewBtn').disabled = true;
+            document.getElementById('codeBtn').disabled = true;
 
             try {
                 const response = await fetch(`${API_URL}/task`, {
@@ -710,16 +773,38 @@ Example:
                 }
 
                 const result = await response.json();
-                displayResults(result);
+
+                // Display results based on task type
+                if (taskType === 'code') {
+                    displayCodeResults(result);
+                } else {
+                    displayResults(result);
+                }
 
             } catch (error) {
                 showError(`Error: ${error.message}`);
             } finally {
                 // Hide loading and re-enable buttons
-                document.getElementById('loading').classList.remove('visible');
+                if (taskType === 'code') {
+                    document.getElementById('codeLoading').style.display = 'none';
+                } else {
+                    document.getElementById('loading').classList.remove('visible');
+                }
                 document.getElementById('validateBtn').disabled = false;
                 document.getElementById('reviewBtn').disabled = false;
+                document.getElementById('codeBtn').disabled = false;
             }
+        }
+
+        // Display code generation results
+        function displayCodeResults(result) {
+            document.getElementById('codeResultModel').textContent = result.model;
+            document.getElementById('codeResultDuration').textContent = result.duration_seconds.toFixed(2);
+            document.getElementById('codeResultContent').textContent = result.output;
+            document.getElementById('codeResults').style.display = 'block';
+
+            // Scroll to results
+            document.getElementById('codeResults').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Display results
@@ -1002,6 +1087,16 @@ Example:
 
         // Initialize
         checkHealth();
+        // Code Generation Functions
+        function copyCodeResults() {
+            const content = document.getElementById('codeResultContent').innerText;
+            navigator.clipboard.writeText(content);
+        }
+
+        function closeCodeResults() {
+            document.getElementById('codeResults').style.display = 'none';
+        }
+
         setInterval(checkHealth, 30000); // Check every 30 seconds
 
         // Chat keyboard shortcuts
