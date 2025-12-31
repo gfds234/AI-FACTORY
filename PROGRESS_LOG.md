@@ -1,8 +1,8 @@
 # AI Studio - Progress Log
 
 **Project Start:** 2025-12-31
-**Last Updated:** 2025-12-31 05:35:00
-**Current Phase:** Phase 1 Complete + Web UI ✓ - FULLY OPERATIONAL
+**Last Updated:** 2025-12-31 06:30:00
+**Current Phase:** Phase 1 + Chat & History ✓ - FULLY OPERATIONAL
 
 ---
 
@@ -19,6 +19,7 @@
 ### Task Types Implemented
 - [x] `validate` - Game idea validation (Mistral 7B)
 - [x] `review` - Architecture review (Llama3 8B)
+- [x] `chat` - Conversational brainstorming (Mistral 7B with context)
 - [ ] `code` - Code generation (DeepSeek Coder) - PHASE 2
 
 ### Testing Results
@@ -31,14 +32,34 @@
 - [x] All 3 models confirmed available
 - [x] Web UI created and tested
 
-### Manager Interface (Added 2025-12-31 05:10)
-- [x] Single-page web UI (web/index.html)
+### Manager Interface (Enhanced 2025-12-31 06:30)
+- [x] Tabbed web UI (Tasks / Chat / History)
 - [x] One-click launcher (start-manager.bat)
 - [x] Manager quick-start guide (README_MANAGER.md)
 - [x] Real-time server status indicator
-- [x] Both task types accessible via UI
+- [x] All task types accessible via UI
 - [x] Results display with copy functionality
 - [x] No terminal required for daily use
+
+### Chat Feature (Added 2025-12-31 06:30)
+- [x] Conversational brainstorming interface
+- [x] Context continuity across messages (Ollama context array)
+- [x] User/AI message distinction (cyan/gray)
+- [x] Typing indicator animation
+- [x] "New Conversation" reset button
+- [x] Keyboard shortcuts (Enter to send, Shift+Enter for newline)
+- [x] Auto-save conversations with 6+ messages as artifacts
+- [ ] Enhanced prompts for better game design insights - TODO
+
+### Task History (Added 2025-12-31 06:30)
+- [x] In-memory storage (last 20 tasks)
+- [x] Thread-safe with sync.RWMutex
+- [x] Ring buffer pattern (oldest auto-removed)
+- [x] Filter by task type (All / Validate / Review / Chat)
+- [x] Expandable task items (show full input/output)
+- [x] Re-run button for quick retry
+- [x] Export history as markdown
+- [x] Real-time updates as tasks execute
 
 ### Performance Metrics
 - **First request:** ~50 seconds (model loading)
@@ -95,7 +116,11 @@ curl -X POST http://localhost:8080/task \
 **Endpoints Available:**
 - `GET /health` - Check if Ollama is accessible
 - `POST /task` - Execute a task (validate or review)
-- `GET /` - API info
+- `POST /chat` - Conversational brainstorming with context
+- `GET /history` - Retrieve task history (last 20 tasks)
+- `GET /export` - Download history as markdown
+- `GET /api` - API info
+- `GET /` - Web UI
 
 ### Files & Directories
 
@@ -186,6 +211,25 @@ AI FACTORY/
 ---
 
 ## Change Log
+
+### 2025-12-31 06:30:00
+- **FEATURE:** Implemented conversational chat with context continuity
+- **FEATURE:** Added task history tracking (in-memory, last 20 tasks)
+- **FEATURE:** Created tabbed UI (Tasks / Chat / History)
+- **FEATURE:** Added history filtering and re-run functionality
+- **FEATURE:** Implemented markdown export for task history
+- **BACKEND:** Added `GenerateWithContext()` method to LLM client
+- **BACKEND:** Added conversation storage with thread-safe access
+- **BACKEND:** Added `/chat`, `/history`, `/export` endpoints
+- **FRONTEND:** Enhanced web UI with 3 tabs (from ~460 to ~1020 lines)
+- **FRONTEND:** Added chat interface with typing indicators
+- **FRONTEND:** Added history UI with expand/collapse
+- **BUILD:** Rebuilt orchestrator (9.2 MB) with all new features
+- **TEST:** Verified chat works with context continuity
+- **TEST:** Verified history tracks tasks correctly
+- **TEST:** Verified export downloads markdown file
+- **STATUS:** ✓ All features operational and tested
+- **TODO:** Fine-tune chat prompts for better game design insights
 
 ### 2025-12-31 05:50:00
 - **GITHUB:** Successfully pushed to https://github.com/gfds234/AI-FACTORY

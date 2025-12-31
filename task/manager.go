@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"ai-studio/orchestrator/config"
@@ -12,8 +13,11 @@ import (
 
 // Manager handles task execution and routing
 type Manager struct {
-	cfg    *config.Config
-	client *llm.Client
+	cfg        *config.Config
+	client     *llm.Client
+	history    []Result
+	historyMux sync.RWMutex
+	maxHistory int
 }
 
 // Result represents the output of a task execution
@@ -31,8 +35,10 @@ type Result struct {
 // NewManager creates a new task manager
 func NewManager(cfg *config.Config) *Manager {
 	return &Manager{
-		cfg:    cfg,
-		client: llm.NewClient(cfg.OllamaURL, cfg.Timeout),
+		cfg:        cfg,
+		client:     llm.NewClient(cfg.OllamaURL, cfg.Timeout),
+		history:    make([]Result, 0, 20),
+		maxHistory: 20,
 	}
 }
 
@@ -91,6 +97,9 @@ func (m *Manager) ExecuteTask(taskType, input string) (*Result, error) {
 	} else {
 		result.ArtifactPath = artifactPath
 	}
+
+	// Add to history
+	m.addToHistory(result)
 
 	return result, nil
 }
@@ -213,4 +222,36 @@ func (m *Manager) saveArtifact(result *Result) (string, error) {
 // Ping checks if the LLM backend is accessible
 func (m *Manager) Ping() error {
 	return m.client.Ping()
+}
+
+// addToHistory adds a task result to the history (ring buffer)
+func (m *Manager) addToHistory(result *Result) {
+	m.historyMux.Lock()
+	defer m.historyMux.Unlock()
+
+	m.history = append(m.history, *result)
+	if len(m.history) > m.maxHistory {
+		m.history = m.history[1:] // Remove oldest
+	}
+}
+
+// GetHistory returns task history, optionally filtered by task type
+func (m *Manager) GetHistory(taskType string) []Result {
+	m.historyMux.RLock()
+	defer m.historyMux.RUnlock()
+
+	// Return in reverse chronological order
+	results := make([]Result, 0, len(m.history))
+	for i := len(m.history) - 1; i >= 0; i-- {
+		result := m.history[i]
+		if taskType == "all" || result.TaskType == taskType {
+			results = append(results, result)
+		}
+	}
+	return results
+}
+
+// GetClient returns the LLM client (for chat functionality)
+func (m *Manager) GetClient() *llm.Client {
+	return m.client
 }

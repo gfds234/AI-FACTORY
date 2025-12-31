@@ -268,6 +268,259 @@
             padding: 6px 12px;
             font-size: 12px;
         }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #00d9ff;
+            border-bottom-color: #00d9ff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* History Tab */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .history-controls select {
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .history-item:hover {
+            border-color: #00d9ff;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-item-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #00d9ff;
+            color: #000;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .history-item-time {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .history-item-preview {
+            color: #ccc;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-expanded {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+            display: none;
+        }
+
+        .history-item.expanded .history-item-expanded {
+            display: block;
+        }
+
+        .history-item-expanded h4 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .history-item-expanded pre {
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        /* Chat UI */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-welcome {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .chat-message.assistant {
+            align-self: flex-start;
+        }
+
+        .chat-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .chat-message.user .chat-message-avatar {
+            background: #00d9ff;
+            color: #000;
+        }
+
+        .chat-message.assistant .chat-message-avatar {
+            background: #555;
+            color: #fff;
+        }
+
+        .chat-message-content {
+            background: #333;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .chat-message.user .chat-message-content {
+            background: #00d9ff;
+            color: #000;
+        }
+
+        .chat-message-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #444;
+        }
+
+        .chat-input-container textarea {
+            flex: 1;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .chat-input-container button {
+            padding: 12px 24px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            animation: blink 1.4s infinite;
+        }
     </style>
 </head>
 <body>
@@ -279,8 +532,16 @@
             </div>
         </header>
 
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('tasks')">Tasks</button>
+            <button class="tab-btn" onclick="switchTab('chat')">Chat</button>
+            <button class="tab-btn" onclick="switchTab('history')">History</button>
+        </div>
+
         <div class="error" id="error"></div>
 
+        <!-- Tasks Tab -->
+        <div id="tasks-tab" class="tab-panel active">
         <div class="main-grid">
             <!-- Validate Task -->
             <div class="task-card">
@@ -341,6 +602,50 @@ Example:
                 <div style="color: #666; font-size: 13px;">Check the artifacts folder for all saved results.</div>
             </div>
         </div>
+        </div>
+        <!-- End Tasks Tab -->
+
+        <!-- Chat Tab -->
+        <div id="chat-tab" class="tab-panel">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>Brainstorm with AI</h2>
+                    <button onclick="newConversation()" class="btn-secondary">New Conversation</button>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <div class="chat-welcome">
+                        <p>Start brainstorming your game ideas!</p>
+                        <p>The AI will remember context throughout the conversation.</p>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <textarea id="chatInput" placeholder="Type your message... (Shift+Enter for new line)" rows="3"></textarea>
+                    <button onclick="sendChatMessage()" id="chatSendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+        <!-- End Chat Tab -->
+
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-panel">
+            <div class="history-header">
+                <h2>Task History</h2>
+                <div class="history-controls">
+                    <select id="historyFilter" onchange="filterHistory()">
+                        <option value="all">All Tasks</option>
+                        <option value="validate">Validate Only</option>
+                        <option value="review">Review Only</option>
+                        <option value="chat">Chat Only</option>
+                    </select>
+                    <button onclick="exportHistory()">Export as Markdown</button>
+                </div>
+            </div>
+            <div id="history-list" class="history-list">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        <!-- End History Tab -->
+
     </div>
 
     <script>
@@ -454,9 +759,263 @@ Example:
             document.getElementById('error').classList.remove('visible');
         }
 
+        // Tab Management
+        let historyData = [];
+
+        function switchTab(tabName) {
+            // Hide all panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected panel
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Activate clicked button
+            event.target.classList.add('active');
+
+            // Load history if switching to history tab
+            if (tabName === 'history') {
+                loadHistory();
+            }
+        }
+
+        // History Management
+        async function loadHistory() {
+            try {
+                const filter = document.getElementById('historyFilter').value;
+                const response = await fetch(`${API_URL}/history?task_type=${filter}`);
+                historyData = await response.json();
+                renderHistory();
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                document.getElementById('history-list').innerHTML =
+                    '<p style="color: #ff6b6b; text-align: center; padding: 40px;">Failed to load history. Server may be offline.</p>';
+            }
+        }
+
+        function renderHistory() {
+            const listEl = document.getElementById('history-list');
+
+            if (!historyData || historyData.length === 0) {
+                listEl.innerHTML = '<p style="color: #888; text-align: center; padding: 40px;">No tasks in history yet. Run some tasks to see them here!</p>';
+                return;
+            }
+
+            listEl.innerHTML = historyData.map((task, index) => `
+                <div class="history-item" onclick="toggleHistoryItem(${index})">
+                    <div class="history-item-header">
+                        <span class="history-item-type">${task.task_type}</span>
+                        <span class="history-item-time">${formatTimestamp(task.timestamp)} • ${task.duration_seconds.toFixed(2)}s</span>
+                    </div>
+                    <div class="history-item-preview">${escapeHtml(task.input.substring(0, 100))}...</div>
+                    <div class="history-item-expanded">
+                        <h4>Input:</h4>
+                        <pre>${escapeHtml(task.input)}</pre>
+                        <h4>Output:</h4>
+                        <pre>${escapeHtml(task.output)}</pre>
+                        <button onclick="rerunTask(${index}, event)" class="btn-secondary">Re-run This Task</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleHistoryItem(index) {
+            const items = document.querySelectorAll('.history-item');
+            items[index].classList.toggle('expanded');
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function rerunTask(index, event) {
+            event.stopPropagation(); // Prevent collapsing
+
+            const task = historyData[index];
+
+            // Switch to tasks tab
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tasks-tab').classList.add('active');
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+
+            // Fill the appropriate textarea
+            if (task.task_type === 'validate') {
+                document.getElementById('validateInput').value = task.input;
+            } else if (task.task_type === 'review') {
+                document.getElementById('reviewInput').value = task.input;
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function exportHistory() {
+            try {
+                const response = await fetch(`${API_URL}/export`);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `history_${Date.now()}.md`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export history. Server may be offline.');
+            }
+        }
+
+        // Chat Management
+        let currentConversationId = null;
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Disable input
+            input.disabled = true;
+            document.getElementById('chatSendBtn').disabled = true;
+
+            // Add user message to UI
+            addChatMessage('user', message);
+
+            // Clear input
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversation_id: currentConversationId,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // Update conversation ID
+                currentConversationId = data.conversation_id;
+
+                // Remove typing indicator
+                removeTypingIndicator(typingId);
+
+                // Add AI response
+                addChatMessage('assistant', data.response);
+
+            } catch (error) {
+                console.error('Chat error:', error);
+                removeTypingIndicator(typingId);
+                addChatMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                document.getElementById('chatSendBtn').disabled = false;
+                input.focus();
+            }
+        }
+
+        function addChatMessage(role, content) {
+            const messagesDiv = document.getElementById('chat-messages');
+
+            // Remove welcome message if present
+            const welcome = messagesDiv.querySelector('.chat-welcome');
+            if (welcome) welcome.remove();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+
+            const avatar = role === 'user' ? 'M' : 'AI';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div class="chat-message-avatar">${avatar}</div>
+                <div>
+                    <div class="chat-message-content">${escapeHtml(content)}</div>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            const id = 'typing_' + Date.now();
+            typingDiv.id = id;
+            typingDiv.className = 'chat-message assistant';
+            typingDiv.innerHTML = `
+                <div class="chat-message-avatar">AI</div>
+                <div class="chat-message-content">
+                    <span class="typing-indicator">●●●</span>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function newConversation() {
+            if (currentConversationId && !confirm('Start a new conversation? Current context will be lost.')) {
+                return;
+            }
+
+            currentConversationId = null;
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML = `
+                <div class="chat-welcome">
+                    <p>Start brainstorming your game ideas!</p>
+                    <p>The AI will remember context throughout the conversation.</p>
+                </div>
+            `;
+        }
+
         // Initialize
         checkHealth();
         setInterval(checkHealth, 30000); // Check every 30 seconds
+
+        // Chat keyboard shortcuts
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendChatMessage();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
