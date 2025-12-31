@@ -45,6 +45,7 @@
 - ✓ **Cost Optimization** - Use free Ollama for 80% of tasks, Claude Code only for truly complex work
 - ✓ **Backward Compatible** - Disabled by default, zero breaking changes
 - ✓ **Granular Control** - Enable/disable individual gates and agents via config
+- ✓ **Web UI Visualization** - Beautiful UI showing complexity scores, agent outputs, execution route
 
 ### Performance
 - First request: 30-50 seconds (model loading)
