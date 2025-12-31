@@ -181,7 +181,7 @@ AI FACTORY/
 
 **Project Location:**
 - Local: `C:\Users\lampr\Desktop\Dev\Projects\AI FACTORY`
-- GitHub: See GITHUB_SETUP.md for instructions to create private repo
+- GitHub: https://github.com/gfds234/AI-FACTORY (private)
 
 ---
 
