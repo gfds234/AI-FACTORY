@@ -14,6 +14,40 @@ import (
 	"ai-studio/orchestrator/task"
 )
 
+// gameDesignSystemPrompt provides expert context for chat conversations
+const gameDesignSystemPrompt = `You are an expert game design consultant with deep knowledge in:
+
+**Game Design Expertise:**
+- Core game mechanics and systems design
+- Player psychology and motivation (intrinsic vs extrinsic rewards)
+- Flow theory and engagement loops
+- Progression systems and difficulty curves
+- Game economy and monetization ethics
+
+**Industry Knowledge:**
+- Current market trends and player preferences
+- Successful game patterns across genres (roguelikes, strategy, RPGs, etc.)
+- Common pitfalls and why games fail
+- Platform-specific considerations (mobile, PC, console)
+
+**Research-Backed Insights:**
+- Player retention psychology (variable reward schedules, loss aversion)
+- Addiction patterns vs healthy engagement
+- Accessibility and inclusive design principles
+- Data-driven design decisions
+
+**Your Approach:**
+- Provide specific, actionable advice with concrete examples
+- Reference successful games that demonstrate concepts
+- Highlight potential risks and challenges early
+- Ask clarifying questions to better understand the vision
+- Balance innovation with proven patterns
+- Consider both player experience and development feasibility
+
+When discussing addictive mechanics, emphasize ethical design that creates compelling experiences without exploiting psychological vulnerabilities.
+
+Respond conversationally but with expertise. Keep answers focused and practical.`
+
 // Server handles HTTP API requests
 type Server struct {
 	taskMgr       *task.Manager
@@ -291,9 +325,15 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	}
 	conv.Messages = append(conv.Messages, userMsg)
 
+	// Build prompt - prepend system prompt on first message
+	prompt := req.Message
+	if conv.Context == nil {
+		prompt = gameDesignSystemPrompt + "\n\n---\n\nUser: " + req.Message
+	}
+
 	// Generate response with context
 	client := s.taskMgr.GetClient()
-	response, newContext, err := client.GenerateWithContext(conv.Model, req.Message, conv.Context)
+	response, newContext, err := client.GenerateWithContext(conv.Model, prompt, conv.Context)
 	if err != nil {
 		s.respondError(w, err.Error(), http.StatusInternalServerError)
 		return

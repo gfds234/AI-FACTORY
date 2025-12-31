@@ -49,7 +49,7 @@
 - [x] "New Conversation" reset button
 - [x] Keyboard shortcuts (Enter to send, Shift+Enter for newline)
 - [x] Auto-save conversations with 6+ messages as artifacts
-- [ ] Enhanced prompts for better game design insights - TODO
+- [x] Enhanced prompts for better game design insights (expert system prompt)
 
 ### Task History (Added 2025-12-31 06:30)
 - [x] In-memory storage (last 20 tasks)
@@ -212,6 +212,18 @@ AI FACTORY/
 
 ## Change Log
 
+### 2025-12-31 06:40:00
+- **ENHANCEMENT:** Added expert game design system prompt to chat
+- **FEATURE:** Chat now provides research-backed game design insights
+- **FEATURE:** AI references specific games and proven design patterns
+- **FEATURE:** Ethical design guidance for engagement mechanics
+- **BACKEND:** Modified `handleChat()` to prepend system prompt on first message
+- **BACKEND:** System context maintained through Ollama context array
+- **TEST:** Verified enhanced responses provide expert-level advice
+- **TEST:** Confirmed context continuity with follow-up questions
+- **QUALITY:** Chat responses now include concrete examples and actionable mechanics
+- **STATUS:** ✓ Chat feature fully enhanced with game design expertise
+
 ### 2025-12-31 06:30:00
 - **FEATURE:** Implemented conversational chat with context continuity
 - **FEATURE:** Added task history tracking (in-memory, last 20 tasks)
@@ -228,7 +240,9 @@ AI FACTORY/
 - **TEST:** Verified chat works with context continuity
 - **TEST:** Verified history tracks tasks correctly
 - **TEST:** Verified export downloads markdown file
-- **STATUS:** ✓ All features operational and tested
+- **GITHUB:** Committed and pushed all changes (commit 35a5152)
+- **DOCS:** Updated PROGRESS_LOG.md and STATUS_SUMMARY.md
+- **STATUS:** ✓ All features operational, tested, and backed up
 - **TODO:** Fine-tune chat prompts for better game design insights
 
 ### 2025-12-31 05:50:00
