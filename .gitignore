@@ -9,6 +9,7 @@ orchestrator.exe
 # Runtime generated files
 config.json
 artifacts/
+projects/
 
 # Go build cache
 *.test
@@ -35,3 +36,4 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+nul
