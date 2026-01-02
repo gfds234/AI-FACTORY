@@ -1268,6 +1268,14 @@ The AI will choose the best language and framework for your specific needs." row
                     <button onclick="rejectPhase()" id="rejectPhaseBtn" class="btn-secondary" style="flex: 1; background: #4d1a1a; color: #ff6b6b;">Reject Phase</button>
                 </div>
 
+                <!-- Project Actions -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px;">
+                    <button onclick="viewArtifacts()" class="btn-secondary" style="flex: 1; background: #1a3a4d; color: #4a9eff;">📄 View Artifacts</button>
+                    <button onclick="viewTaskHistory()" class="btn-secondary" style="flex: 1; background: #3a1a4d; color: #a77bff;">📊 Task History</button>
+                    <button onclick="exportProject()" class="btn-secondary" style="flex: 1; background: #1a4d3a; color: #4aff7b;">📥 Export Report</button>
+                    <button onclick="deleteCurrentProject()" class="btn-secondary" style="background: #4d1a1a; color: #ff6b6b;">🗑 Delete</button>
+                </div>
+
                 <!-- Hand-off Ready Criteria -->
                 <div id="handoffCriteria" style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none;">
                     <h3 style="color: #4a9eff; margin-bottom: 15px;">Hand-Off Ready Criteria</h3>
@@ -1285,6 +1293,24 @@ The AI will choose the best language and framework for your specific needs." row
                             <span id="criteria-readme-status">❌</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Artifacts Viewer -->
+                <div id="artifactsViewer" style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #4a9eff; margin: 0;">Generated Artifacts</h3>
+                        <button onclick="closeArtifactsViewer()" class="btn-secondary" style="background: #4a5568;">Close</button>
+                    </div>
+                    <div id="artifactsList"></div>
+                </div>
+
+                <!-- Task History Viewer -->
+                <div id="taskHistoryViewer" style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #a77bff; margin: 0;">Task Execution History</h3>
+                        <button onclick="closeTaskHistoryViewer()" class="btn-secondary" style="background: #4a5568;">Close</button>
+                    </div>
+                    <div id="taskHistoryList"></div>
                 </div>
 
                 <!-- Phase Execution Log -->
@@ -2722,6 +2748,165 @@ Deliver code that is ready to run.`;
             } catch (error) {
                 console.error('Failed to load metrics:', error);
             }
+        }
+
+        async function viewArtifacts() {
+            if (!currentProjectID) return;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+                const artifactsList = document.getElementById('artifactsList');
+
+                if (!project.artifact_paths || project.artifact_paths.length === 0) {
+                    artifactsList.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">No artifacts generated yet</div>';
+                } else {
+                    let html = '<div style="display: grid; gap: 10px;">';
+                    for (const artifactPath of project.artifact_paths) {
+                        const fileName = artifactPath.split(/[\\\/]/).pop();
+                        html += `
+                            <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span style="color: #4a9eff; font-weight: 600;">${fileName}</span>
+                                    <button onclick="viewArtifactContent('${artifactPath}')" class="btn-secondary" style="font-size: 12px; padding: 5px 10px;">View Content</button>
+                                </div>
+                                <div style="color: #888; font-size: 12px;">${artifactPath}</div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    artifactsList.innerHTML = html;
+                }
+
+                document.getElementById('artifactsViewer').style.display = 'block';
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        async function viewArtifactContent(path) {
+            try {
+                const response = await fetch(`${API_URL}/artifact/view?path=${encodeURIComponent(path)}`);
+                if (!response.ok) throw new Error('Failed to load artifact');
+
+                const data = await response.json();
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.9); z-index: 10000;
+                    display: flex; align-items: center; justify-content: center;
+                    padding: 20px;
+                `;
+                modal.innerHTML = `
+                    <div style="background: #1a1a1a; width: 90%; max-width: 1200px; max-height: 90vh; border-radius: 8px; display: flex; flex-direction: column;">
+                        <div style="padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; color: #4a9eff;">${path.split(/[\\\/]/).pop()}</h3>
+                            <button onclick="this.closest('div').parentElement.parentElement.remove()" class="btn-secondary">Close</button>
+                        </div>
+                        <div style="flex: 1; overflow: auto; padding: 20px;">
+                            <pre style="margin: 0; white-space: pre-wrap; font-family: Consolas, monospace; font-size: 13px; line-height: 1.5;">${escapeHtml(data.content)}</pre>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.remove();
+                });
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function closeArtifactsViewer() {
+            document.getElementById('artifactsViewer').style.display = 'none';
+        }
+
+        async function viewTaskHistory() {
+            if (!currentProjectID) return;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+                const taskHistoryList = document.getElementById('taskHistoryList');
+
+                if (!project.tasks || project.tasks.length === 0) {
+                    taskHistoryList.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">No task executions yet</div>';
+                } else {
+                    let html = '<div style="display: grid; gap: 15px;">';
+                    project.tasks.forEach((task, index) => {
+                        html += `
+                            <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; border-left: 3px solid #a77bff;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span style="color: #a77bff; font-weight: 600;">Task #${index + 1}: ${task.task_type.toUpperCase()}</span>
+                                    <span style="color: #888; font-size: 12px;">${new Date(task.created_at).toLocaleString()}</span>
+                                </div>
+                                <div style="color: #ccc; font-size: 14px; margin-bottom: 5px;">
+                                    <strong>Phase:</strong> ${task.phase} |
+                                    <strong>Complexity:</strong> ${task.complexity_score}/10 |
+                                    <strong>Route:</strong> ${task.execution_route}
+                                </div>
+                                ${task.artifact_path ? `<div style="color: #888; font-size: 12px; margin-top: 5px;">📄 ${task.artifact_path}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    taskHistoryList.innerHTML = html;
+                }
+
+                document.getElementById('taskHistoryViewer').style.display = 'block';
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function closeTaskHistoryViewer() {
+            document.getElementById('taskHistoryViewer').style.display = 'none';
+        }
+
+        async function exportProject() {
+            if (!currentProjectID) return;
+
+            try {
+                showToast('📥 Generating report...', 'info');
+                window.open(`${API_URL}/project/export?id=${currentProjectID}`, '_blank');
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteCurrentProject() {
+            if (!currentProjectID) return;
+
+            const project = await fetch(`${API_URL}/project?id=${currentProjectID}`).then(r => r.json());
+
+            if (!confirm(`Are you sure you want to delete project "${project.name}"? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/project/delete?id=${currentProjectID}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete project');
+
+                showToast('✅ Project deleted successfully', 'success');
+                closeDashboard();
+                loadProjectsList();
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function showToast(message, type) {

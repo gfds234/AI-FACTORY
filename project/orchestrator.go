@@ -477,3 +477,8 @@ func (po *ProjectOrchestrator) GetHistory(taskType string) []task.Result {
 func (po *ProjectOrchestrator) GetClient() *llm.Client {
 	return po.supervisedMgr.GetClient()
 }
+
+// DeleteProject deletes a project
+func (po *ProjectOrchestrator) DeleteProject(id string) error {
+	return po.projectMgr.DeleteProject(id)
+}

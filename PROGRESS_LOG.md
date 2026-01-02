@@ -591,3 +591,62 @@ AI FACTORY/
 - Model switching causes reload delay
 - Artifacts are human-readable markdown with full metadata
 - Config can be manually edited if needed (config.json)
+
+## Session: 2026-01-02 - Bug Fixes & Usability Improvements
+
+**Duration:** ~2 hours
+**Focus:** Fix blocking bugs, add usability features, comprehensive testing
+
+### Bugs Fixed
+1. **Stuck CodeGen Phase** - Manually edited project JSON (discovered corruption issue)
+2. **Corrupted JSON from Manual Edits** - Deleted broken file, improved Review phase error handling
+
+### Features Added
+1. **Artifact Viewer** (`/artifact/view` endpoint)
+   - View code in-browser with modal popup
+   - Path traversal security protection
+   - Files: api/server.go:927-959, web/index.html:2753-2810
+
+2. **Task History Viewer**
+   - Display all task executions with complexity/route info
+   - Files: web/index.html:2812-2858
+
+3. **Project Export** (`/project/export` endpoint)
+   - Generate comprehensive markdown reports
+   - Files: api/server.go:993-1095, web/index.html:2860-2869
+
+4. **Project Deletion** (`/project/delete` endpoint)
+   - Delete with confirmation dialog
+   - Files: api/server.go:961-991, web/index.html:2871-2891
+
+5. **Go Back to Previous Phase** (`/project/revert` endpoint)
+   - Revert to completed phases while preserving all data
+   - Files: project/orchestrator.go:329-390, project/project.go:130-158, web/index.html:2654-2751
+
+### Testing Results
+- All 5 features tested and working
+- Export: 265-line report generated
+- Delete: "Todo API" project removed successfully
+- Revert: "Test Game Project" complete→qa successful
+- Artifact viewer: 4,673-byte file retrieved
+- Response times: 30-100ms across all endpoints
+
+### Documentation Created
+- TESTING_RESULTS.md - Comprehensive test report
+- SESSION_SUMMARY.md - Session overview
+
+### Known Issues
+- "The Great Escape" project corrupted from manual JSON editing (deleted)
+- Project Orchestrator requires Supervisor to be enabled
+
+### Files Modified
+- api/server.go
+- project/lead_agent.go
+- project/orchestrator.go
+- project/project.go
+- web/index.html
+
+### Next Steps
+- Create new test project to fully verify artifact/task history UI
+- Consider JSON schema validation for project files
+- Add startup logging for project loading status

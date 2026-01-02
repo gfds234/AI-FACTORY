@@ -131,6 +131,9 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/project/reject", s.handleProjectReject)
 	s.mux.HandleFunc("/project/revert", s.handleProjectRevert)
 	s.mux.HandleFunc("/project/metrics", s.handleProjectMetrics)
+	s.mux.HandleFunc("/project/delete", s.handleDeleteProject)
+	s.mux.HandleFunc("/project/export", s.handleExportProject)
+	s.mux.HandleFunc("/artifact/view", s.handleViewArtifact)
 
 	s.mux.HandleFunc("/", s.handleRoot)
 }
@@ -922,4 +925,174 @@ func (s *Server) handleProjectMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.respondJSON(w, metrics)
+}
+
+// handleViewArtifact serves artifact file content
+func (s *Server) handleViewArtifact(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		s.respondError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	artifactPath := r.URL.Query().Get("path")
+	if artifactPath == "" {
+		s.respondError(w, "Artifact path required", http.StatusBadRequest)
+		return
+	}
+
+	// Security: Prevent path traversal attacks
+	if strings.Contains(artifactPath, "..") || !strings.HasPrefix(artifactPath, "artifacts") {
+		s.respondError(w, "Invalid artifact path", http.StatusBadRequest)
+		return
+	}
+
+	// Read artifact file
+	content, err := os.ReadFile(artifactPath)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to read artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Return content as JSON with file info
+	s.respondJSON(w, map[string]interface{}{
+		"path":    artifactPath,
+		"content": string(content),
+		"size":    len(content),
+	})
+}
+
+// handleDeleteProject deletes a project
+func (s *Server) handleDeleteProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		s.respondError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	orchestrator, ok := s.taskMgr.(*project.ProjectOrchestrator)
+	if !ok {
+		s.respondError(w, "Project orchestrator not enabled", http.StatusNotImplemented)
+		return
+	}
+
+	projectID := r.URL.Query().Get("id")
+	if projectID == "" {
+		s.respondError(w, "Project ID required", http.StatusBadRequest)
+		return
+	}
+
+	// Delete project
+	err := orchestrator.DeleteProject(projectID)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to delete project: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	s.respondJSON(w, map[string]interface{}{
+		"success": true,
+		"message": "Project deleted successfully",
+	})
+}
+
+// handleExportProject exports project as markdown report
+func (s *Server) handleExportProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		s.respondError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	orchestrator, ok := s.taskMgr.(*project.ProjectOrchestrator)
+	if !ok {
+		s.respondError(w, "Project orchestrator not enabled", http.StatusNotImplemented)
+		return
+	}
+
+	projectID := r.URL.Query().Get("id")
+	if projectID == "" {
+		s.respondError(w, "Project ID required", http.StatusBadRequest)
+		return
+	}
+
+	// Get project
+	proj, err := orchestrator.GetProject(projectID)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to get project: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Generate markdown report
+	report := generateProjectReport(proj)
+
+	// Set headers for file download
+	w.Header().Set("Content-Type", "text/markdown")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s-report.md\"", strings.ReplaceAll(proj.Name, " ", "_")))
+	w.Write([]byte(report))
+}
+
+// generateProjectReport creates a markdown report for a project
+func generateProjectReport(proj *project.Project) string {
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf("# Project Report: %s\n\n", proj.Name))
+	sb.WriteString(fmt.Sprintf("**Project ID:** %s\n", proj.ID))
+	sb.WriteString(fmt.Sprintf("**Status:** %s\n", proj.Status))
+	sb.WriteString(fmt.Sprintf("**Current Phase:** %s\n", proj.CurrentPhase))
+	sb.WriteString(fmt.Sprintf("**Created:** %s\n", proj.CreatedAt.Format("2006-01-02 15:04:05")))
+	sb.WriteString(fmt.Sprintf("**Last Updated:** %s\n\n", proj.UpdatedAt.Format("2006-01-02 15:04:05")))
+
+	sb.WriteString("## Description\n\n")
+	sb.WriteString(proj.Description + "\n\n")
+
+	sb.WriteString("## Phase History\n\n")
+	for _, phase := range proj.Phases {
+		sb.WriteString(fmt.Sprintf("### %s Phase\n\n", strings.ToTitle(string(phase.Phase))))
+		sb.WriteString(fmt.Sprintf("- **Status:** %s\n", phase.Status))
+		sb.WriteString(fmt.Sprintf("- **Started:** %s\n", phase.StartedAt.Format("2006-01-02 15:04:05")))
+		if phase.CompletedAt != nil {
+			sb.WriteString(fmt.Sprintf("- **Completed:** %s\n", phase.CompletedAt.Format("2006-01-02 15:04:05")))
+		}
+		if phase.LeadAgentDecision != "" {
+			sb.WriteString(fmt.Sprintf("- **Decision:** %s\n", phase.LeadAgentDecision))
+		}
+		if phase.HumanApproval {
+			sb.WriteString("- **Human Approval:** ✓ Approved\n")
+		}
+		if phase.Notes != "" {
+			sb.WriteString(fmt.Sprintf("- **Notes:** %s\n", phase.Notes))
+		}
+		if len(phase.AgentOutputs) > 0 {
+			sb.WriteString("\n**Agent Outputs:**\n\n")
+			for agentName, output := range phase.AgentOutputs {
+				sb.WriteString(fmt.Sprintf("**%s:**\n```\n%s\n```\n\n", agentName, output))
+			}
+		}
+		sb.WriteString("\n")
+	}
+
+	if len(proj.Tasks) > 0 {
+		sb.WriteString("## Task Executions\n\n")
+		for i, task := range proj.Tasks {
+			sb.WriteString(fmt.Sprintf("### Task %d (%s)\n\n", i+1, task.TaskType))
+			sb.WriteString(fmt.Sprintf("- **Phase:** %s\n", task.Phase))
+			sb.WriteString(fmt.Sprintf("- **Complexity Score:** %d\n", task.ComplexityScore))
+			sb.WriteString(fmt.Sprintf("- **Execution Route:** %s\n", task.ExecutionRoute))
+			sb.WriteString(fmt.Sprintf("- **Created:** %s\n", task.CreatedAt.Format("2006-01-02 15:04:05")))
+			if task.ArtifactPath != "" {
+				sb.WriteString(fmt.Sprintf("- **Artifact:** %s\n", task.ArtifactPath))
+			}
+			sb.WriteString("\n")
+		}
+	}
+
+	if len(proj.ArtifactPaths) > 0 {
+		sb.WriteString("## Artifacts\n\n")
+		for _, path := range proj.ArtifactPaths {
+			sb.WriteString(fmt.Sprintf("- %s\n", path))
+		}
+		sb.WriteString("\n")
+	}
+
+	sb.WriteString("---\n\n")
+	sb.WriteString("*Generated by AI FACTORY Project Orchestrator*\n")
+
+	return sb.String()
 }

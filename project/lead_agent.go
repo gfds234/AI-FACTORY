@@ -202,11 +202,14 @@ func (la *LeadAgent) executeReviewPhase(project *Project) (*PhaseResult, error) 
 	log.Printf("Lead Agent: Executing Review phase for project %s", project.Name)
 
 	// Get the latest code artifact from project
+	var lastArtifact string
 	if len(project.ArtifactPaths) == 0 {
-		return nil, fmt.Errorf("no artifacts found for review")
+		log.Printf("Warning: No artifacts found for review phase, proceeding with requirements-only review")
+		lastArtifact = "" // Allow review without artifacts (useful for planning-only projects)
+	} else {
+		lastArtifact = project.ArtifactPaths[len(project.ArtifactPaths)-1]
+		log.Printf("Review Phase: Found %d artifact(s), reviewing: %s", len(project.ArtifactPaths), lastArtifact)
 	}
-
-	lastArtifact := project.ArtifactPaths[len(project.ArtifactPaths)-1]
 
 	context := map[string]interface{}{
 		"project_id":    project.ID,
