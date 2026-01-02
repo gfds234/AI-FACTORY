@@ -709,9 +709,264 @@
             color: #999;
             min-width: 60px;
         }
+
+        /* Discover Tab Styles */
+        .discover-phase {
+            display: none;
+        }
+
+        .discover-phase.active {
+            display: block;
+        }
+
+        .discover-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .discover-header h2 {
+            margin-bottom: 10px;
+        }
+
+        .discover-header p {
+            color: #999;
+        }
+
+        #discoverIdeaInput {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            background: #1e1e1e;
+            color: #fff;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .discover-progress {
+            background: #2a2a2a;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .discover-idea-summary {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .discover-idea-summary strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #0ea5e9;
+        }
+
+        .discover-idea-summary p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        .discover-question-card {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .discover-question-card h3 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        #questionAnswer {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            background: #1e1e1e;
+            color: #fff;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .verdict-card {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #333;
+        }
+
+        .verdict-card.verdict-GO {
+            border-color: #4ade80;
+            background: linear-gradient(135deg, #1e1e1e, #1e3a28);
+        }
+
+        .verdict-card.verdict-REFINE {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, #1e1e1e, #3a2f1e);
+        }
+
+        .verdict-card.verdict-PASS {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #1e1e1e, #3a1e1e);
+        }
+
+        .verdict-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .verdict-card h2 {
+            margin-bottom: 15px;
+        }
+
+        .verdict-card.verdict-GO h2 span {
+            color: #4ade80;
+        }
+
+        .verdict-card.verdict-REFINE h2 span {
+            color: #fbbf24;
+        }
+
+        .verdict-card.verdict-PASS h2 span {
+            color: #ff6b6b;
+        }
+
+        #verdictReasoning {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .verdict-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .discover-summary {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .discover-summary h3 {
+            margin-bottom: 15px;
+        }
+
+        #answersSummary {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .answer-item {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #0ea5e9;
+        }
+
+        .answer-item strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #0ea5e9;
+        }
+
+        .answer-item p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-hint {
+            margin-top: 10px;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-error {
+            background: #f44336;
+        }
+
+        .toast.fade-out {
+            animation: fadeOut 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(20px); }
+        }
     </style>
 </head>
 <body>
+    <!-- Code Generation Loading Overlay -->
+    <div id="codeLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="codeLoadingMessage">Generating code...</p>
+        <p class="loading-hint">This may take 10-30 seconds depending on complexity</p>
+    </div>
+
     <div class="container">
         <header>
             <h1>AI Studio - Manager Console</h1>
@@ -723,7 +978,9 @@
         <div class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('tasks')">Tasks</button>
             <button class="tab-btn" onclick="switchTab('code')">Generate Code</button>
+            <button class="tab-btn" onclick="switchTab('discover')">Discover</button>
             <button class="tab-btn" onclick="switchTab('chat')">Chat</button>
+            <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
             <button class="tab-btn" onclick="switchTab('history')">History</button>
         </div>
 
@@ -862,6 +1119,181 @@ The AI will choose the best language and framework for your specific needs." row
             </div>
         </div>
         <!-- End Chat Tab -->
+
+        <!-- Discover Tab -->
+        <div id="discover-tab" class="tab-panel">
+            <!-- Phase 1: Initial Input -->
+            <div id="discover-input-phase" class="discover-phase active">
+                <div class="discover-header">
+                    <h2>Discover & Validate Your Idea</h2>
+                    <p>Let's validate your product idea with 3 key questions to ensure you're ready to build.</p>
+                </div>
+                <textarea id="discoverIdeaInput" placeholder="Describe your product idea in detail..." rows="6"></textarea>
+                <button onclick="startDiscovery()" class="btn-primary">Start Discovery</button>
+            </div>
+
+            <!-- Phase 2: Answering Questions -->
+            <div id="discover-questions-phase" class="discover-phase">
+                <div class="discover-progress">
+                    Question <span id="questionNum">1</span> of 3
+                </div>
+                <div class="discover-idea-summary">
+                    <strong>Your Idea:</strong>
+                    <p id="ideaSummary"></p>
+                </div>
+                <div class="discover-question-card">
+                    <h3 id="currentQuestion"></h3>
+                    <textarea id="questionAnswer" placeholder="Your answer..." rows="5"></textarea>
+                    <button onclick="submitAnswer()" id="answerBtn" class="btn-primary">Next Question</button>
+                </div>
+            </div>
+
+            <!-- Phase 3: Verdict Display -->
+            <div id="discover-verdict-phase" class="discover-phase">
+                <div id="verdictCard" class="verdict-card">
+                    <div class="verdict-icon" id="verdictIcon"></div>
+                    <h2>Verdict: <span id="verdictText"></span></h2>
+                    <p id="verdictReasoning"></p>
+                </div>
+                <div class="verdict-actions">
+                    <button onclick="autoGenerateFromDiscovery()" id="codeGenBtn" class="btn-primary" style="display: none;">
+                        🚀 Start Building (Auto-Generate)
+                    </button>
+                    <button onclick="startNewDiscovery()" class="btn-secondary">
+                        Start New Discovery
+                    </button>
+                </div>
+                <div class="discover-summary">
+                    <h3>Your Answers:</h3>
+                    <div id="answersSummary"></div>
+                </div>
+            </div>
+
+            <!-- Discovery History Section -->
+            <div id="discover-history-section" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">
+                <div class="discover-history-header">
+                    <h3>📚 Discovery History</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="loadDiscoveryHistory()" class="btn-secondary">Refresh History</button>
+                        <button onclick="exportAllDiscoveries()" class="btn-secondary">Export All</button>
+                    </div>
+                </div>
+                <div id="discovery-history-list" style="margin-top: 20px;">
+                    <!-- Populated by JavaScript -->
+                    <p style="color: #999;">Loading history...</p>
+                </div>
+            </div>
+        </div>
+        <!-- End Discover Tab -->
+
+        <!-- Projects Tab -->
+        <div id="projects-tab" class="tab-panel">
+            <!-- Create New Project -->
+            <div class="task-card" style="max-width: 900px; margin: 0 auto 30px;">
+                <h2>Create New Project</h2>
+                <p>Start a new AI-guided project workflow from idea to hand-off ready completion.</p>
+                <input type="text" id="projectName" placeholder="Project name (e.g., '2D Roguelike Game')" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0; font-size: 14px;">
+                <textarea id="projectDescription" placeholder="Describe your project idea in detail..." rows="6"></textarea>
+                <button onclick="createProject()" id="createProjectBtn">Create Project</button>
+            </div>
+
+            <!-- Project List -->
+            <div class="task-card" style="max-width: 900px; margin: 0 auto;">
+                <div class="result-header" style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2>My Projects</h2>
+                    <button onclick="loadProjects()" class="btn-secondary btn-small">Refresh</button>
+                </div>
+                <div id="projectsList">
+                    <div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>
+                </div>
+            </div>
+
+            <!-- Project Dashboard (Hidden by default) -->
+            <div id="projectDashboard" class="task-card" style="max-width: 900px; margin: 30px auto; display: none;">
+                <div class="result-header" style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2 id="dashboardProjectName">Project Name</h2>
+                    <button onclick="closeDashboard()" class="btn-secondary btn-small">Close</button>
+                </div>
+
+                <!-- Project Status -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Current Phase</div>
+                        <div id="dashboardPhase" style="color: #4a9eff; font-size: 18px; font-weight: 600;">Discovery</div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Completion</div>
+                        <div id="dashboardCompletion" style="color: #4ade80; font-size: 18px; font-weight: 600;">10%</div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Status</div>
+                        <div id="dashboardStatus" style="color: #4ade80; font-size: 18px; font-weight: 600;">Active</div>
+                    </div>
+                </div>
+
+                <!-- Phase Progress -->
+                <div style="margin-bottom: 25px;">
+                    <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Phase Progress</div>
+                    <div style="display: flex; gap: 8px;">
+                        <div id="phase-discovery" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Discovery</div>
+                        <div id="phase-validation" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Validation</div>
+                        <div id="phase-planning" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Planning</div>
+                        <div id="phase-codegen" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">CodeGen</div>
+                        <div id="phase-review" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Review</div>
+                        <div id="phase-qa" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">QA</div>
+                        <div id="phase-docs" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Docs</div>
+                        <div id="phase-complete" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Complete</div>
+                    </div>
+                </div>
+
+                <!-- Lead Agent Recommendation -->
+                <div id="leadAgentRecommendation" style="background: #1a4d2e; border-left: 4px solid #4ade80; padding: 15px; border-radius: 4px; margin-bottom: 25px; display: none;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Lead Agent Recommendation</div>
+                    <div style="color: #888; font-size: 14px; margin-bottom: 8px;">
+                        <strong>Decision:</strong> <span id="agentDecision">PROCEED</span>
+                    </div>
+                    <div style="color: #ccc; font-size: 14px; margin-bottom: 8px;">
+                        <strong>Reasoning:</strong> <span id="agentReasoning">Analysis complete.</span>
+                    </div>
+                    <div style="color: #ccc; font-size: 14px;">
+                        <strong>Next Steps:</strong> <span id="agentNextSteps">Proceed to next phase.</span>
+                    </div>
+                </div>
+
+                <!-- Phase Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button onclick="executeCurrentPhase()" id="executePhaseBtn" style="flex: 1;">Execute Current Phase</button>
+                    <button onclick="showGoBackOptions()" id="goBackBtn" class="btn-secondary" style="padding: 10px 20px; background: #4a5568; color: white;">← Go Back</button>
+                    <button onclick="approvePhase()" id="approvePhaseBtn" class="btn-secondary" style="flex: 1; background: #1a4d2e; color: #4ade80;">Approve & Continue</button>
+                    <button onclick="rejectPhase()" id="rejectPhaseBtn" class="btn-secondary" style="flex: 1; background: #4d1a1a; color: #ff6b6b;">Reject Phase</button>
+                </div>
+
+                <!-- Hand-off Ready Criteria -->
+                <div id="handoffCriteria" style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none;">
+                    <h3 style="color: #4a9eff; margin-bottom: 15px;">Hand-Off Ready Criteria</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <div id="criteria-build" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>Runnable Build</span>
+                            <span id="criteria-build-status">❌</span>
+                        </div>
+                        <div id="criteria-tests" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>Tests Exist</span>
+                            <span id="criteria-tests-status">❌</span>
+                        </div>
+                        <div id="criteria-readme" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>README Documentation</span>
+                            <span id="criteria-readme-status">❌</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase Execution Log -->
+                <div id="phaseLog" style="margin-top: 25px; padding: 15px; background: #1a1a1a; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; display: none;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        <!-- End Projects Tab -->
 
         <!-- History Tab -->
         <div id="history-tab" class="tab-panel">
@@ -1072,7 +1504,7 @@ The AI will choose the best language and framework for your specific needs." row
 
         // Create individual agent card
         function createAgentCard(title, agentData, icon) {
-            const cardId = `agent-${title.toLowerCase().replace(' ', '-')}-${Date.now()}`;
+            const cardId = `agent-${title.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
             const statusClass = agentData.status === 'passed' ? 'status-passed' :
                                agentData.status === 'warning' ? 'status-warning' : 'status-failed';
 
@@ -1400,6 +1832,932 @@ The AI will choose the best language and framework for your specific needs." row
                     }
                 });
             }
+        });
+
+        // ============================================
+        // Discover Tab Functions
+        // ============================================
+
+        let currentDiscoverSession = null;
+        let currentDiscoverAnswers = [];
+
+        function startDiscovery() {
+            const ideaInput = document.getElementById('discoverIdeaInput');
+            const idea = ideaInput.value.trim();
+
+            if (!idea) {
+                showError('Please enter your product idea');
+                return;
+            }
+
+            // Start discovery session
+            fetch('/discover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'start',
+                    input: idea
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                // Store session data with enhanced fields from API
+                currentDiscoverSession = {
+                    id: data.discover_id,
+                    raw_idea: data.raw_idea || idea,
+                    idea_type: data.idea_type || 'General Application',
+                    questions: data.questions || []
+                };
+                currentDiscoverAnswers = [];
+
+                // Show idea summary
+                document.getElementById('ideaSummary').textContent = idea;
+
+                // Display first question
+                displayQuestion(data);
+
+                // Switch to questions phase
+                document.getElementById('discover-input-phase').classList.remove('active');
+                document.getElementById('discover-questions-phase').classList.add('active');
+            })
+            .catch(error => {
+                showError('Failed to start discovery: ' + error.message);
+            });
+        }
+
+        function displayQuestion(data) {
+            document.getElementById('questionNum').textContent = data.current_question;
+            document.getElementById('currentQuestion').textContent = data.question;
+            document.getElementById('questionAnswer').value = '';
+
+            // Update button text for last question
+            const answerBtn = document.getElementById('answerBtn');
+            if (data.current_question === 3) {
+                answerBtn.textContent = 'Get Verdict';
+            } else {
+                answerBtn.textContent = 'Next Question';
+            }
+        }
+
+        function submitAnswer() {
+            const answerInput = document.getElementById('questionAnswer');
+            const answer = answerInput.value.trim();
+
+            if (!answer) {
+                showError('Please provide an answer');
+                return;
+            }
+
+            // Store answer locally
+            currentDiscoverAnswers.push(answer);
+
+            // Send answer to server
+            fetch('/discover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    discover_id: currentDiscoverSession.id,
+                    action: 'answer',
+                    input: answer
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                // Check if complete
+                if (data.status === 'complete') {
+                    displayVerdict(data);
+                } else {
+                    // Display next question
+                    displayQuestion(data);
+                }
+            })
+            .catch(error => {
+                showError('Failed to submit answer: ' + error.message);
+            });
+        }
+
+        function displayVerdict(data) {
+            // Update session with verdict response data
+            if (currentDiscoverSession) {
+                currentDiscoverSession.idea_type = data.idea_type || currentDiscoverSession.idea_type;
+                currentDiscoverSession.questions = data.questions || currentDiscoverSession.questions;
+                currentDiscoverSession.raw_idea = data.raw_idea || currentDiscoverSession.raw_idea;
+                currentDiscoverSession.verdict = data.verdict;
+                currentDiscoverSession.reasoning = data.reasoning;
+            }
+
+            // Set verdict text and icon
+            const verdictIcon = document.getElementById('verdictIcon');
+            const verdictText = document.getElementById('verdictText');
+            const verdictReasoning = document.getElementById('verdictReasoning');
+            const verdictCard = document.getElementById('verdictCard');
+            const codeGenBtn = document.getElementById('codeGenBtn');
+
+            verdictText.textContent = data.verdict;
+            verdictReasoning.textContent = data.reasoning;
+
+            // Set icon based on verdict
+            if (data.verdict === 'GO') {
+                verdictIcon.textContent = '✅';
+                verdictCard.className = 'verdict-card verdict-GO';
+                codeGenBtn.style.display = 'inline-block';
+            } else if (data.verdict === 'REFINE') {
+                verdictIcon.textContent = '🔄';
+                verdictCard.className = 'verdict-card verdict-REFINE';
+                codeGenBtn.style.display = 'none';
+            } else {
+                verdictIcon.textContent = '❌';
+                verdictCard.className = 'verdict-card verdict-PASS';
+                codeGenBtn.style.display = 'none';
+            }
+
+            // Display answers summary with DYNAMIC questions from session
+            const answersSummary = document.getElementById('answersSummary');
+            const questions = currentDiscoverSession?.questions || [
+                'What makes it different from existing solutions?',
+                'Who is your target audience?',
+                'How would you monetize this?'
+            ];
+
+            answersSummary.innerHTML = currentDiscoverAnswers.map((answer, i) => `
+                <div class="answer-item">
+                    <strong>Q${i + 1}: ${questions[i]}</strong>
+                    <p>${answer}</p>
+                </div>
+            `).join('');
+
+            // Switch to verdict phase
+            document.getElementById('discover-questions-phase').classList.remove('active');
+            document.getElementById('discover-verdict-phase').classList.add('active');
+        }
+
+        function passToCodeGen() {
+            if (!currentDiscoverSession) {
+                return;
+            }
+
+            // Construct enriched prompt
+            const prompt = `${currentDiscoverSession.raw_idea}
+
+Target Audience: ${currentDiscoverAnswers[1]}
+Unique Features: ${currentDiscoverAnswers[0]}
+Monetization Strategy: ${currentDiscoverAnswers[2]}
+
+Generate a production-ready implementation with detailed architecture and setup instructions.`;
+
+            // Switch to Code tab and pre-fill
+            document.getElementById('codeInput').value = prompt;
+            switchTab('code');
+
+            // Reset discover tab
+            startNewDiscovery();
+        }
+
+        // Build enriched prompt with ALL discovery context (dynamic questions)
+        function buildEnrichedPrompt(session, answers) {
+            let prompt = `# Product Idea
+${session.raw_idea}
+
+# Category
+${session.idea_type || 'General Application'}
+
+# Validation Insights
+`;
+
+            // Dynamically include ALL Q&A pairs from discovery
+            for (let i = 0; i < session.questions.length; i++) {
+                prompt += `\n**${session.questions[i]}**\n${answers[i]}\n`;
+            }
+
+            prompt += `\n# Task
+Generate production-ready code implementation with:
+1. Optimal tech stack for a ${session.idea_type}
+2. Complete, commented source code following best practices
+3. Project structure and file organization
+4. Setup instructions with all dependencies
+5. Architecture documentation and next steps
+
+Deliver code that is ready to run.`;
+
+            return prompt;
+        }
+
+        // Auto-generate code from discovery session (seamless integration)
+        async function autoGenerateFromDiscovery() {
+            if (!currentDiscoverSession) {
+                showToast('❌ No discovery session found', 'error');
+                return;
+            }
+
+            // Build enriched prompt
+            const enrichedPrompt = buildEnrichedPrompt(currentDiscoverSession, currentDiscoverAnswers);
+
+            // Show confirmation
+            if (!confirm("🚀 Ready to generate code! This will use all your discovery insights. Continue?")) {
+                return;
+            }
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('codeLoading');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('visible');
+                document.getElementById('codeLoadingMessage').textContent = 'Generating code from your validated idea...';
+            }
+
+            try {
+                // Submit code generation task
+                const response = await fetch(`${API_URL}/task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_type: 'code',
+                        input: enrichedPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Hide loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('visible');
+                }
+
+                // Display code result
+                displayCodeResults(result);
+
+                // Switch to tasks tab to show result
+                switchTab('tasks');
+
+                // Show success toast
+                showToast('✅ Code generated successfully!');
+
+            } catch (error) {
+                // Hide loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('visible');
+                }
+                showToast('❌ Code generation failed: ' + error.message, 'error');
+                console.error('Code generation error:', error);
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function startNewDiscovery() {
+            // Reset all phases
+            document.getElementById('discover-verdict-phase').classList.remove('active');
+            document.getElementById('discover-questions-phase').classList.remove('active');
+            document.getElementById('discover-input-phase').classList.add('active');
+
+            // Clear inputs
+            document.getElementById('discoverIdeaInput').value = '';
+            document.getElementById('questionAnswer').value = '';
+
+            // Reset state
+            currentDiscoverSession = null;
+            currentDiscoverAnswers = [];
+        }
+
+        // ============================================
+        // Discovery History Functions
+        // ============================================
+
+        function loadDiscoveryHistory() {
+            fetch('/discover/history')
+                .then(res => res.json())
+                .then(data => {
+                    displayDiscoveryHistory(data.sessions || []);
+                })
+                .catch(error => {
+                    console.error('Failed to load history:', error);
+                    document.getElementById('discovery-history-list').innerHTML = '<p style="color: #ff6b6b;">Failed to load history</p>';
+                });
+        }
+
+        function displayDiscoveryHistory(sessions) {
+            const container = document.getElementById('discovery-history-list');
+
+            if (!sessions || sessions.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No discovery sessions yet. Complete a discovery to see it here!</p>';
+                return;
+            }
+
+            container.innerHTML = sessions.map(session => {
+                const date = new Date(session.created_at || session.CreatedAt);
+                const verdictClass = (session.verdict || '').toLowerCase();
+                const verdictBadge = session.verdict ? `<span class="verdict-badge verdict-${verdictClass}" style="
+                    display: inline-block; padding: 4px 12px; border-radius: 12px;
+                    font-size: 12px; font-weight: 600; text-transform: uppercase;
+                    ${verdictClass === 'go' ? 'background: #d4edda; color: #155724;' : ''}
+                    ${verdictClass === 'refine' ? 'background: #fff3cd; color: #856404;' : ''}
+                    ${verdictClass === 'pass' ? 'background: #f8d7da; color: #721c24;' : ''}
+                ">${session.verdict}</span>` : '<span style="color: #999;">In Progress</span>';
+
+                const categoryBadge = session.idea_type || session.IdeaType ? `<span style="
+                    display: inline-block; padding: 4px 8px; border-radius: 8px;
+                    background: #e3f2fd; color: #1976d2; font-size: 11px;
+                    font-weight: 600; text-transform: uppercase; margin-left: 8px;
+                ">${session.idea_type || session.IdeaType}</span>` : '';
+
+                return `
+                    <div class="history-item" style="
+                        border: 1px solid #e0e0e0; border-radius: 8px;
+                        padding: 16px; margin-bottom: 12px;
+                        background: white; transition: box-shadow 0.2s;
+                    " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                       onmouseout="this.style.boxShadow='none'">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                ${verdictBadge}
+                                ${categoryBadge}
+                            </div>
+                            <span style="color: #999; font-size: 13px;">${date.toLocaleDateString()}</span>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong style="font-size: 14px; color: #333;">${session.raw_idea || session.RawIdea || 'Untitled'}</strong>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="viewDiscoverySession('${session.id || session.ID}')" class="btn-secondary" style="font-size: 13px; padding: 6px 12px;">
+                                View Details
+                            </button>
+                            ${session.verdict === 'GO' || session.Verdict === 'GO' ? `
+                                <button onclick="useSessionForCodeGen('${session.id || session.ID}')" class="btn-primary" style="font-size: 13px; padding: 6px 12px;">
+                                    🚀 Use for Code Gen
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewDiscoverySession(sessionID) {
+            fetch(`/discover/session?discover_id=${sessionID}`)
+                .then(res => res.json())
+                .then(session => {
+                    showSessionDetailsModal(session);
+                })
+                .catch(error => {
+                    console.error('Failed to load session:', error);
+                    showToast('❌ Failed to load session details', 'error');
+                });
+        }
+
+        function showSessionDetailsModal(session) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.5); z-index: 1000;
+                display: flex; align-items: center; justify-content: center;
+                padding: 20px;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white; border-radius: 12px; padding: 30px;
+                max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            `;
+
+            const questions = session.questions || session.Questions || [];
+            const answers = session.answers || session.Answers || [];
+            const qaHTML = questions.map((q, i) => `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <strong style="color: #495057; font-size: 14px;">Q${i+1}: ${q}</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; line-height: 1.6;">${answers[i] || '<em>Not answered</em>'}</p>
+                </div>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <h2 style="margin-top: 0; color: #333;">Discovery Session Details</h2>
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <strong>Idea:</strong> ${session.raw_idea || session.RawIdea}
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <strong>Category:</strong> ${session.idea_type || session.IdeaType}
+                    &nbsp;|&nbsp;
+                    <strong>Verdict:</strong> ${session.verdict || session.Verdict}
+                </div>
+                <h3 style="margin-top: 25px;">Questions & Answers:</h3>
+                ${qaHTML}
+                ${session.reasoning || session.Reasoning ? `
+                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                        <strong>Reasoning:</strong>
+                        <p style="margin: 10px 0 0 0;">${session.reasoning || session.Reasoning}</p>
+                    </div>
+                ` : ''}
+                <button onclick="this.closest('[style*=\\'position: fixed\\']').remove()" class="btn-secondary" style="margin-top: 20px; width: 100%;">
+                    Close
+                </button>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function useSessionForCodeGen(sessionID) {
+            fetch(`/discover/session?discover_id=${sessionID}`)
+                .then(res => res.json())
+                .then(session => {
+                    const enrichedPrompt = buildEnrichedPrompt(session, session.answers || session.Answers || []);
+                    document.getElementById('codeInput').value = enrichedPrompt;
+                    switchTab('code');
+                    showToast('✅ Enriched prompt loaded from discovery session!', 'success');
+                })
+                .catch(error => {
+                    console.error('Failed to load session:', error);
+                    showToast('❌ Failed to load session', 'error');
+                });
+        }
+
+        function exportAllDiscoveries() {
+            fetch('/discover/history')
+                .then(res => res.json())
+                .then(data => {
+                    const markdown = generateDiscoveryReport(data.sessions || []);
+                    downloadMarkdown(markdown, 'all_discoveries.md');
+                    showToast('✅ Discovery history exported!', 'success');
+                })
+                .catch(error => {
+                    console.error('Failed to export:', error);
+                    showToast('❌ Export failed', 'error');
+                });
+        }
+
+        function generateDiscoveryReport(sessions) {
+            let md = '# Discovery Session History\n\n';
+            md += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
+
+            const byVerdict = {
+                GO: sessions.filter(s => (s.verdict || s.Verdict) === 'GO'),
+                REFINE: sessions.filter(s => (s.verdict || s.Verdict) === 'REFINE'),
+                PASS: sessions.filter(s => (s.verdict || s.Verdict) === 'PASS')
+            };
+
+            md += `**Summary:** ${sessions.length} total sessions\n`;
+            md += `- ✅ GO: ${byVerdict.GO.length}\n`;
+            md += `- 🔄 REFINE: ${byVerdict.REFINE.length}\n`;
+            md += `- ❌ PASS: ${byVerdict.PASS.length}\n\n`;
+            md += '---\n\n';
+
+            sessions.forEach((session, idx) => {
+                md += `## ${idx + 1}. ${session.raw_idea || session.RawIdea}\n\n`;
+                md += `**Category:** ${session.idea_type || session.IdeaType}\n`;
+                md += `**Verdict:** ${session.verdict || session.Verdict}\n`;
+                md += `**Date:** ${new Date(session.created_at || session.CreatedAt).toLocaleDateString()}\n\n`;
+
+                const questions = session.questions || session.Questions || [];
+                const answers = session.answers || session.Answers || [];
+                questions.forEach((q, i) => {
+                    md += `**Q${i+1}:** ${q}\n`;
+                    md += `**A:** ${answers[i] || 'Not answered'}\n\n`;
+                });
+
+                if (session.reasoning || session.Reasoning) {
+                    md += `**Reasoning:** ${session.reasoning || session.Reasoning}\n\n`;
+                }
+                md += '---\n\n';
+            });
+
+            return md;
+        }
+
+        function downloadMarkdown(content, filename) {
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Project Management Functions
+        let currentProjectID = null;
+
+        async function createProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+
+            if (!name || !description) {
+                alert('Please provide both project name and description');
+                return;
+            }
+
+            const btn = document.getElementById('createProjectBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            try {
+                const response = await fetch(`${API_URL}/project`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create project');
+                }
+
+                const project = await response.json();
+                document.getElementById('projectName').value = '';
+                document.getElementById('projectDescription').value = '';
+                showToast(`✅ Project "${project.name}" created successfully!`, 'success');
+                loadProjects();
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Project';
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_URL}/project/list`);
+                if (!response.ok) throw new Error('Project orchestrator not enabled');
+
+                const data = await response.json();
+                const projects = data.projects || [];
+
+                const listHTML = projects.length === 0
+                    ? '<div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>'
+                    : projects.map(p => `
+                        <div style="padding: 15px; background: #1a1a1a; border-radius: 4px; margin-bottom: 10px; cursor: pointer;" onclick="openProjectDashboard('${p.id}')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: #4a9eff; margin-bottom: 5px;">${p.name}</div>
+                                    <div style="font-size: 13px; color: #888;">Phase: ${p.current_phase} | Status: ${p.status}</div>
+                                </div>
+                                <div style="font-size: 18px; font-weight: 600; color: #4ade80;">${calculateCompletion(p)}%</div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                document.getElementById('projectsList').innerHTML = listHTML;
+            } catch (error) {
+                document.getElementById('projectsList').innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Project orchestrator not enabled. Set "enabled": true in config.json.</div>';
+            }
+        }
+
+        function calculateCompletion(project) {
+            const phaseWeights = {
+                discovery: 10,
+                validation: 10,
+                planning: 10,
+                codegen: 30,
+                review: 20,
+                qa: 10,
+                docs: 10
+            };
+
+            let total = 0;
+            (project.phases || []).forEach(phase => {
+                if (phase.status === 'complete') {
+                    total += phaseWeights[phase.phase] || 0;
+                }
+            });
+
+            return Math.round(total);
+        }
+
+        async function openProjectDashboard(projectID) {
+            currentProjectID = projectID;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${projectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+
+                document.getElementById('dashboardProjectName').textContent = project.name;
+                document.getElementById('dashboardPhase').textContent = project.current_phase;
+                document.getElementById('dashboardStatus').textContent = project.status;
+                document.getElementById('dashboardCompletion').textContent = `${calculateCompletion(project)}%`;
+
+                updatePhaseIndicators(project);
+                document.getElementById('projectDashboard').style.display = 'block';
+                document.getElementById('leadAgentRecommendation').style.display = 'none';
+                document.getElementById('phaseLog').style.display = 'none';
+
+                if (project.current_phase === 'qa') {
+                    loadProjectMetrics(projectID);
+                }
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function closeDashboard() {
+            document.getElementById('projectDashboard').style.display = 'none';
+            currentProjectID = null;
+        }
+
+        function updatePhaseIndicators(project) {
+            const phases = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const completedPhases = (project.phases || []).filter(p => p.status === 'complete').map(p => p.phase);
+
+            phases.forEach(phase => {
+                const el = document.getElementById(`phase-${phase}`);
+                if (!el) return;
+
+                if (completedPhases.includes(phase)) {
+                    el.style.background = '#1a4d2e';
+                    el.style.color = '#4ade80';
+                } else if (project.current_phase === phase) {
+                    el.style.background = '#1a3a4d';
+                    el.style.color = '#4a9eff';
+                } else {
+                    el.style.background = '#2a2a2a';
+                    el.style.color = '#888';
+                }
+            });
+        }
+
+        async function executeCurrentPhase() {
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('executePhaseBtn');
+            btn.disabled = true;
+            btn.textContent = 'Executing...';
+
+            const logDiv = document.getElementById('phaseLog');
+            logDiv.style.display = 'block';
+            logDiv.innerHTML = '<div style="color: #4a9eff;">⏳ Executing phase...</div>';
+
+            try {
+                const projectResponse = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                const project = await projectResponse.json();
+
+                const response = await fetch(`${API_URL}/project/phase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        phase: project.current_phase
+                    })
+                });
+
+                if (!response.ok) throw new Error('Phase execution failed');
+
+                const result = await response.json();
+
+                logDiv.innerHTML += `<div style="color: #4ade80;">✓ Phase executed successfully</div>`;
+                logDiv.innerHTML += `<div style="color: #ccc; margin-top: 10px;">Decision: ${result.decision}</div>`;
+                logDiv.innerHTML += `<div style="color: #ccc;">Reasoning: ${result.reasoning}</div>`;
+
+                document.getElementById('agentDecision').textContent = result.decision;
+                document.getElementById('agentReasoning').textContent = result.reasoning;
+                document.getElementById('agentNextSteps').textContent = result.next_steps;
+                document.getElementById('leadAgentRecommendation').style.display = 'block';
+
+                if (result.decision === 'PROCEED') {
+                    document.getElementById('approvePhaseBtn').disabled = false;
+                }
+
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                logDiv.innerHTML += `<div style="color: #ff6b6b;">❌ Error: ${error.message}</div>`;
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Execute Current Phase';
+            }
+        }
+
+        async function approvePhase() {
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('approvePhaseBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: currentProjectID })
+                });
+
+                if (!response.ok) throw new Error('Failed to approve phase');
+
+                showToast('✅ Phase approved and transitioned!', 'success');
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function rejectPhase() {
+            const reason = prompt('Reason for rejection:');
+            if (!reason) return;
+
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('rejectPhaseBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        reason: reason
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to reject phase');
+
+                showToast('❌ Phase rejected', 'error');
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function showGoBackOptions() {
+            if (!currentProject) {
+                alert('No project loaded');
+                return;
+            }
+
+            // Get list of completed phases before current
+            const phaseOrder = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const currentIdx = phaseOrder.indexOf(currentProject.current_phase);
+
+            if (currentIdx <= 0) {
+                alert('Already at the first phase - cannot go back');
+                return;
+            }
+
+            const availablePhases = [];
+            for (let i = 0; i < currentIdx; i++) {
+                const phaseName = phaseOrder[i];
+                // Check if this phase was completed
+                const phaseExec = currentProject.phases.find(p => p.phase === phaseName && p.status === 'complete');
+                if (phaseExec) {
+                    availablePhases.push({
+                        name: phaseName,
+                        label: capitalizePhase(phaseName),
+                        completedAt: phaseExec.completed_at
+                    });
+                }
+            }
+
+            if (availablePhases.length === 0) {
+                alert('No previous completed phases to go back to');
+                return;
+            }
+
+            // Show selection dialog
+            let options = availablePhases.map((p, idx) =>
+                `${idx + 1}. ${p.label} (completed ${new Date(p.completedAt).toLocaleString()})`
+            ).join('\n');
+
+            const selection = prompt(
+                `Select which phase to go back to:\n\n${options}\n\nEnter phase number (1-${availablePhases.length}):`,
+                availablePhases.length.toString()
+            );
+
+            if (!selection) return;
+
+            const selectedIdx = parseInt(selection) - 1;
+            if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= availablePhases.length) {
+                alert('Invalid selection');
+                return;
+            }
+
+            const targetPhase = availablePhases[selectedIdx].name;
+            const reason = prompt('Why are you going back? (optional note):', 'User requested revert');
+
+            if (reason !== null) {
+                goBackToPhase(targetPhase, reason || 'User requested revert');
+            }
+        }
+
+        async function goBackToPhase(targetPhase, reason) {
+            const btn = document.getElementById('goBackBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/revert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        target_phase: targetPhase,
+                        reason: reason
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to revert phase');
+                }
+
+                showToast(`✅ Reverted to ${capitalizePhase(targetPhase)} phase`, 'success');
+                setTimeout(() => openProjectDashboard(currentProjectID), 500);
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function capitalizePhase(phase) {
+            return phase.charAt(0).toUpperCase() + phase.slice(1);
+        }
+
+        async function loadProjectMetrics(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/metrics?project_id=${projectID}`);
+                if (!response.ok) return;
+
+                const metrics = await response.json();
+
+                document.getElementById('criteria-build-status').textContent = metrics.has_runnable_build ? '✅' : '❌';
+                document.getElementById('criteria-tests-status').textContent = metrics.has_tests ? '✅' : '❌';
+                document.getElementById('criteria-readme-status').textContent = metrics.has_readme ? '✅' : '❌';
+                document.getElementById('handoffCriteria').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load metrics:', error);
+            }
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#1a4d2e' : '#4d1a1a'};
+                color: ${type === 'success' ? '#4ade80' : '#ff6b6b'};
+                border-radius: 4px;
+                z-index: 10000;
+                font-weight: 600;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Load projects when switching to projects tab
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            originalSwitchTab(tabName);
+            if (tabName === 'projects') {
+                loadProjects();
+            }
+        };
+
+        // Load history when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit for server to be ready
+            setTimeout(loadDiscoveryHistory, 1000);
         });
     </script>
 </body>

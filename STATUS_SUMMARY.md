@@ -1,10 +1,13 @@
 # AI Studio - Status Summary
 
-**Date:** 2025-12-31
-**Status:** ✅ PHASE 3 OPERATIONAL - Supervisor System Tested & Running
+**Date:** 2026-01-01
+**Status:** ✅ PHASE 4 COMPLETE - Project Orchestrator with "Ollama Leads, Claude Escalates" Model
 **Phase 1 Review:** See PHASE_1_DELIVERY_REVIEW.md
 **Phase 2:** Code generation + Enhanced review system
 **Phase 3:** Multi-Agent Supervisor with Quality Gates + Smart Routing (TESTED ✓)
+**Phase 3.5:** Discovery System with History & Session Recovery (TESTED ✓)
+**Phase 4:** Project-Based Workflow Orchestrator with Lead Agent (NEW ✓)
+**Guide:** See PROJECT_ORCHESTRATOR_GUIDE.md for complete documentation
 **Next Session:** See NEXT_SESSION.md for setup instructions
 
 ---
@@ -18,10 +21,11 @@
 - ✓ One-click launcher (start-manager.bat)
 
 ### Task Types Available
-1. **Validate** - Game/app idea validation (Mistral 7B)
-2. **Generate Code** - AI auto-detects project type and generates code (DeepSeek Coder 6.7B)
-3. **Review** - Enhanced tech stack & architecture review (Llama3 8B)
-4. **Chat** - Expert consultant with research-backed insights (Mistral 7B)
+1. **Discover** - Interactive idea validation with category-specific questions + session history (Mistral 7B)
+2. **Validate** - Game/app idea validation (Mistral 7B)
+3. **Generate Code** - AI auto-detects project type and generates code (DeepSeek Coder 6.7B)
+4. **Review** - Enhanced tech stack & architecture review (Llama3 8B)
+5. **Chat** - Expert consultant with research-backed insights (Mistral 7B)
 
 ### Phase 1 Features (Morning Session)
 - ✓ **Expert Chat** - Game design consultant with research-backed insights
@@ -46,6 +50,32 @@
 - ✓ **Backward Compatible** - Disabled by default, zero breaking changes
 - ✓ **Granular Control** - Enable/disable individual gates and agents via config
 - ✓ **Web UI Visualization** - Beautiful UI showing complexity scores, agent outputs, execution route
+
+### Phase 3.5 Features (Discovery System Enhancements)
+- ✓ **Discovery History** - View all past discovery sessions with verdicts and category badges
+- ✓ **Session Recovery** - Full session data available via API endpoints
+- ✓ **Category-Specific Questions** - Dynamic question generation based on idea type (game, SaaS, mobile, etc.)
+- ✓ **Enhanced API Responses** - All discovery endpoints return complete session data
+- ✓ **Discovery Artifacts** - Auto-save completed sessions to markdown files
+- ✓ **Session Retrieval** - GET endpoints for history and individual sessions
+- ✓ **Export All Discoveries** - Download complete discovery history as formatted markdown
+- ✓ **Enriched Code Prompts** - Discovery context automatically feeds into code generation
+
+### Phase 4 Features (Project-Based Workflow Orchestrator - NEW!)
+- ✓ **Lead Agent Pattern** - Ollama llama3:8b coordinates project lifecycle (conservative, shipping-focused)
+- ✓ **8-Phase Workflow** - Discovery → Validation → Planning → CodeGen → Review → QA → Docs → Complete
+- ✓ **Human-in-the-Loop** - Approval required for critical phase transitions
+- ✓ **PROCEED/REFINE/BLOCK Decisions** - Lead Agent analyzes and recommends actions
+- ✓ **Hand-Off Ready Validation** - Automated checks: Runnable build + Tests + README
+- ✓ **Completion Percentage** - Real-time tracking from 0% → 100%
+- ✓ **Project Persistence** - JSON file storage in `./projects/` directory
+- ✓ **Specialist Agent Delegation** - Lead Agent routes to 6 specialist agents
+- ✓ **Cost Optimized** - Ollama leads (free), Claude escalates only when needed
+- ✓ **Projects Web UI Tab** - Create projects, execute phases, approve/reject, monitor progress
+- ✓ **Phase Progress Visualization** - Color-coded indicators (completed/current/pending)
+- ✓ **Completion Metrics Dashboard** - Hand-off criteria with ✅/❌ indicators
+- ✓ **Go Back to Previous Phase** - Revert to any completed phase while preserving all data
+- ✓ **Backward Compatible** - Disabled by default, zero breaking changes to existing features
 
 ### Performance
 - First request: 30-50 seconds (model loading)
@@ -83,7 +113,7 @@
 5. Tested full Generate → Review workflow
 6. Verified 4.4s code generation, 9.2s review times
 
-**Phase 3 (Multi-Agent Supervisor - Today):**
+**Phase 3 (Multi-Agent Supervisor):**
 1. Created supervisor orchestrator with wrapper pattern (zero breaking changes)
 2. Implemented 8-indicator complexity scoring algorithm (1-10 scale)
 3. Built 6 specialized agents (requirements, tech stack, scope, QA, testing, documentation)
@@ -95,7 +125,36 @@
 9. Tested backward compatibility and routing logic
 10. Verified production-ready deployment
 
-**Total Time:** ~13.5 hours total (~2.5h Phase 1 + ~3.5h Phase 1.5 + ~2.5h Phase 2 + ~5h Phase 3)
+**Phase 3.5 (Discovery System Enhancements):**
+1. Enhanced discovery API responses to include full session data
+2. Added GetAllSessions() method to DiscoverManager
+3. Implemented `/discover/history` endpoint (returns all sessions sorted by date)
+4. Implemented `/discover/session?discover_id=X` endpoint (retrieves single session)
+5. Created discovery history UI section in web interface
+6. Added JavaScript functions for history display, session viewing, and export
+7. Implemented "View Details" modal for full Q&A display
+8. Added "Use for Code Gen" button to load enriched prompts from discoveries
+9. Implemented "Export All" feature for markdown downloads
+10. Verified category-specific questions flow into code generation
+
+**Phase 4 (Project-Based Workflow Orchestrator - Today):**
+1. Created Project data model with 8-phase lifecycle tracking
+2. Implemented ProjectManager for JSON file persistence
+3. Built Lead Agent with PROCEED/REFINE/BLOCK decision framework
+4. Created CompletionValidator for hand-off ready checks (build/tests/README)
+5. Built ProjectOrchestrator wrapping SupervisedTaskManager
+6. Added 7 new API endpoints for project management
+7. Implemented phase execution logic with specialist agent delegation
+8. Added human approval gates for critical transitions
+9. Created completion percentage calculator with phase weights
+10. Built comprehensive Projects tab in web UI with dashboard
+11. Implemented phase progress visualization and metrics display
+12. Added agent getter methods to SupervisedTaskManager
+13. Extended configuration system with project_orchestrator section
+14. Tested build and compilation (successful)
+15. Created PROJECT_ORCHESTRATOR_GUIDE.md (comprehensive documentation)
+
+**Total Time:** ~21 hours total (~2.5h Phase 1 + ~3.5h Phase 1.5 + ~2.5h Phase 2 + ~5h Phase 3 + ~1.5h Phase 3.5 + ~6h Phase 4)
 
 ---
 
@@ -105,26 +164,43 @@
 
 **Daily Workflow:**
 1. Double-click `start-manager.bat`
-2. Browser opens to http://localhost:8080 with 4 tabs:
+2. Browser opens to http://localhost:8080 with 6 tabs:
+   - **Discover** - Interactive validation with category-specific questions + history
    - **Tasks** - Validate ideas
    - **Generate Code** - AI creates code with optimal tech stack
    - **Chat** - Brainstorm with expert AI
+   - **Projects** - **NEW!** Full project workflow from idea to hand-off ready
    - **History** - View, filter, re-run, export past tasks
-3. Describe what you want to build
-4. AI analyzes, chooses tech stack, generates code (4-60 seconds)
-5. Review the code/architecture in Review tab
-6. Results auto-saved to `artifacts/` folder
+3. Start with Discovery to validate your idea through guided questions
+4. View past discoveries in the Discovery History section
+5. Click "Use for Code Gen" to automatically load enriched prompts
+6. **OR** use **Projects tab** for guided workflow with Lead Agent
+7. AI analyzes, chooses tech stack, generates code (4-60 seconds)
+8. Review the code/architecture in Review tab
+9. Results auto-saved to `artifacts/` folder
 
 **Complete Workflow Example:**
-1. **Validate** your game idea → Get feedback
-2. **Generate Code** for a mechanic → Get working prototype
-3. **Review** the generated code → Evaluate tech choices
-4. **Chat** about improvements → Refine approach
+1. **Discover** your idea → Answer category-specific questions → Get GO/REFINE/PASS verdict
+2. **View History** → Browse past discoveries, click "Use for Code Gen" for GO verdicts
+3. **Generate Code** → Enriched prompt with discovery context → Get working prototype
+4. **Review** the generated code → Evaluate tech choices
+5. **Chat** about improvements → Refine approach
 
-**Task 1: Validate Ideas**
+**Task 0: Discover (Interactive Validation)**
+- Input: Product idea (game, app, SaaS, tool, etc.)
+- AI detects: Category (game, SaaS, mobile app, etc.)
+- AI generates: 3-4 category-specific validation questions
+- You answer: Each question about your idea
+- Output: GO/REFINE/PASS verdict + reasoning + full session saved
+- **New:** View all past discoveries with verdicts and category badges
+- **New:** Export all discoveries to markdown
+- **New:** "Use for Code Gen" button loads enriched prompts with full context
+- Use case: Structured idea validation with history tracking
+
+**Task 1: Validate Ideas (Quick Check)**
 - Input: Plain text concept (game, app, tool, etc.)
 - Output: Strengths, issues, market viability, recommendation, next steps
-- Use case: Quick sanity check on new concepts
+- Use case: Quick sanity check on new concepts (simpler than Discover)
 
 **Task 2: Generate Code**
 - Input: Description of what you want to build
@@ -157,16 +233,29 @@
 - **Cost Savings** - Use free AI for 80% of tasks
 - See [SUPERVISOR_GUIDE.md](SUPERVISOR_GUIDE.md) for complete documentation
 
+**Phase 4: Project Orchestrator (Optional - Disabled by Default)**
+- **Enable in config.json** - Set `project_orchestrator.enabled: true`
+- **Requires Supervisor** - Supervisor must be enabled as well
+- **8-Phase Workflow** - Discovery → Validation → Planning → CodeGen → Review → QA → Docs → Complete
+- **Lead Agent Coordination** - Ollama llama3:8b makes PROCEED/REFINE/BLOCK decisions
+- **Human Approval Required** - You control phase transitions
+- **Hand-Off Ready Validation** - Automated checks for runnable build + tests + README
+- **Cost-Optimized** - Free Ollama for coordination, Claude only for complex code
+- **Projects Web UI Tab** - Visual project dashboard with progress tracking
+- See [PROJECT_ORCHESTRATOR_GUIDE.md](PROJECT_ORCHESTRATOR_GUIDE.md) for complete documentation
+
 ---
 
-## What's NOT Done Yet (Phase 4+)
+## What's NOT Done Yet (Phase 5+)
 
 These are optional enhancements, not required for current operation:
 
-1. **Task Chaining / Workflows** (3-4 hours)
-   - Automated pipelines: Click "Full Analysis" → validate → code → review automatically
-   - Chain results together (validation feeds into code generation)
-   - Requires pipeline system and workflow UI
+1. **Project Orchestrator Testing** (Manual - 1-2 hours)
+   - Enable project orchestrator in config.json
+   - Create test project and run through full workflow
+   - Verify all 8 phases execute correctly
+   - Test approval/rejection workflows
+   - Validate hand-off criteria detection
 
 2. **WebSocket Streaming** (4-5 hours)
    - Real-time output instead of waiting for full response
