@@ -140,9 +140,15 @@ func (stm *SupervisedTaskManager) runQualityGates(taskType, input string, result
 		result.RequirementsAnalysis = reqOutput
 		result.AgentDurations["requirements"] = reqOutput.Duration
 
+		log.Printf("Requirements check result: %s", reqOutput.Status)
+		if reqOutput.Status == "warning" {
+			log.Printf("⚠️  Requirements need clarification - proceeding with warnings")
+		}
 		if reqOutput.Status == "failed" {
+			log.Printf("❌ Requirements incomplete - blocking execution")
 			return fmt.Errorf("requirements incomplete - cannot proceed")
 		}
+		log.Printf("✓ Requirements check passed")
 	}
 
 	// Gate 2: Tech stack approval (code tasks only)
@@ -155,9 +161,15 @@ func (stm *SupervisedTaskManager) runQualityGates(taskType, input string, result
 		result.TechStackApproval = tsOutput
 		result.AgentDurations["techstack"] = tsOutput.Duration
 
+		log.Printf("Tech stack approval result: %s", tsOutput.Status)
+		if tsOutput.Status == "warning" {
+			log.Printf("⚠️  Tech stack needs review - proceeding with warnings")
+		}
 		if tsOutput.Status == "failed" {
+			log.Printf("❌ Tech stack rejected - blocking execution")
 			return fmt.Errorf("tech stack rejected - cannot proceed")
 		}
+		log.Printf("✓ Tech stack approved")
 	}
 
 	// Gate 3: Scope validation
@@ -170,11 +182,18 @@ func (stm *SupervisedTaskManager) runQualityGates(taskType, input string, result
 		result.ScopeValidation = scopeOutput
 		result.AgentDurations["scope"] = scopeOutput.Duration
 
+		log.Printf("Scope validation result: %s", scopeOutput.Status)
+		if scopeOutput.Status == "warning" {
+			log.Printf("⚠️  Scope may be broad - proceeding with warnings")
+		}
 		if scopeOutput.Status == "failed" {
+			log.Printf("❌ Scope too broad - blocking execution")
 			return fmt.Errorf("scope too broad - break into smaller tasks")
 		}
+		log.Printf("✓ Scope validated")
 	}
 
+	log.Printf("✅ All quality gates passed")
 	return nil
 }
 
@@ -266,4 +285,34 @@ func (stm *SupervisedTaskManager) GetHistory(taskType string) []task.Result {
 // GetClient returns LLM client for chat
 func (stm *SupervisedTaskManager) GetClient() *llm.Client {
 	return stm.baseManager.GetClient()
+}
+
+// GetRequirementsAgent returns the requirements agent
+func (stm *SupervisedTaskManager) GetRequirementsAgent() *RequirementsAgent {
+	return stm.requirementsAgent
+}
+
+// GetTechStackAgent returns the tech stack agent
+func (stm *SupervisedTaskManager) GetTechStackAgent() *TechStackAgent {
+	return stm.techStackAgent
+}
+
+// GetScopeAgent returns the scope agent
+func (stm *SupervisedTaskManager) GetScopeAgent() *ScopeAgent {
+	return stm.scopeAgent
+}
+
+// GetQAAgent returns the QA agent
+func (stm *SupervisedTaskManager) GetQAAgent() *QAAgent {
+	return stm.qaAgent
+}
+
+// GetTestingAgent returns the testing agent
+func (stm *SupervisedTaskManager) GetTestingAgent() *TestingAgent {
+	return stm.testingAgent
+}
+
+// GetDocsAgent returns the documentation agent
+func (stm *SupervisedTaskManager) GetDocsAgent() *DocumentationAgent {
+	return stm.docsAgent
 }

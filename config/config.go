@@ -9,11 +9,21 @@ import (
 
 // Config holds the orchestrator configuration
 type Config struct {
-	OllamaURL    string            `json:"ollama_url"`
-	Models       map[string]string `json:"models"`        // task_type -> model_name
-	ArtifactsDir string            `json:"artifacts_dir"`
-	MaxRetries   int               `json:"max_retries"`
-	Timeout      int               `json:"timeout_seconds"`
+	OllamaURL            string                    `json:"ollama_url"`
+	Models               map[string]string         `json:"models"`        // task_type -> model_name
+	ArtifactsDir         string                    `json:"artifacts_dir"`
+	MaxRetries           int                       `json:"max_retries"`
+	Timeout              int                       `json:"timeout_seconds"`
+	ProjectOrchestrator  ProjectOrchestratorConfig `json:"project_orchestrator"`
+}
+
+// ProjectOrchestratorConfig holds project orchestrator configuration
+type ProjectOrchestratorConfig struct {
+	Enabled              bool   `json:"enabled"`
+	ProjectsDir          string `json:"projects_dir"`
+	AutoTransition       bool   `json:"auto_transition"`
+	RequireHumanApproval bool   `json:"require_human_approval"`
+	LeadAgentModel       string `json:"lead_agent_model"`
 }
 
 // Default configuration
@@ -28,6 +38,13 @@ func defaultConfig() *Config {
 		ArtifactsDir: "./artifacts",
 		MaxRetries:   2,
 		Timeout:      120, // 2 minutes per task
+		ProjectOrchestrator: ProjectOrchestratorConfig{
+			Enabled:              false,
+			ProjectsDir:          "./projects",
+			AutoTransition:       false,
+			RequireHumanApproval: true,
+			LeadAgentModel:       "llama3:8b",
+		},
 	}
 }
 

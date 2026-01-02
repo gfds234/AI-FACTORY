@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"ai-studio/orchestrator/api"
+	"ai-studio/orchestrator/project"
 	"ai-studio/orchestrator/supervisor"
 	"ai-studio/orchestrator/task"
 )
@@ -30,12 +31,36 @@ func main() {
 
 	// Wrap with supervisor if enabled
 	var taskMgr api.TaskManager
+	var supervisedMgr *supervisor.SupervisedTaskManager
+
 	if supervisorConfig.Enabled {
-		taskMgr = supervisor.NewSupervisedTaskManager(baseMgr, baseConfig, supervisorConfig)
+		supervisedMgr = supervisor.NewSupervisedTaskManager(baseMgr, baseConfig, supervisorConfig)
+		taskMgr = supervisedMgr
 		log.Printf("✓ Supervisor enabled (complexity threshold: %d)", supervisorConfig.ComplexityThreshold)
 	} else {
 		taskMgr = baseMgr
 		log.Printf("Supervisor disabled - using standard task manager")
+	}
+
+	// Wrap with ProjectOrchestrator if enabled
+	if baseConfig.ProjectOrchestrator.Enabled && supervisedMgr != nil {
+		orchestrator, err := project.NewProjectOrchestrator(
+			supervisedMgr,
+			baseConfig.ProjectOrchestrator.ProjectsDir,
+			baseConfig.ArtifactsDir,
+			baseMgr.GetClient(),
+			supervisedMgr.GetRequirementsAgent(),
+			supervisedMgr.GetTechStackAgent(),
+			supervisedMgr.GetScopeAgent(),
+			supervisedMgr.GetQAAgent(),
+			supervisedMgr.GetTestingAgent(),
+			supervisedMgr.GetDocsAgent(),
+		)
+		if err != nil {
+			log.Fatalf("Failed to create ProjectOrchestrator: %v", err)
+		}
+		taskMgr = orchestrator
+		log.Printf("✓ ProjectOrchestrator enabled (projects dir: %s)", baseConfig.ProjectOrchestrator.ProjectsDir)
 	}
 
 	switch *mode {
