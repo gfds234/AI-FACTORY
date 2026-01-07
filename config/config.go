@@ -51,22 +51,15 @@ func defaultConfig() *Config {
 // Load reads configuration from config.json or returns defaults
 func Load() (*Config, error) {
 	configPath := "config.json"
-	
+
 	// Check if config file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		// Create default config
 		cfg := defaultConfig()
-		
-		// Ensure artifacts directory exists
-		if err := os.MkdirAll(cfg.ArtifactsDir, 0755); err != nil {
-			return nil, fmt.Errorf("failed to create artifacts dir: %w", err)
-		}
-		
-		// Save default config
-		if err := Save(cfg, configPath); err != nil {
-			return nil, fmt.Errorf("failed to save default config: %w", err)
-		}
-		
+
+		// Apply environment variable overrides
+		applyEnvOverrides(cfg)
+
 		return cfg, nil
 	}
 
@@ -81,12 +74,29 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	// Ensure artifacts directory exists
-	if err := os.MkdirAll(cfg.ArtifactsDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create artifacts dir: %w", err)
-	}
+	// Apply environment variable overrides
+	applyEnvOverrides(&cfg)
 
 	return &cfg, nil
+}
+
+// applyEnvOverrides applies environment variable overrides to config
+func applyEnvOverrides(cfg *Config) {
+	if ollamaURL := os.Getenv("OLLAMA_BASE_URL"); ollamaURL != "" {
+		cfg.OllamaURL = ollamaURL
+	}
+
+	if projectsDir := os.Getenv("PROJECTS_DIR"); projectsDir != "" {
+		cfg.ProjectOrchestrator.ProjectsDir = projectsDir
+	}
+
+	if artifactsDir := os.Getenv("ARTIFACTS_DIR"); artifactsDir != "" {
+		cfg.ArtifactsDir = artifactsDir
+	}
+
+	// Ensure directories exist
+	os.MkdirAll(cfg.ArtifactsDir, 0755)
+	os.MkdirAll(cfg.ProjectOrchestrator.ProjectsDir, 0755)
 }
 
 // Save writes configuration to file

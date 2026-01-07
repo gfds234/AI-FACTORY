@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"ai-studio/orchestrator/api"
 	"ai-studio/orchestrator/project"
@@ -17,7 +18,16 @@ func main() {
 	mode := flag.String("mode", "server", "Run mode: server or cli")
 	taskType := flag.String("task", "", "Task type for CLI mode: validate or review")
 	input := flag.String("input", "", "Input file path for CLI mode")
-	port := flag.Int("port", 8080, "Server port")
+
+	// Use Railway PORT if available
+	defaultPort := 8080
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		if p, err := strconv.Atoi(envPort); err == nil {
+			defaultPort = p
+		}
+	}
+
+	port := flag.Int("port", defaultPort, "Server port")
 	flag.Parse()
 
 	// Load configuration with supervisor settings

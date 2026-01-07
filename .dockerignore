@@ -1,0 +1,8 @@
+.git
+.env
+*.exe
+artifacts/*
+projects/*
+test/
+*.md
+.vscode
