@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Game Studio - Simplified UX</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a9eff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== HERO INPUT SECTION ===== */
+        .hero-section {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4a9eff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-section .subtitle {
+            font-size: 18px;
+            color: #9ca3af;
+            margin-bottom: 40px;
+        }
+
+        .input-card {
+            background: rgba(42, 42, 58, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 158, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-label {
+            font-size: 16px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .idea-input {
+            width: 100%;
+            background: rgba(15, 15, 30, 0.8);
+            border: 2px solid rgba(74, 158, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: #e0e0e0;
+            font-size: 16px;
+            font-family: inherit;
+            min-height: 140px;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .idea-input:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+        }
+
+        .idea-input::placeholder {
+            color: #6b7280;
+        }
+
+        .primary-btn {
+            margin-top: 24px;
+            background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(74, 158, 255, 0.4);
+        }
+
+        .primary-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== ACTIVE PROJECTS SECTION ===== */
+        .projects-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .section-header {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .project-card {
+            background: rgba(42, 42, 58, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 158, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            border-color: rgba(74, 158, 255, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .project-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .project-status {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .secondary-btn {
+            background: rgba(74, 158, 255, 0.1);
+            border: 1px solid rgba(74, 158, 255, 0.3);
+            color: #4a9eff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(74, 158, 255, 0.2);
+        }
+
+        /* ===== VISUAL PIPELINE ===== */
+        .pipeline {
+            margin: 24px 0;
+        }
+
+        .pipeline-phases {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .phase {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase.completed {
+            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+        }
+
+        .phase.active {
+            background: linear-gradient(90deg, #4a9eff 0%, #357abd 100%);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .pipeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pipeline-status {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-top: 12px;
+        }
+
+        /* ===== AGENT ACTIVITY PANEL ===== */
+        .agents-panel {
+            margin-top: 24px;
+            background: rgba(15, 15, 30, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .agent-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .agent-row:last-child {
+            border-bottom: none;
+        }
+
+        .agent-icon {
+            font-size: 24px;
+        }
+
+        .agent-info {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+        }
+
+        .agent-status {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .agent-status.working {
+            color: #4a9eff;
+        }
+
+        .agent-status.complete {
+            color: #4ade80;
+        }
+
+        .agent-status.waiting {
+            color: #6b7280;
+        }
+
+        /* ===== APPROVAL GATE ===== */
+        .approval-gate {
+            background: rgba(234, 179, 8, 0.1);
+            border: 2px solid rgba(234, 179, 8, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .approval-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fbbf24;
+            margin-bottom: 16px;
+        }
+
+        .approval-content {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .approval-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .approval-recommendation {
+            font-size: 14px;
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid #4a9eff;
+            border-radius: 4px;
+        }
+
+        .approval-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .approve-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .approve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .modify-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modify-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+        }
+
+        /* ===== COMPLETED PROJECT ===== */
+        .project-card.completed {
+            border-color: rgba(74, 222, 128, 0.3);
+        }
+
+        .completion-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
+        }
+
+        /* ===== QUICK NAV ===== */
+        .quick-nav {
+            max-width: 1200px;
+            margin: 40px auto 60px;
+            padding: 0 40px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: rgba(42, 42, 58, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 158, 255, 0.2);
+            color: #9ca3af;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: rgba(74, 158, 255, 0.5);
+            color: #4a9eff;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .hero-section {
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 32px;
+            }
+
+            .projects-section {
+                padding: 0 20px;
+            }
+
+            .pipeline-labels {
+                font-size: 9px;
+            }
+
+            .quick-nav {
+                flex-wrap: wrap;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">
+            🎮 AI Game Studio
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>Ready</span>
+        </div>
+    </div>
+
+    <!-- HERO INPUT SECTION -->
+    <div class="hero-section">
+        <h1>Build Your Game with AI</h1>
+        <p class="subtitle">Describe your idea and watch AI turn it into working code</p>
+
+        <div class="input-card">
+            <div class="input-label">What do you want to build?</div>
+            <textarea
+                class="idea-input"
+                placeholder="A 2D roguelike dungeon crawler with procedural generation, turn-based combat, permadeath, and pixel art graphics. Players collect items and level up as they explore randomly generated dungeons..."
+                id="gameIdea"
+            ></textarea>
+            <button class="primary-btn" onclick="startBuilding()">
+                Start Building →
+            </button>
+        </div>
+    </div>
+
+    <!-- ACTIVE PROJECTS SECTION -->
+    <div class="projects-section">
+        <div class="section-header">
+            📁 Active Projects
+        </div>
+
+        <!-- EXAMPLE: In-Progress Project -->
+        <div class="project-card">
+            <div class="project-header">
+                <div>
+                    <div class="project-title">Roguelike Dungeon Crawler</div>
+                    <div class="project-status">Started 5 minutes ago</div>
+                </div>
+                <div class="project-actions">
+                    <button class="secondary-btn">View Details →</button>
+                </div>
+            </div>
+
+            <!-- Visual Pipeline -->
+            <div class="pipeline">
+                <div class="pipeline-phases">
+                    <div class="phase completed" title="Discover"></div>
+                    <div class="phase completed" title="Validate"></div>
+                    <div class="phase completed" title="Plan"></div>
+                    <div class="phase completed" title="Code"></div>
+                    <div class="phase active" title="Review"></div>
+                    <div class="phase" title="QA"></div>
+                    <div class="phase" title="Docs"></div>
+                    <div class="phase" title="Complete"></div>
+                </div>
+                <div class="pipeline-labels">
+                    <span>Discover</span>
+                    <span>Validate</span>
+                    <span>Plan</span>
+                    <span>Code</span>
+                    <span>Review</span>
+                    <span>QA</span>
+                    <span>Docs</span>
+                    <span>Done</span>
+                </div>
+                <div class="pipeline-status">
+                    Phase 5 of 8: AI reviewing code quality and generating tests...
+                </div>
+            </div>
+
+            <!-- Agent Activity Panel -->
+            <div class="agents-panel">
+                <div class="agent-row">
+                    <div class="agent-icon">🤖</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Lead Agent</div>
+                        <div class="agent-status complete">✓ Approved code generation (Decision: PROCEED)</div>
+                    </div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-icon">🔍</div>
+                    <div class="agent-info">
+                        <div class="agent-name">QA Agent</div>
+                        <div class="agent-status working">Analyzing code quality, security, and performance...</div>
+                    </div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-icon">🧪</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Testing Agent</div>
+                        <div class="agent-status waiting">Waiting for QA completion...</div>
+                    </div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-icon">📚</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Documentation Agent</div>
+                        <div class="agent-status waiting">Queued</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval Gate (conditionally shown) -->
+            <!-- This would appear when human approval is needed -->
+        </div>
+
+        <!-- EXAMPLE: Completed Project -->
+        <div class="project-card completed">
+            <div class="project-header">
+                <div>
+                    <div class="project-title">
+                        Tower Defense Game
+                        <span class="completion-badge">✅ 100% Complete</span>
+                    </div>
+                    <div class="project-status">Completed 2 hours ago • All criteria met</div>
+                </div>
+                <div class="project-actions">
+                    <button class="download-btn">Download Code</button>
+                    <button class="secondary-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Visual Pipeline (all completed) -->
+            <div class="pipeline">
+                <div class="pipeline-phases">
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                    <div class="phase completed"></div>
+                </div>
+                <div class="pipeline-status" style="color: #4ade80;">
+                    ✓ Runnable build • ✓ Tests included • ✓ Documentation complete
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE (shown when no projects) -->
+        <!-- <div class="empty-state">
+            <div class="empty-state-icon">🎮</div>
+            <div class="empty-state-text">No projects yet. Describe your game idea above to get started!</div>
+        </div> -->
+    </div>
+
+    <!-- QUICK NAV -->
+    <div class="quick-nav">
+        <button class="nav-btn">Recent Builds</button>
+        <button class="nav-btn">Agent Logs</button>
+        <button class="nav-btn">Templates</button>
+        <button class="nav-btn">Settings</button>
+    </div>
+
+    <script>
+        function startBuilding() {
+            const idea = document.getElementById('gameIdea').value;
+            if (!idea.trim()) {
+                alert('Please describe your game idea first!');
+                return;
+            }
+
+            // TODO: Connect to API
+            console.log('Starting project with idea:', idea);
+
+            // Create new project via API
+            fetch('/project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: idea.substring(0, 50) + '...',
+                    description: idea
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Project created:', data);
+                // Refresh project list or navigate to project view
+                location.reload();
+            })
+            .catch(err => {
+                console.error('Error creating project:', err);
+                alert('Failed to start project. Is the server running?');
+            });
+        }
+    </script>
+</body>
+</html>
