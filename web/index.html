@@ -1295,6 +1295,88 @@ The AI will choose the best language and framework for your specific needs." row
                     </div>
                 </div>
 
+                <!-- Triple Guarantee Quality Report -->
+                <div id="qualityReport" style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none; margin-top: 20px;">
+                    <h3 style="color: #4a9eff; margin-bottom: 15px;">🛡️ Triple Guarantee Quality Report</h3>
+
+                    <!-- Overall Score -->
+                    <div style="background: #1a1a1a; padding: 20px; border-radius: 4px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: bold; color: #4aff7b;" id="quality-score">--</div>
+                        <div style="color: #888; margin-top: 5px;">Quality Score</div>
+                        <div style="margin-top: 10px; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold;" id="quality-status"></div>
+                    </div>
+
+                    <!-- Build Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">🔨 Build Verification</h4>
+                            <span id="build-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Syntax Valid</span><span id="build-syntax">❓</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Dependencies OK</span><span id="build-deps">❓</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Entry Point Valid</span><span id="build-entry">❓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Runtime Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">🚀 Runtime Verification</h4>
+                            <span id="runtime-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Application Starts</span><span id="runtime-starts">❓</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Health Check</span><span id="runtime-health">❓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">✅ Test Verification</h4>
+                            <span id="test-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div id="test-results" style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Tests Passed</span><span id="test-passed">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Tests Failed</span><span id="test-failed">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Total Tests</span><span id="test-total">0</span>
+                            </div>
+                        </div>
+                        <div id="test-no-results" style="color: #888; padding: 20px; text-align: center; display: none;">
+                            No tests have been executed yet
+                        </div>
+                    </div>
+
+                    <!-- Documentation Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="color: #4a9eff; margin: 0;">📚 Documentation</h4>
+                            <span id="docs-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>README Complete</span><span id="docs-readme">❓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Artifacts Viewer -->
                 <div id="artifactsViewer" style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -2504,6 +2586,11 @@ Deliver code that is ready to run.`;
                 if (project.current_phase === 'qa') {
                     loadProjectMetrics(projectID);
                 }
+
+                // Load quality report if in QA phase or later
+                if (['qa', 'docs', 'complete'].includes(project.current_phase)) {
+                    loadQualityReport(projectID);
+                }
             } catch (error) {
                 showToast(`❌ Error: ${error.message}`, 'error');
             }
@@ -2747,6 +2834,69 @@ Deliver code that is ready to run.`;
                 document.getElementById('handoffCriteria').style.display = 'block';
             } catch (error) {
                 console.error('Failed to load metrics:', error);
+            }
+        }
+
+        async function loadQualityReport(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/quality?project_id=${projectID}`);
+                if (!response.ok) return;
+                const qr = await response.json();
+
+                // Overall score and status
+                document.getElementById('quality-score').textContent = qr.OverallScore + '/100';
+                const statusBadge = document.getElementById('quality-status');
+                if (qr.Status === 'READY') {
+                    statusBadge.textContent = '✅ READY FOR DELIVERY';
+                    statusBadge.style.background = '#1a4d2e';
+                    statusBadge.style.color = '#4ade80';
+                    document.getElementById('quality-score').style.color = '#4ade80';
+                } else if (qr.Status === 'NEEDS_WORK') {
+                    statusBadge.textContent = '⚠️ NEEDS WORK';
+                    statusBadge.style.background = '#4d3a1a';
+                    statusBadge.style.color = '#ffbb33';
+                    document.getElementById('quality-score').style.color = '#ffbb33';
+                } else {
+                    statusBadge.textContent = '❌ BLOCKED';
+                    statusBadge.style.background = '#4d1a1a';
+                    statusBadge.style.color = '#ff6b6b';
+                    document.getElementById('quality-score').style.color = '#ff6b6b';
+                }
+
+                // Build verification
+                document.getElementById('build-status-badge').textContent = qr.BuildPassed ? '✅' : '❌';
+                document.getElementById('build-syntax').textContent = qr.SyntaxValid ? '✅' : '❌';
+                document.getElementById('build-deps').textContent = qr.DependenciesOK ? '✅' : '❌';
+                document.getElementById('build-entry').textContent = qr.EntryPointValid ? '✅' : '❌';
+
+                // Runtime verification
+                document.getElementById('runtime-status-badge').textContent = qr.RuntimePassed ? '✅' : '❌';
+                document.getElementById('runtime-starts').textContent = qr.ApplicationStarts ? '✅' : '❌';
+                document.getElementById('runtime-health').textContent = qr.HealthCheckPassed ? '✅' : '❌';
+
+                // Test verification
+                if (qr.TotalTests > 0) {
+                    const allPassed = qr.TestsFailed === 0;
+                    document.getElementById('test-status-badge').textContent = allPassed ? '✅' : '⚠️';
+                    document.getElementById('test-passed').textContent = qr.TestsPassed;
+                    document.getElementById('test-failed').textContent = qr.TestsFailed;
+                    document.getElementById('test-total').textContent = qr.TotalTests;
+                    document.getElementById('test-results').style.display = 'grid';
+                    document.getElementById('test-no-results').style.display = 'none';
+                } else {
+                    document.getElementById('test-status-badge').textContent = '⚠️';
+                    document.getElementById('test-results').style.display = 'none';
+                    document.getElementById('test-no-results').style.display = 'block';
+                }
+
+                // Documentation
+                document.getElementById('docs-status-badge').textContent = qr.ReadmeComplete ? '✅' : '❌';
+                document.getElementById('docs-readme').textContent = qr.ReadmeComplete ? '✅' : '❌';
+
+                // Show quality report
+                document.getElementById('qualityReport').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load quality report:', error);
             }
         }
 

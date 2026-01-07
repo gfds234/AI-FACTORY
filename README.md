@@ -1,94 +1,152 @@
-# AI FACTORY - Game Development Decision Amplifier
+# AI FACTORY - Autonomous MVP Generation with Quality Guarantees
 
-**Status:** Phase 1 Complete ✓ - Fully Operational
-**Hardware Target:** RTX 4070 Super (12GB VRAM)
-**Philosophy:** Human leverage over automation percentage
-**Repository:** https://github.com/gfds234/AI-FACTORY
+**Status: Phase 4+ Complete** ✓ (Triple Guarantee System Implemented)
+
+AI FACTORY is an autonomous system for generating production-ready MVPs with automated quality verification. Unlike competitors that only generate code, AI FACTORY **proves every deliverable works** through automated Build + Runtime + Test verification.
+
+## Quick Links
+
+- **[Status Summary](STATUS_SUMMARY.md)** - Current features and capabilities
+- **[Project Orchestrator Guide](PROJECT_ORCHESTRATOR_GUIDE.md)** - Phase 4 implementation details
+- **[Supervisor Guide](SUPERVISOR_GUIDE.md)** - Multi-agent system architecture
+- **[Progress Log](PROGRESS_LOG.md)** - Detailed technical changelog
+- **[User Guide](README_MANAGER.md)** - Non-technical daily usage
+
+## Triple Guarantee System™
+
+AI FACTORY is the **only** MVP generation tool that provides automated quality guarantees:
+
+1. **Build Guarantee** ✅
+   - Syntax validation
+   - Dependency resolution
+   - Entry point verification
+
+2. **Runtime Guarantee** ✅
+   - Application startup verification
+   - Health check validation
+   - Port binding confirmation
+
+3. **Test Guarantee** ✅
+   - Test execution with framework detection (Jest, pytest, go test)
+   - Pass/fail count reporting
+   - Test coverage tracking
+
+**Every project includes:**
+- Quality Score (0-100) based on all verification phases
+- Professional Quality Certificate markdown report
+- Visual dashboard showing verification status
+- API access to quality data (`GET /project/quality`)
+
+**Business Impact:**
+- Justify premium pricing ($800-2500/MVP vs $20/month competitors)
+- "Money-back if code doesn't work" guarantee
+- Client deliverables include verification proof
 
 ## Overview
 
-AI-assisted studio for game development using local LLMs. NOT an autonomous factory - it's a human-centered decision amplifier that helps a solo game developer achieve 2x creative output per day.
+AI FACTORY autonomously generates complete MVPs through a 6-phase process: Planning → Code Generation → QA → Documentation → Finalization → Completion. Each phase uses specialized agents coordinated by a multi-agent supervisor system.
 
 ## Project Structure
 
 ```
-ai-studio/
-├── orchestrator/     # Go-based orchestration layer
-│   ├── api/         # HTTP API handlers
-│   ├── task/        # Task management
-│   └── llm/         # LLM client interfaces
-├── models/          # Downloaded GGUF models (gitignored)
-├── docs/            # Architecture decisions and runbooks
-└── verify-env.sh    # Environment verification script
+AI FACTORY/
+├── api/              # REST API server
+├── project/          # Project orchestrator and phase management
+├── supervisor/       # Multi-agent coordination system
+├── validation/       # Triple Guarantee verification
+├── task/             # Task execution and routing
+├── llm/              # Claude API and Ollama LLM clients
+├── web/              # Web UI dashboard
+├── artifacts/        # Generated project artifacts
+└── projects/         # Generated MVP projects
 ```
 
-## Current Phase: Phase 1 - Foundation
+## Key Features
 
-**Goal:** Basic orchestration + 2 working tasks (idea validation + architecture review)
-
-**Scope:**
-- Sequential model execution only (RTX 4070 Super constraint)
-- GGUF-format models via llama.cpp or ollama
-- REST API for task submission
-- File-based artifact storage
-- Basic CLI for testing
+- **Autonomous MVP Generation**: 6-phase process from idea to production-ready code
+- **Multi-Agent Coordination**: Specialized agents for planning, coding, QA, and documentation
+- **Triple Guarantee Verification**: Automated build, runtime, and test validation
+- **Web Dashboard**: Visual project management and quality reporting
+- **Quality Certificates**: Professional markdown reports for client deliverables
+- **Project Export**: Comprehensive documentation bundles
+- **Phase Reversion**: Go back to previous phases while preserving data
 
 ## Environment Requirements
 
 **Core:**
 - Go 1.22+
-- Python 3.12+
 - Git
 
-**Models (to download):**
-- Planning: Mistral-7B-Instruct (4-bit GGUF, ~4GB VRAM)
-- Implementation: DeepSeek-Coder-6.7B (4-bit GGUF, ~4GB VRAM)
-- Review: Llama-3-8B (4-bit GGUF, ~5GB VRAM)
+**LLM Providers:**
+- Claude API (Anthropic) - Primary agent for project generation
+- Ollama (optional) - Local models for task routing
 
-**LLM Runtime (choose one):**
-- llama.cpp (direct, more control)
-- Ollama (simpler, abstracts model management)
+**Language Runtimes (for validation):**
+- Node.js (for JavaScript/TypeScript projects)
+- Python 3.10+ (for Python projects)
+- Go 1.22+ (for Go projects)
 
-## Quick Start (You've Already Done This ✓)
+## Quick Start
 
-```powershell
-# 1. Models installed ✓
-ollama list
-# Shows: mistral:7b-instruct-v0.2-q4_K_M, llama3:8b, deepseek-coder:6.7b-instruct
-
-# 2. Build orchestrator
-cd orchestrator
+1. **Clone and build:**
+```bash
+git clone https://github.com/gfds234/AI-FACTORY
+cd AI-FACTORY
 go build -o orchestrator.exe .
-
-# 3. Run tests
-cd ..
-.\test.ps1
 ```
 
-**That's it.** The orchestrator is ready to route tasks to your local models.
+2. **Configure environment:**
+```bash
+# Create .env file
+ANTHROPIC_API_KEY=your_claude_api_key_here
+OLLAMA_BASE_URL=http://localhost:11434
+```
 
-## Design Decisions
+3. **Run the system:**
+```bash
+./orchestrator.exe
+# Opens web UI at http://localhost:8080
+```
 
-1. **Sequential execution:** No parallel models (hardware constraint)
-2. **Local-first:** All models run on RTX 4070 Super
-3. **File artifacts:** Easier to inspect/version than database
-4. **Go orchestrator:** Performance + simplicity for task routing
-5. **No enterprise tooling:** DataDog, K8s, etc. are overkill
+4. **Create your first MVP:**
+- Open web dashboard
+- Click "New Project"
+- Enter project idea
+- Watch autonomous generation with real-time phase updates
+- Get quality-verified deliverable
 
-## Risk Register
+## Architecture Highlights
 
-See project specification document for full risk analysis.
+1. **Phase-Based Generation**: Structured 6-phase workflow ensures quality at each step
+2. **Multi-Agent Supervision**: Supervisor coordinates specialized agents (Planning, Code, QA, Docs)
+3. **File-Based Artifacts**: Project files stored in structured directories for easy inspection
+4. **Triple Guarantee Verification**: Automated validation proves code works before delivery
+5. **Progressive Web UI**: Real-time phase updates with quality dashboards
+6. **REST API**: Full programmatic access to all features
 
-**Top risks:**
-- VRAM exhaustion from model switching
-- Model quality variance across specialized tasks
-- Latency accumulation in sequential pipeline
+## Implementation Phases
 
-## Phases
+- **Phase 1:** Foundation - Basic orchestration and task routing ✅
+- **Phase 2:** Task expansion - Additional task types and monitoring ✅
+- **Phase 3:** Multi-agent supervision - Coordinated specialist agents ✅
+- **Phase 4:** Project orchestration - 6-phase MVP generation ✅
+- **Phase 4+:** Triple Guarantee System - Automated quality verification ✅
 
-- **Phase 1 (Days 1-10):** Foundation - orchestration + 2 tasks
-- **Phase 2 (Days 11-20):** Expansion - 2 more tasks + monitoring
-- **Phase 3 (Days 21-30):** Integration - workflow templates + metrics
+**Current Focus:** Client acquisition and demo preparation
+
+## Business Model
+
+**Target Market:** Agencies, freelancers, and technical founders needing rapid MVP development
+
+**Pricing Strategy:**
+- $800-2500 per MVP (vs competitors at $20/month with no guarantees)
+- Premium justified by Triple Guarantee System
+- "Money-back if code doesn't work" guarantee differentiates from competition
+
+**Competitive Advantage:**
+- Only tool with automated quality verification
+- Professional quality certificates included
+- Visual proof that deliverables actually work
 
 ## License
 
@@ -96,4 +154,4 @@ Private project - not open source.
 
 ---
 
-*Last updated: 2025-12-31*
+*Last updated: 2026-01-07*

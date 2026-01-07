@@ -4,8 +4,10 @@ import (
 	"ai-studio/orchestrator/llm"
 	"ai-studio/orchestrator/supervisor"
 	"ai-studio/orchestrator/task"
+	"ai-studio/orchestrator/validation"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -188,17 +190,137 @@ func (po *ProjectOrchestrator) executeCodeGenPhase(project *Project) (*PhaseResu
 		}
 	}
 
+	// Run Triple Guarantee System: Build + Runtime + Test verification
+	decision := "PROCEED"
+	reasoning := fmt.Sprintf("Code generated via %s (complexity: %d)", supervisedResult.ExecutionRoute, supervisedResult.ComplexityScore)
+
+	// Extract project directory and verify if it exists
+	projectDir := po.extractProjectDir(supervisedResult.Result.ArtifactPath)
+	var verifyResult *supervisor.VerificationResult
+	var runtimeResult *validation.RuntimeResult
+	var testResult *validation.TestResult
+
+	if projectDir != "" {
+		// Phase 1: Build Verification
+		verifyAgent := supervisor.NewVerificationAgent()
+		verifyResult, err = verifyAgent.VerifyProject(projectDir)
+
+		if err == nil && verifyResult != nil {
+			// Check for critical failures
+			if !verifyResult.SyntaxValid || !verifyResult.EntryPointValid {
+				decision = "BLOCK"
+				reasoning = fmt.Sprintf("Build verification failed: %v", verifyResult.Errors)
+			} else if !verifyResult.DependenciesOK {
+				decision = "REFINE"
+				reasoning = fmt.Sprintf("Code generated but dependencies missing: %v", verifyResult.Errors)
+			} else {
+				reasoning += fmt.Sprintf(" | Build: ✓")
+
+				// Phase 2: Runtime Verification (only if build passed)
+				runtimeValidator := validation.NewRuntimeValidator()
+				var rtErr error
+				runtimeResult, rtErr = runtimeValidator.ValidateRuntime(projectDir, verifyResult.ProjectType)
+
+				if rtErr == nil && runtimeResult != nil {
+					if runtimeResult.ApplicationStarts {
+						reasoning += " | Runtime: ✓"
+						if runtimeResult.HealthCheckPassed {
+							reasoning += " (health check passed)"
+						}
+					} else {
+						reasoning += " | Runtime: ⚠️ (startup failed)"
+						log.Printf("ProjectOrchestrator: Runtime validation warnings: %v", runtimeResult.Errors)
+					}
+
+					// Phase 3: Test Execution (only if build passed)
+					testExecutor := validation.NewTestExecutor()
+					var testErr error
+					testResult, testErr = testExecutor.ExecuteTests(projectDir, verifyResult.ProjectType)
+
+					if testErr == nil && testResult != nil && testResult.TestsExecuted {
+						if testResult.TestsFailed == 0 && testResult.TestsPassed > 0 {
+							reasoning += fmt.Sprintf(" | Tests: ✓ (%d/%d passed)", testResult.TestsPassed, testResult.TotalTests)
+						} else if testResult.TestsFailed > 0 {
+							reasoning += fmt.Sprintf(" | Tests: ⚠️ (%d/%d passed)", testResult.TestsPassed, testResult.TotalTests)
+						}
+						log.Printf("ProjectOrchestrator: Tests executed - Passed: %d, Failed: %d, Total: %d",
+							testResult.TestsPassed, testResult.TestsFailed, testResult.TotalTests)
+					}
+				} else if rtErr != nil {
+					log.Printf("ProjectOrchestrator: Runtime validation failed: %v", rtErr)
+				}
+			}
+
+			log.Printf("ProjectOrchestrator: Build verification - Syntax: %v, Dependencies: %v, Entry Point: %v",
+				verifyResult.SyntaxValid, verifyResult.DependenciesOK, verifyResult.EntryPointValid)
+		} else {
+			log.Printf("ProjectOrchestrator: Build verification skipped or failed: %v", err)
+		}
+
+		// Store validation results in project for persistence
+		project.ValidationResults = &ValidationResults{
+			LastValidated: time.Now(),
+		}
+
+		// Store build verification results
+		if verifyResult != nil {
+			project.ValidationResults.BuildVerified = verifyResult.SyntaxValid && verifyResult.DependenciesOK && verifyResult.EntryPointValid
+			project.ValidationResults.SyntaxValid = verifyResult.SyntaxValid
+			project.ValidationResults.DependenciesOK = verifyResult.DependenciesOK
+			project.ValidationResults.EntryPointValid = verifyResult.EntryPointValid
+			project.ValidationResults.BuildErrors = verifyResult.Errors
+		}
+
+		// Store runtime verification results
+		if runtimeResult != nil {
+			project.ValidationResults.RuntimeVerified = runtimeResult.ApplicationStarts
+			project.ValidationResults.ApplicationStarts = runtimeResult.ApplicationStarts
+			project.ValidationResults.HealthCheckPassed = runtimeResult.HealthCheckPassed
+			project.ValidationResults.RuntimeErrors = runtimeResult.Errors
+			project.ValidationResults.RuntimeWarnings = runtimeResult.Warnings
+		}
+
+		// Store test execution results
+		if testResult != nil {
+			project.ValidationResults.TestsExecuted = testResult.TestsExecuted
+			project.ValidationResults.TestsPassed = testResult.TestsPassed
+			project.ValidationResults.TestsFailed = testResult.TestsFailed
+			project.ValidationResults.TestsSkipped = testResult.TestsSkipped
+			project.ValidationResults.TotalTests = testResult.TotalTests
+			project.ValidationResults.TestFramework = testResult.TestFramework
+			project.ValidationResults.TestErrors = testResult.Errors
+		}
+
+		// Persist to disk
+		if err := po.projectMgr.SaveProject(project); err != nil {
+			log.Printf("Warning: Failed to save validation results: %v", err)
+		}
+	}
+
 	phaseResult := &PhaseResult{
 		Phase:             PhaseCodeGen,
-		Decision:          "PROCEED",
-		Reasoning:         fmt.Sprintf("Code generated via %s (complexity: %d)", supervisedResult.ExecutionRoute, supervisedResult.ComplexityScore),
+		Decision:          decision,
+		Reasoning:         reasoning,
 		NextSteps:         "Proceed to Review phase",
 		AgentOutputs:      make(map[string]*supervisor.AgentOutput),
-		RequiresApproval:  false, // CodeGen is automated
+		RequiresApproval:  decision == "BLOCK", // Require approval if verification failed
 		RecommendedAction: "Automated transition to Review phase",
 	}
 
 	return phaseResult, nil
+}
+
+// extractProjectDir extracts project directory from artifact path
+func (po *ProjectOrchestrator) extractProjectDir(artifactPath string) string {
+	// Extract project directory from path like "artifacts\code_123.md (project: projects/generated_456)"
+	if strings.Contains(artifactPath, "(project: ") {
+		start := strings.Index(artifactPath, "(project: ") + len("(project: ")
+		end := strings.Index(artifactPath[start:], ")")
+		if end > 0 {
+			return artifactPath[start : start+end]
+		}
+	}
+	return ""
 }
 
 // executeCompletePhase finalizes the project
@@ -216,6 +338,25 @@ func (po *ProjectOrchestrator) executeCompletePhase(project *Project) (*PhaseRes
 	if err != nil {
 		log.Printf("Warning: Failed to generate summary: %v", err)
 		summary = "Summary generation unavailable"
+	}
+
+	// Generate Quality Guarantee Report
+	qualityReport := GenerateQualityReport(project.Name, *metrics)
+
+	// Save quality report to project directory
+	projectDir := ""
+	if len(project.ArtifactPaths) > 0 {
+		projectDir = po.extractProjectDir(project.ArtifactPaths[0])
+	}
+
+	if projectDir != "" {
+		reportPath := fmt.Sprintf("%s/QUALITY_REPORT.md", projectDir)
+		if err := qualityReport.SaveToFile(reportPath); err != nil {
+			log.Printf("Warning: Failed to save quality report: %v", err)
+		} else {
+			log.Printf("Quality report saved to: %s", reportPath)
+			log.Printf("Quality Score: %d/100 | Status: %s", qualityReport.OverallScore, qualityReport.Status)
+		}
 	}
 
 	// Update project status

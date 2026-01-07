@@ -1,8 +1,10 @@
 package project
 
 import (
+	"ai-studio/orchestrator/supervisor"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,12 +26,38 @@ func (cv *CompletionValidator) ValidateHandoffReady(project *Project) (*Completi
 		BlockingIssues: []string{},
 	}
 
-	// Check criteria
-	hasCode, err := cv.checkRunnableBuild(project)
-	if err != nil {
-		metrics.BlockingIssues = append(metrics.BlockingIssues, fmt.Sprintf("Build check error: %v", err))
+	// Run actual build verification if project directory exists
+	projectDir := cv.extractProjectDirectory(project)
+	if projectDir != "" {
+		verifyAgent := supervisor.NewVerificationAgent()
+		verifyResult, err := verifyAgent.VerifyProject(projectDir)
+		if err == nil && verifyResult != nil {
+			// Store verification results
+			metrics.SyntaxValid = verifyResult.SyntaxValid
+			metrics.DependenciesOK = verifyResult.DependenciesOK
+			metrics.BuildLog = verifyResult.BuildLog
+			metrics.HasRunnableBuild = verifyResult.EntryPointValid && verifyResult.SyntaxValid
+
+			// Add errors as blocking issues
+			for _, errMsg := range verifyResult.Errors {
+				metrics.BlockingIssues = append(metrics.BlockingIssues, errMsg)
+			}
+		} else {
+			// Fallback to marker-based detection if verification fails
+			hasCode, err := cv.checkRunnableBuildMarkers(project)
+			if err != nil {
+				metrics.BlockingIssues = append(metrics.BlockingIssues, fmt.Sprintf("Build check error: %v", err))
+			}
+			metrics.HasRunnableBuild = hasCode
+		}
+	} else {
+		// No project directory - use marker-based detection
+		hasCode, err := cv.checkRunnableBuildMarkers(project)
+		if err != nil {
+			metrics.BlockingIssues = append(metrics.BlockingIssues, fmt.Sprintf("Build check error: %v", err))
+		}
+		metrics.HasRunnableBuild = hasCode
 	}
-	metrics.HasRunnableBuild = hasCode
 
 	hasTests, err := cv.checkTestsExist(project)
 	if err != nil {
@@ -57,11 +85,50 @@ func (cv *CompletionValidator) ValidateHandoffReady(project *Project) (*Completi
 		metrics.BlockingIssues = append(metrics.BlockingIssues, "No README documentation detected")
 	}
 
+	// Populate runtime and test metrics from stored validation results
+	if project.ValidationResults != nil {
+		vr := project.ValidationResults
+
+		metrics.RuntimeVerified = vr.RuntimeVerified
+		metrics.TestsExecuted = vr.TestsExecuted
+		metrics.TestsPassed = vr.TestsPassed
+		metrics.TestsFailed = vr.TestsFailed
+
+		// Calculate quality score (0-100)
+		metrics.QualityScore = cv.calculateQualityScore(metrics)
+	}
+
 	return metrics, nil
 }
 
-// checkRunnableBuild checks if runnable code exists
-func (cv *CompletionValidator) checkRunnableBuild(project *Project) (bool, error) {
+// extractProjectDirectory extracts project directory from artifact paths
+func (cv *CompletionValidator) extractProjectDirectory(project *Project) string {
+	// Look for project directory in artifact paths (e.g., "projects/generated_1234567890")
+	for _, artifactPath := range project.ArtifactPaths {
+		if strings.Contains(artifactPath, "projects/generated_") || strings.Contains(artifactPath, "projects\\generated_") {
+			// Extract directory from path like "artifacts\code_123.md (project: projects/generated_456)"
+			if strings.Contains(artifactPath, "(project: ") {
+				start := strings.Index(artifactPath, "(project: ") + len("(project: ")
+				end := strings.Index(artifactPath[start:], ")")
+				if end > 0 {
+					return artifactPath[start : start+end]
+				}
+			}
+			// Direct project path
+			if strings.HasPrefix(artifactPath, "projects/") || strings.HasPrefix(artifactPath, "projects\\") {
+				// Return the base project directory
+				parts := strings.Split(filepath.ToSlash(artifactPath), "/")
+				if len(parts) >= 2 {
+					return filepath.Join(parts[0], parts[1])
+				}
+			}
+		}
+	}
+	return ""
+}
+
+// checkRunnableBuildMarkers checks if runnable code exists (marker-based fallback)
+func (cv *CompletionValidator) checkRunnableBuildMarkers(project *Project) (bool, error) {
 	// Entry point markers for different languages
 	entryPointMarkers := []string{
 		// Go
@@ -247,6 +314,41 @@ func (cv *CompletionValidator) calculateCompletionPercentage(project *Project, m
 	}
 
 	return total
+}
+
+// calculateQualityScore calculates 0-100 quality score based on Triple Guarantee
+func (cv *CompletionValidator) calculateQualityScore(metrics *CompletionMetrics) int {
+	score := 0
+
+	// Build verification (35 points)
+	if metrics.SyntaxValid {
+		score += 15
+	}
+	if metrics.DependenciesOK {
+		score += 10
+	}
+	if metrics.HasRunnableBuild {
+		score += 10
+	}
+
+	// Runtime verification (25 points)
+	if metrics.RuntimeVerified {
+		score += 25
+	}
+
+	// Test verification (20 points)
+	if metrics.TestsExecuted && (metrics.TestsPassed+metrics.TestsFailed) > 0 {
+		score += 5
+		passRate := float64(metrics.TestsPassed) / float64(metrics.TestsPassed+metrics.TestsFailed)
+		score += int(passRate * 15)
+	}
+
+	// Documentation (20 points)
+	if metrics.HasReadme {
+		score += 20
+	}
+
+	return score
 }
 
 // getFullArtifactPath returns the full path to an artifact

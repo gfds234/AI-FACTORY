@@ -12,12 +12,13 @@ type Project struct {
 	CurrentPhase  Phase             `json:"current_phase"`
 	Phases        []PhaseExecution  `json:"phases"`
 	Tasks         []TaskExecution   `json:"tasks"`
-	ArtifactPaths []string          `json:"artifact_paths"`
-	Metadata      ProjectMetadata   `json:"metadata"`
-	CreatedAt     time.Time         `json:"created_at"`
-	UpdatedAt     time.Time         `json:"updated_at"`
-	CompletedAt   *time.Time        `json:"completed_at,omitempty"`
-	Status        ProjectStatus     `json:"status"`
+	ArtifactPaths     []string           `json:"artifact_paths"`
+	Metadata          ProjectMetadata    `json:"metadata"`
+	ValidationResults *ValidationResults `json:"validation_results,omitempty"`
+	CreatedAt         time.Time          `json:"created_at"`
+	UpdatedAt         time.Time          `json:"updated_at"`
+	CompletedAt       *time.Time         `json:"completed_at,omitempty"`
+	Status            ProjectStatus      `json:"status"`
 }
 
 // Phase represents a project phase
@@ -92,11 +93,57 @@ const (
 
 // CompletionMetrics tracks hand-off ready criteria
 type CompletionMetrics struct {
+	// Original fields
 	HasRunnableBuild bool     `json:"has_runnable_build"`
 	HasTests         bool     `json:"has_tests"`
 	HasReadme        bool     `json:"has_readme"`
 	CompletionPct    float64  `json:"completion_pct"`
 	BlockingIssues   []string `json:"blocking_issues"`
+
+	// Day 1: Build Verification
+	SyntaxValid    bool   `json:"syntax_valid"`     // Code parses without errors
+	DependenciesOK bool   `json:"dependencies_ok"`  // All packages installable
+	BuildLog       string `json:"build_log"`        // Full build output
+
+	// Day 2: Runtime & Testing (for future implementation)
+	RuntimeVerified bool `json:"runtime_verified"` // App starts successfully
+	TestsExecuted   bool `json:"tests_executed"`   // Tests were run
+	TestsPassed     int  `json:"tests_passed"`     // Number of passing tests
+	TestsFailed     int  `json:"tests_failed"`     // Number of failing tests
+
+	// Day 3: Deployment & Quality (for future implementation)
+	DeploymentReady   bool `json:"deployment_ready"`    // Docker builds successfully
+	DockerBuilds      bool `json:"docker_builds"`       // Dockerfile valid
+	EnvVarsDocumented bool `json:"env_vars_documented"` // .env.example complete
+	QualityScore      int  `json:"quality_score"`       // 0-100 overall score
+}
+
+// ValidationResults stores Triple Guarantee System results
+type ValidationResults struct {
+	// Build verification
+	BuildVerified   bool     `json:"build_verified"`
+	SyntaxValid     bool     `json:"syntax_valid"`
+	DependenciesOK  bool     `json:"dependencies_ok"`
+	EntryPointValid bool     `json:"entry_point_valid"`
+	BuildErrors     []string `json:"build_errors"`
+
+	// Runtime verification
+	RuntimeVerified   bool     `json:"runtime_verified"`
+	ApplicationStarts bool     `json:"application_starts"`
+	HealthCheckPassed bool     `json:"health_check_passed"`
+	RuntimeErrors     []string `json:"runtime_errors"`
+	RuntimeWarnings   []string `json:"runtime_warnings"`
+
+	// Test execution
+	TestsExecuted bool   `json:"tests_executed"`
+	TestsPassed   int    `json:"tests_passed"`
+	TestsFailed   int    `json:"tests_failed"`
+	TestsSkipped  int    `json:"tests_skipped"`
+	TotalTests    int    `json:"total_tests"`
+	TestFramework string `json:"test_framework"`
+	TestErrors    []string `json:"test_errors"`
+
+	LastValidated time.Time `json:"last_validated"`
 }
 
 // PhaseTransitions defines valid phase transitions

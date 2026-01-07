@@ -131,6 +131,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/project/reject", s.handleProjectReject)
 	s.mux.HandleFunc("/project/revert", s.handleProjectRevert)
 	s.mux.HandleFunc("/project/metrics", s.handleProjectMetrics)
+	s.mux.HandleFunc("/project/quality", s.handleProjectQuality)
 	s.mux.HandleFunc("/project/delete", s.handleDeleteProject)
 	s.mux.HandleFunc("/project/export", s.handleExportProject)
 	s.mux.HandleFunc("/artifact/view", s.handleViewArtifact)
@@ -925,6 +926,45 @@ func (s *Server) handleProjectMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.respondJSON(w, metrics)
+}
+
+// handleProjectQuality gets quality guarantee report for a project
+func (s *Server) handleProjectQuality(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		s.respondError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	orchestrator, ok := s.taskMgr.(*project.ProjectOrchestrator)
+	if !ok {
+		s.respondError(w, "Project orchestrator not enabled", http.StatusNotImplemented)
+		return
+	}
+
+	projectID := r.URL.Query().Get("project_id")
+	if projectID == "" {
+		s.respondError(w, "Project ID required", http.StatusBadRequest)
+		return
+	}
+
+	// Get project
+	proj, err := orchestrator.GetProject(projectID)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Project not found: %v", err), http.StatusNotFound)
+		return
+	}
+
+	// Get completion metrics
+	metrics, err := orchestrator.GetCompletionMetrics(projectID)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to get metrics: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Generate quality report
+	qualityReport := project.GenerateQualityReport(proj.Name, *metrics)
+
+	s.respondJSON(w, qualityReport)
 }
 
 // handleViewArtifact serves artifact file content
