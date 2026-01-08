@@ -669,13 +669,12 @@ type FileContent struct {
 func ParseFilesFromOutput(output string) []FileContent {
 	files := make([]FileContent, 0)
 
-	// Pattern: ### or #### filename.ext followed by ```language\n content \n```
-	// Using regex to find file markers (flexible with 3 or 4 hashes)
-	// Allow optional description in parentheses after filename
-	fileMarkerRegex := regexp.MustCompile(`###+\s+([^\s\n(]+).*\n`)
+	// Pattern: ### filename.ext or #### filename.ext
+	// We want to be strict to avoid matching generic headers. 
+	// We look for a filename that HAS an extension.
+	fileMarkerRegex := regexp.MustCompile(`###+\s+([^\s\n(]+\.[a-zA-Z0-9]+).*\n`)
 	// Use (?s) flag for DOTALL mode - allows . to match newlines
-	// Match both uppercase and lowercase language names
-	codeBlockRegex := regexp.MustCompile("(?s)```[a-zA-Z]*\\n(.*?)```")
+	codeBlockRegex := regexp.MustCompile("(?s)```[a-zA-Z0-9]*\\n(.*?)```")
 
 	// Find all file markers
 	fileMarkers := fileMarkerRegex.FindAllStringSubmatchIndex(output, -1)

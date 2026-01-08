@@ -57,38 +57,81 @@ func (a *TechStackAgent) Execute(taskType, input string, context map[string]inte
 }
 
 func (a *TechStackAgent) buildPrompt(input string) string {
-	return fmt.Sprintf(`You are a senior tech lead reviewing technology choices. Analyze this project request and pre-approve or reject the tech stack.
+	return fmt.Sprintf(`<system>
+You are a senior tech lead specializing in modern, lightweight technology stacks for MVPs.
+Your goal: Recommend the fastest path to a working, deployable product.
+</system>
 
-Project Request:
+<context>
+<user_request>
 %s
+</user_request>
+<tech_landscape_2025>
+RECOMMENDED STACKS (fast, modern, solo-dev friendly):
+- Frontend: React/Vite, Next.js 14+, Svelte, Vue 3, HTMX+Alpine.js
+- Backend: Node.js (Express/Fastify/Hono), Go (Chi/Echo), Python (FastAPI), Bun
+- Database: SQLite (local/Turso), PostgreSQL (Supabase/Neon), MongoDB Atlas
+- Auth: Lucia, NextAuth, Supabase Auth, Clerk (free tier)
+- Deployment: Vercel, Railway, Fly.io, Render (all have free tiers)
+- Runtime: Node.js 20+, Bun, Deno 2.0
 
-Evaluate and respond in this format:
+AVOID (too complex for MVP):
+- Kubernetes, microservices, GraphQL (unless specifically needed)
+- Self-hosted databases, custom auth systems
+- Monorepo setups, complex build pipelines
+</tech_landscape_2025>
+</context>
 
-## Inferred Tech Stack
-[What technologies/frameworks would you use for this?]
-- Language: [X]
-- Framework: [Y]
-- Database: [Z] (if needed)
+<instructions>
+<thinking>
+1. What type of application is this? (web app, API, CLI, static site)
+2. What's the simplest stack that meets the requirements?
+3. Will this deploy easily on free tiers?
+4. Can a solo developer maintain this?
+</thinking>
 
-## Tech Stack Assessment
-[Is this stack appropriate for the requirements?]
-- Pros: [List benefits]
-- Cons: [List drawbacks]
-- Alternatives: [Better options?]
+Provide your analysis:
+</instructions>
 
-## Solo Developer Friendliness
-[Can one person build and maintain this? Rate 1-10]
+<output_format>
+## Recommended Stack
+| Layer | Technology | Justification |
+|-------|------------|---------------|
+| Language | [X] | [Why] |
+| Framework | [Y] | [Why] |
+| Database | [Z] | [Why] |
+| Auth | [A] | [Why - or "N/A"] |
+| Deployment | [D] | [Why] |
 
-## Production Readiness
-[Will this stack produce production-quality code?]
+## Stack Scores
+- Solo Developer Friendly: [1-10]
+- Free Tier Deployable: [Yes/No]
+- Time to MVP: [Days estimate]
+- Maintenance Burden: [Low/Medium/High]
+
+## Alternative Considered
+[One alternative stack and why the recommended one is better]
+
+## Risks & Mitigations
+- [Risk 1]: [Mitigation]
+- [Risk 2]: [Mitigation]
 
 ## Verdict
-[One word: APPROVED, NEEDS_REVISION, or REJECTED]
+APPROVED | NEEDS_REVISION | REJECTED
 
-## Recommendation
-[Final advice on tech stack choice]
+## Quick Start Commands
+` + "```bash" + `
+# Commands to scaffold this project
+[npm create vite@latest / npx create-next-app / go mod init / etc.]
+` + "```" + `
+</output_format>
 
-Focus on practical, modern stacks that a solo developer can handle.`, input)
+<rules>
+- Always prefer SQLite unless there's a clear need for PostgreSQL
+- Default to Vercel/Railway for deployment
+- If in doubt, pick the simpler option
+- Reject overly complex stacks for MVPs
+</rules>`, input)
 }
 
 func (a *TechStackAgent) parseStatus(response string) string {

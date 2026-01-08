@@ -37,7 +37,7 @@ func defaultConfig() *Config {
 		},
 		ArtifactsDir: "./artifacts",
 		MaxRetries:   2,
-		Timeout:      120, // 2 minutes per task
+		Timeout:      600, // 10 minutes per task
 		ProjectOrchestrator: ProjectOrchestratorConfig{
 			Enabled:              false,
 			ProjectsDir:          "./projects",

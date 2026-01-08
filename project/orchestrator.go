@@ -152,10 +152,19 @@ func (po *ProjectOrchestrator) ExecuteProjectPhase(projectID string, phase Phase
 
 // executeCodeGenPhase executes the code generation phase
 func (po *ProjectOrchestrator) executeCodeGenPhase(project *Project) (*PhaseResult, error) {
-	log.Printf("ProjectOrchestrator: Delegating to SupervisedTaskManager for code generation")
+	// Gather planning context to provide to the coder
+	fullInput := fmt.Sprintf("Project: %s\nDescription: %s\n\n", project.Name, project.Description)
+	for _, phase := range project.Phases {
+		if phase.Phase == PhasePlanning && phase.Status == PhaseStatusComplete {
+			fullInput += "### Planning Phase Output:\n"
+			for agent, output := range phase.AgentOutputs {
+				fullInput += fmt.Sprintf("#### %s Agent:\n%s\n\n", agent, output)
+			}
+		}
+	}
 
 	// Execute code generation via SupervisedTaskManager
-	result, err := po.supervisedMgr.ExecuteTask("code", project.Description)
+	result, err := po.supervisedMgr.ExecuteTask("code", fullInput)
 	if err != nil {
 		return nil, fmt.Errorf("supervised task execution failed: %w", err)
 	}

@@ -48,32 +48,127 @@ func (a *DocumentationAgent) Execute(taskType, input string, context map[string]
 }
 
 func (a *DocumentationAgent) buildPrompt(taskType, input, output string) string {
-	return fmt.Sprintf(`You are a technical writer. Create comprehensive documentation for this code.
+	return fmt.Sprintf(`<system>
+You are a technical writer specializing in developer documentation and open-source README files.
+Your goal: Create documentation that helps users get started in under 5 minutes.
+</system>
 
-Original Request:
+<context>
+<original_request>
 %s
-
-Generated Code:
+</original_request>
+<generated_code>
 %s
+</generated_code>
+<documentation_standards>
+- README must have: Quick start, installation, usage examples
+- Use shields.io badges for visual appeal
+- Include copy-paste ready code snippets
+- SEO: Clear title, description, keywords for discoverability
+</documentation_standards>
+</context>
 
-Create:
+<instructions>
+<thinking>
+1. What's the one-sentence pitch for this project?
+2. What does a new user need to do to get it running?
+3. What are the most common use cases?
+4. What will go wrong and how do users fix it?
+</thinking>
 
+Generate documentation:
+</instructions>
+
+<output_format>
 ## README.md
-` + "```markdown" + `
-[Full README with: project overview, installation, usage, examples, configuration]
-` + "```" + `
+`+"```markdown"+`
+# [Project Name]
 
-## API Documentation
-[If applicable - document all public functions/endpoints]
+<!-- Badges -->
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+[Add relevant badges: build status, coverage, npm/pypi version if applicable]
 
-## Code Comments
-[Suggest inline comments for complex sections]
+> [One-line description that explains what this does and why it matters]
 
-## Setup Guide
-[Step-by-step setup instructions]
+## ✨ Features
 
-## Troubleshooting
-[Common issues and solutions]
+- [Feature 1]
+- [Feature 2]
+- [Feature 3]
 
-Make documentation clear, complete, and beginner-friendly.`, input, output)
+## 🚀 Quick Start
+
+`+"```bash"+`
+# Clone and run in 30 seconds
+[git clone / npm install / pip install commands]
+[single command to run]
+`+"```"+`
+
+## 📦 Installation
+
+### Prerequisites
+- [Prerequisite 1]
+- [Prerequisite 2]
+
+### Install
+`+"```bash"+`
+[Installation commands]
+`+"```"+`
+
+## 📖 Usage
+
+### Basic Example
+`+"```[language]"+`
+[Simple, working code example]
+`+"```"+`
+
+### API Reference
+[If applicable: endpoints, functions, methods]
+
+## ⚙️ Configuration
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| [VAR_1] | [Description] | [Default] |
+
+## 🚀 Deployment
+
+### [Platform 1: Vercel/Railway/etc.]
+`+"```bash"+`
+[One-click deploy or commands]
+`+"```"+`
+
+## 🔧 Troubleshooting
+
+### [Common Issue 1]
+**Problem:** [Description]
+**Solution:** [Fix]
+
+## 📄 License
+
+MIT © [Year]
+`+"```"+`
+
+## API_DOCS.md (if applicable)
+`+"```markdown"+`
+# API Documentation
+
+## Endpoints
+
+### [Method] /[endpoint]
+[Description, parameters, response examples]
+`+"```"+`
+
+## Setup Instructions
+[Step-by-step for developers joining the project]
+</output_format>
+
+<rules>
+- README should be scannable in 30 seconds
+- Every code block must be copy-paste ready
+- Include environment variable examples with placeholder values
+- Never expose real secrets or API keys
+- Use emojis sparingly for section headers
+</rules>`, input, output)
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -198,8 +199,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .error {
@@ -513,8 +519,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         .typing-indicator {
@@ -917,8 +930,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-hint {
@@ -936,7 +954,7 @@
             background: #4CAF50;
             color: white;
             border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 2000;
             animation: slideIn 0.3s ease;
         }
@@ -950,13 +968,22 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(400px);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(20px); }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
         }
+
         /* AutoClaude-Inspired Enhancements */
         .view-toggle {
             display: flex;
@@ -1030,17 +1057,40 @@
         .kanban-card:hover {
             background: #333;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .kanban-card.phase-discovery { border-left-color: #4a9eff; }
-        .kanban-card.phase-validation { border-left-color: #a77bff; }
-        .kanban-card.phase-planning { border-left-color: #ff9f43; }
-        .kanban-card.phase-codegen { border-left-color: #4ade80; }
-        .kanban-card.phase-review { border-left-color: #ffd93d; }
-        .kanban-card.phase-qa { border-left-color: #6bcf7f; }
-        .kanban-card.phase-docs { border-left-color: #00d2ff; }
-        .kanban-card.phase-complete { border-left-color: #4ade80; }
+        .kanban-card.phase-discovery {
+            border-left-color: #4a9eff;
+        }
+
+        .kanban-card.phase-validation {
+            border-left-color: #a77bff;
+        }
+
+        .kanban-card.phase-planning {
+            border-left-color: #ff9f43;
+        }
+
+        .kanban-card.phase-codegen {
+            border-left-color: #4ade80;
+        }
+
+        .kanban-card.phase-review {
+            border-left-color: #ffd93d;
+        }
+
+        .kanban-card.phase-qa {
+            border-left-color: #6bcf7f;
+        }
+
+        .kanban-card.phase-docs {
+            border-left-color: #00d2ff;
+        }
+
+        .kanban-card.phase-complete {
+            border-left-color: #4ade80;
+        }
 
         .kanban-card-title {
             font-weight: 600;
@@ -1084,14 +1134,33 @@
             margin-right: 6px;
         }
 
-        .status-icon.active { background: #4ade80; animation: pulse 2s infinite; }
-        .status-icon.pending { background: #ff9f43; }
-        .status-icon.complete { background: #4a9eff; }
-        .status-icon.error { background: #ff6b6b; }
+        .status-icon.active {
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        .status-icon.pending {
+            background: #ff9f43;
+        }
+
+        .status-icon.complete {
+            background: #4a9eff;
+        }
+
+        .status-icon.error {
+            background: #ff6b6b;
+        }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         /* Phase Badge */
@@ -1104,14 +1173,45 @@
             text-transform: uppercase;
         }
 
-        .phase-badge.discovery { background: #1a3a4d; color: #4a9eff; }
-        .phase-badge.validation { background: #3a1a4d; color: #a77bff; }
-        .phase-badge.planning { background: #4d3a1a; color: #ff9f43; }
-        .phase-badge.codegen { background: #1a4d2e; color: #4ade80; }
-        .phase-badge.review { background: #4d4a1a; color: #ffd93d; }
-        .phase-badge.qa { background: #1a4d3a; color: #6bcf7f; }
-        .phase-badge.docs { background: #1a4a4d; color: #00d2ff; }
-        .phase-badge.complete { background: #1a4d2e; color: #4ade80; }
+        .phase-badge.discovery {
+            background: #1a3a4d;
+            color: #4a9eff;
+        }
+
+        .phase-badge.validation {
+            background: #3a1a4d;
+            color: #a77bff;
+        }
+
+        .phase-badge.planning {
+            background: #4d3a1a;
+            color: #ff9f43;
+        }
+
+        .phase-badge.codegen {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        .phase-badge.review {
+            background: #4d4a1a;
+            color: #ffd93d;
+        }
+
+        .phase-badge.qa {
+            background: #1a4d3a;
+            color: #6bcf7f;
+        }
+
+        .phase-badge.docs {
+            background: #1a4a4d;
+            color: #00d2ff;
+        }
+
+        .phase-badge.complete {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
 
         /* Activity Timeline */
         .activity-timeline {
@@ -1183,8 +1283,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .welcome-content {
@@ -1204,6 +1309,7 @@
                 transform: translateY(50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -1305,6 +1411,22 @@
             justify-content: center;
         }
 
+        .welcome-close-x {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+        }
+
+        .welcome-close-x:hover {
+            color: #4a9eff;
+        }
+
         .btn-welcome {
             padding: 14px 32px;
             border-radius: 6px;
@@ -1337,6 +1459,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Code Generation Loading Overlay -->
     <div id="codeLoading" class="loading-overlay">
@@ -1348,6 +1471,7 @@
     <!-- Welcome Modal for First-Time Users -->
     <div id="welcomeModal" class="welcome-modal">
         <div class="welcome-content">
+            <div class="welcome-close-x" onclick="closeWelcome(true)">×</div>
             <div class="welcome-header">
                 <h1>Welcome to AI FACTORY!</h1>
                 <p class="tagline">Autonomous MVP Generation with Quality Guarantees</p>
@@ -1355,7 +1479,8 @@
 
             <div class="welcome-section">
                 <h3>🚀 What is AI FACTORY?</h3>
-                <p>AI FACTORY autonomously generates production-ready MVPs through a 6-phase process. Unlike other tools, we <strong>prove every deliverable works</strong> through automated testing.</p>
+                <p>AI FACTORY autonomously generates production-ready MVPs through a 6-phase process. Unlike other
+                    tools, we <strong>prove every deliverable works</strong> through automated testing.</p>
             </div>
 
             <div class="welcome-section">
@@ -1373,11 +1498,13 @@
                 <div class="example-projects">
                     <div class="example-project" onclick="useExample('todo')">
                         <div class="example-project-title">Simple Todo App</div>
-                        <div class="example-project-desc">React-based task manager with add, complete, and delete features</div>
+                        <div class="example-project-desc">React-based task manager with add, complete, and delete
+                            features</div>
                     </div>
                     <div class="example-project" onclick="useExample('landing')">
                         <div class="example-project-title">Landing Page</div>
-                        <div class="example-project-desc">Modern SaaS landing with hero, features, pricing, and contact form</div>
+                        <div class="example-project-desc">Modern SaaS landing with hero, features, pricing, and contact
+                            form</div>
                     </div>
                     <div class="example-project" onclick="useExample('api')">
                         <div class="example-project-title">REST API</div>
@@ -1388,7 +1515,8 @@
 
             <div class="welcome-section">
                 <h3>🎯 Getting Started</h3>
-                <p>Click "Projects" tab above, then "Create New Project". Fill in your project name and description, then watch the magic happen!</p>
+                <p>Click "Projects" tab above, then "Create New Project". Fill in your project name and description,
+                    then watch the magic happen!</p>
             </div>
 
             <div class="welcome-actions">
@@ -1423,23 +1551,26 @@
 
         <!-- Tasks Tab -->
         <div id="tasks-tab" class="tab-panel active">
-        <div class="main-grid">
-            <!-- Validate Task -->
-            <div class="task-card">
-                <h2>Validate Game Idea</h2>
-                <p>Get structured feedback on game concepts. Returns strengths, issues, market viability, and next steps.</p>
-                <textarea id="validateInput" placeholder="Enter your game idea here...
+            <div class="main-grid">
+                <!-- Validate Task -->
+                <div class="task-card">
+                    <h2>Validate Game Idea</h2>
+                    <p>Get structured feedback on game concepts. Returns strengths, issues, market viability, and next
+                        steps.</p>
+                    <textarea id="validateInput"
+                        placeholder="Enter your game idea here...
 
 Example:
 A cooperative multiplayer game where players are members of a space station crew dealing with escalating system failures..."></textarea>
-                <button onclick="submitTask('validate')" id="validateBtn">Validate Idea</button>
-            </div>
+                    <button onclick="submitTask('validate')" id="validateBtn">Validate Idea</button>
+                </div>
 
-            <!-- Review Task -->
-            <div class="task-card">
-                <h2>Review Architecture</h2>
-                <p>Get technical feedback on architecture decisions. Returns risk assessment, recommendations, and verdict.</p>
-                <textarea id="reviewInput" placeholder="Enter your architecture document here...
+                <!-- Review Task -->
+                <div class="task-card">
+                    <h2>Review Architecture</h2>
+                    <p>Get technical feedback on architecture decisions. Returns risk assessment, recommendations, and
+                        verdict.</p>
+                    <textarea id="reviewInput" placeholder="Enter your architecture document here...
 
 Example:
 # Game Architecture - Strategy Game
@@ -1448,41 +1579,41 @@ Example:
 - Hex grid pathfinding with A* algorithm
 - Component-based unit system
 ..."></textarea>
-                <button onclick="submitTask('review')" id="reviewBtn">Review Architecture</button>
-            </div>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div>Processing... This may take 4-50 seconds depending on model state.</div>
-        </div>
-
-        <!-- Results Section -->
-        <div class="result-section" id="results">
-            <div class="result-header">
-                <h2>Results</h2>
-                <div>
-                    <button onclick="copyResults()" class="btn-secondary btn-small">Copy</button>
-                    <button onclick="closeResults()" class="btn-secondary btn-small">Close</button>
+                    <button onclick="submitTask('review')" id="reviewBtn">Review Architecture</button>
                 </div>
             </div>
-            <div class="result-meta">
-                <div class="meta-item">Task: <span id="resultTask"></span></div>
-                <div class="meta-item">Model: <span id="resultModel"></span></div>
-                <div class="meta-item">Duration: <span id="resultDuration"></span>s</div>
-            </div>
-            <div class="result-content" id="resultContent"></div>
-        </div>
 
-        <!-- Artifacts Section -->
-        <div class="artifacts-section">
-            <h2>Recent Artifacts</h2>
-            <div class="artifact-list" id="artifactList">
-                <div style="color: #999; font-size: 14px;">Artifacts saved to: ./artifacts/</div>
-                <div style="color: #666; font-size: 13px;">Check the artifacts folder for all saved results.</div>
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Processing... This may take 4-50 seconds depending on model state.</div>
             </div>
-        </div>
+
+            <!-- Results Section -->
+            <div class="result-section" id="results">
+                <div class="result-header">
+                    <h2>Results</h2>
+                    <div>
+                        <button onclick="copyResults()" class="btn-secondary btn-small">Copy</button>
+                        <button onclick="closeResults()" class="btn-secondary btn-small">Close</button>
+                    </div>
+                </div>
+                <div class="result-meta">
+                    <div class="meta-item">Task: <span id="resultTask"></span></div>
+                    <div class="meta-item">Model: <span id="resultModel"></span></div>
+                    <div class="meta-item">Duration: <span id="resultDuration"></span>s</div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+
+            <!-- Artifacts Section -->
+            <div class="artifacts-section">
+                <h2>Recent Artifacts</h2>
+                <div class="artifact-list" id="artifactList">
+                    <div style="color: #999; font-size: 14px;">Artifacts saved to: ./artifacts/</div>
+                    <div style="color: #666; font-size: 13px;">Check the artifacts folder for all saved results.</div>
+                </div>
+            </div>
         </div>
         <!-- End Tasks Tab -->
 
@@ -1490,7 +1621,8 @@ Example:
         <div id="code-tab" class="tab-panel">
             <div class="task-card" style="max-width: 900px; margin: 0 auto;">
                 <h2>Generate Code</h2>
-                <p>AI will analyze your request, choose the optimal tech stack (language/framework), and generate production-quality code.</p>
+                <p>AI will analyze your request, choose the optimal tech stack (language/framework), and generate
+                    production-quality code.</p>
                 <p style="font-size: 14px; color: #888; margin-top: 10px;">
                     <strong>Works for:</strong> Games • Mobile Apps • Web Apps • Backend APIs • Desktop Tools
                 </p>
@@ -1506,7 +1638,8 @@ Examples:
 The AI will choose the best language and framework for your specific needs." rows="8"></textarea>
                 <button onclick="submitTask('code')" id="codeBtn">Generate Code</button>
                 <div style="margin-top: 15px; padding: 12px; background: #2a2a2a; border-radius: 4px; font-size: 13px;">
-                    <strong>💡 Tip:</strong> After generation, use the "Review Architecture" task to evaluate the tech stack choices and code quality.
+                    <strong>💡 Tip:</strong> After generation, use the "Review Architecture" task to evaluate the tech
+                    stack choices and code quality.
                 </div>
             </div>
 
@@ -1548,7 +1681,8 @@ The AI will choose the best language and framework for your specific needs." row
                     </div>
                 </div>
                 <div class="chat-input-container">
-                    <textarea id="chatInput" placeholder="Type your message... (Shift+Enter for new line)" rows="3"></textarea>
+                    <textarea id="chatInput" placeholder="Type your message... (Shift+Enter for new line)"
+                        rows="3"></textarea>
                     <button onclick="sendChatMessage()" id="chatSendBtn">Send</button>
                 </div>
             </div>
@@ -1563,7 +1697,8 @@ The AI will choose the best language and framework for your specific needs." row
                     <h2>Discover & Validate Your Idea</h2>
                     <p>Let's validate your product idea with 3 key questions to ensure you're ready to build.</p>
                 </div>
-                <textarea id="discoverIdeaInput" placeholder="Describe your product idea in detail..." rows="6"></textarea>
+                <textarea id="discoverIdeaInput" placeholder="Describe your product idea in detail..."
+                    rows="6"></textarea>
                 <button onclick="startDiscovery()" class="btn-primary">Start Discovery</button>
             </div>
 
@@ -1591,7 +1726,8 @@ The AI will choose the best language and framework for your specific needs." row
                     <p id="verdictReasoning"></p>
                 </div>
                 <div class="verdict-actions">
-                    <button onclick="autoGenerateFromDiscovery()" id="codeGenBtn" class="btn-primary" style="display: none;">
+                    <button onclick="autoGenerateFromDiscovery()" id="codeGenBtn" class="btn-primary"
+                        style="display: none;">
                         🚀 Start Building (Auto-Generate)
                     </button>
                     <button onclick="startNewDiscovery()" class="btn-secondary">
@@ -1627,14 +1763,17 @@ The AI will choose the best language and framework for your specific needs." row
             <div class="task-card" style="max-width: 900px; margin: 0 auto 30px;">
                 <h2>Create New Project</h2>
                 <p>Start a new AI-guided project workflow from idea to hand-off ready completion.</p>
-                <input type="text" id="projectName" placeholder="Project name (e.g., '2D Roguelike Game')" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0; font-size: 14px;">
-                <textarea id="projectDescription" placeholder="Describe your project idea in detail..." rows="6"></textarea>
+                <input type="text" id="projectName" placeholder="Project name (e.g., '2D Roguelike Game')"
+                    style="width: 100%; padding: 12px; margin-bottom: 15px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0; font-size: 14px;">
+                <textarea id="projectDescription" placeholder="Describe your project idea in detail..."
+                    rows="6"></textarea>
                 <button onclick="createProject()" id="createProjectBtn">Create Project</button>
             </div>
 
             <!-- Project List -->
             <div class="task-card" style="max-width: 900px; margin: 0 auto;">
-                <div class="result-header" style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+                <div class="result-header"
+                    style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
                     <h2>My Projects</h2>
                     <button onclick="loadProjects()" class="btn-secondary btn-small">Refresh</button>
                 </div>
@@ -1650,13 +1789,17 @@ The AI will choose the best language and framework for your specific needs." row
                 </div>
 
                 <div id="projectsList">
-                    <div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>
+                    <div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!
+                    </div>
                 </div>
             </div>
 
             <!-- Project Dashboard (Hidden by default) -->
-            <div id="projectDashboard" class="task-card" style="max-width: 900px; margin: 30px auto; display: none;">
-                <div class="result-header" style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+            <div id="projectDashboard" class="task-card"
+                style="max-width: 900px; margin: 30px auto; display: none; position: relative; z-index: 100;">
+
+                <div class="result-header"
+                    style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
                     <h2 id="dashboardProjectName">Project Name</h2>
                     <button onclick="closeDashboard()" class="btn-secondary btn-small">Close</button>
                 </div>
@@ -1665,15 +1808,18 @@ The AI will choose the best language and framework for your specific needs." row
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
                         <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Current Phase</div>
-                        <div id="dashboardPhase" style="color: #4a9eff; font-size: 18px; font-weight: 600;">Discovery</div>
+                        <div id="dashboardPhase" style="color: #4a9eff; font-size: 18px; font-weight: 600;">Discovery
+                        </div>
                     </div>
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
                         <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Completion</div>
-                        <div id="dashboardCompletion" style="color: #4ade80; font-size: 18px; font-weight: 600;">10%</div>
+                        <div id="dashboardCompletion" style="color: #4ade80; font-size: 18px; font-weight: 600;">10%
+                        </div>
                     </div>
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
                         <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Status</div>
-                        <div id="dashboardStatus" style="color: #4ade80; font-size: 18px; font-weight: 600;">Active</div>
+                        <div id="dashboardStatus" style="color: #4ade80; font-size: 18px; font-weight: 600;">Active
+                        </div>
                     </div>
                 </div>
 
@@ -1681,19 +1827,36 @@ The AI will choose the best language and framework for your specific needs." row
                 <div style="margin-bottom: 25px;">
                     <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Phase Progress</div>
                     <div style="display: flex; gap: 8px;">
-                        <div id="phase-discovery" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Discovery</div>
-                        <div id="phase-validation" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Validation</div>
-                        <div id="phase-planning" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Planning</div>
-                        <div id="phase-codegen" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">CodeGen</div>
-                        <div id="phase-review" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Review</div>
-                        <div id="phase-qa" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">QA</div>
-                        <div id="phase-docs" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Docs</div>
-                        <div id="phase-complete" class="phase-indicator" style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">Complete</div>
+                        <div id="phase-discovery" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Discovery</div>
+                        <div id="phase-validation" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Validation</div>
+                        <div id="phase-planning" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Planning</div>
+                        <div id="phase-codegen" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            CodeGen</div>
+                        <div id="phase-review" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Review</div>
+                        <div id="phase-qa" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            QA</div>
+                        <div id="phase-docs" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Docs</div>
+                        <div id="phase-complete" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Complete</div>
                     </div>
                 </div>
 
                 <!-- Lead Agent Recommendation -->
-                <div id="leadAgentRecommendation" style="background: #1a4d2e; border-left: 4px solid #4ade80; padding: 15px; border-radius: 4px; margin-bottom: 25px; display: none;">
+                <div id="leadAgentRecommendation"
+                    style="background: #1a4d2e; border-left: 4px solid #4ade80; padding: 15px; border-radius: 4px; margin-bottom: 25px; display: none;">
                     <div style="font-weight: 600; margin-bottom: 8px;">Lead Agent Recommendation</div>
                     <div style="color: #888; font-size: 14px; margin-bottom: 8px;">
                         <strong>Decision:</strong> <span id="agentDecision">PROCEED</span>
@@ -1708,33 +1871,46 @@ The AI will choose the best language and framework for your specific needs." row
 
                 <!-- Phase Controls -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <button onclick="executeCurrentPhase()" id="executePhaseBtn" style="flex: 1;">Execute Current Phase</button>
-                    <button onclick="showGoBackOptions()" id="goBackBtn" class="btn-secondary" style="padding: 10px 20px; background: #4a5568; color: white;">← Go Back</button>
-                    <button onclick="approvePhase()" id="approvePhaseBtn" class="btn-secondary" style="flex: 1; background: #1a4d2e; color: #4ade80;">Approve & Continue</button>
-                    <button onclick="rejectPhase()" id="rejectPhaseBtn" class="btn-secondary" style="flex: 1; background: #4d1a1a; color: #ff6b6b;">Reject Phase</button>
+                    <button onclick="executeCurrentPhase()" id="executePhaseBtn" style="flex: 1;">Execute Current
+                        Phase</button>
+                    <button onclick="showGoBackOptions()" id="goBackBtn" class="btn-secondary"
+                        style="padding: 10px 20px; background: #4a5568; color: white;">← Go Back</button>
+                    <button onclick="approvePhase()" id="approvePhaseBtn" class="btn-secondary"
+                        style="flex: 1; background: #1a4d2e; color: #4ade80;">Approve & Continue</button>
+                    <button onclick="rejectPhase()" id="rejectPhaseBtn" class="btn-secondary"
+                        style="flex: 1; background: #4d1a1a; color: #ff6b6b;">Reject Phase</button>
                 </div>
 
                 <!-- Project Actions -->
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px;">
-                    <button onclick="viewArtifacts()" class="btn-secondary" style="flex: 1; background: #1a3a4d; color: #4a9eff;">📄 View Artifacts</button>
-                    <button onclick="viewTaskHistory()" class="btn-secondary" style="flex: 1; background: #3a1a4d; color: #a77bff;">📊 Task History</button>
-                    <button onclick="exportProject()" class="btn-secondary" style="flex: 1; background: #1a4d3a; color: #4aff7b;">📥 Export Report</button>
-                    <button onclick="deleteCurrentProject()" class="btn-secondary" style="background: #4d1a1a; color: #ff6b6b;">🗑 Delete</button>
+                <div
+                    style="display: flex; gap: 10px; margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px;">
+                    <button onclick="viewArtifacts()" class="btn-secondary"
+                        style="flex: 1; background: #1a3a4d; color: #4a9eff;">📄 View Artifacts</button>
+                    <button onclick="viewTaskHistory()" class="btn-secondary"
+                        style="flex: 1; background: #3a1a4d; color: #a77bff;">📊 Task History</button>
+                    <button onclick="exportProject()" class="btn-secondary"
+                        style="flex: 1; background: #1a4d3a; color: #4aff7b;">📥 Export Report</button>
+                    <button onclick="deleteCurrentProject()" class="btn-secondary"
+                        style="background: #4d1a1a; color: #ff6b6b;">🗑 Delete</button>
                 </div>
 
                 <!-- Hand-off Ready Criteria -->
-                <div id="handoffCriteria" style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none;">
+                <div id="handoffCriteria"
+                    style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none;">
                     <h3 style="color: #4a9eff; margin-bottom: 15px;">Hand-Off Ready Criteria</h3>
                     <div style="display: grid; gap: 10px;">
-                        <div id="criteria-build" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <div id="criteria-build"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
                             <span>Runnable Build</span>
                             <span id="criteria-build-status">❌</span>
                         </div>
-                        <div id="criteria-tests" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <div id="criteria-tests"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
                             <span>Tests Exist</span>
                             <span id="criteria-tests-status">❌</span>
                         </div>
-                        <div id="criteria-readme" style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <div id="criteria-readme"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
                             <span>README Documentation</span>
                             <span id="criteria-readme-status">❌</span>
                         </div>
@@ -1742,30 +1918,37 @@ The AI will choose the best language and framework for your specific needs." row
                 </div>
 
                 <!-- Triple Guarantee Quality Report -->
-                <div id="qualityReport" style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none; margin-top: 20px;">
+                <div id="qualityReport"
+                    style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none; margin-top: 20px;">
                     <h3 style="color: #4a9eff; margin-bottom: 15px;">🛡️ Triple Guarantee Quality Report</h3>
 
                     <!-- Overall Score -->
-                    <div style="background: #1a1a1a; padding: 20px; border-radius: 4px; margin-bottom: 20px; text-align: center;">
+                    <div
+                        style="background: #1a1a1a; padding: 20px; border-radius: 4px; margin-bottom: 20px; text-align: center;">
                         <div style="font-size: 48px; font-weight: bold; color: #4aff7b;" id="quality-score">--</div>
                         <div style="color: #888; margin-top: 5px;">Quality Score</div>
-                        <div style="margin-top: 10px; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold;" id="quality-status"></div>
+                        <div style="margin-top: 10px; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold;"
+                            id="quality-status"></div>
                     </div>
 
                     <!-- Build Status -->
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h4 style="color: #4a9eff; margin: 0;">🔨 Build Verification</h4>
                             <span id="build-status-badge" style="font-size: 24px;">❓</span>
                         </div>
                         <div style="display: grid; gap: 8px; margin-top: 10px;">
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Syntax Valid</span><span id="build-syntax">❓</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Dependencies OK</span><span id="build-deps">❓</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Entry Point Valid</span><span id="build-entry">❓</span>
                             </div>
                         </div>
@@ -1773,15 +1956,18 @@ The AI will choose the best language and framework for your specific needs." row
 
                     <!-- Runtime Status -->
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h4 style="color: #4a9eff; margin: 0;">🚀 Runtime Verification</h4>
                             <span id="runtime-status-badge" style="font-size: 24px;">❓</span>
                         </div>
                         <div style="display: grid; gap: 8px; margin-top: 10px;">
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Application Starts</span><span id="runtime-starts">❓</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Health Check</span><span id="runtime-health">❓</span>
                             </div>
                         </div>
@@ -1789,22 +1975,27 @@ The AI will choose the best language and framework for your specific needs." row
 
                     <!-- Test Status -->
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h4 style="color: #4a9eff; margin: 0;">✅ Test Verification</h4>
                             <span id="test-status-badge" style="font-size: 24px;">❓</span>
                         </div>
                         <div id="test-results" style="display: grid; gap: 8px; margin-top: 10px;">
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Tests Passed</span><span id="test-passed">0</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Tests Failed</span><span id="test-failed">0</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>Total Tests</span><span id="test-total">0</span>
                             </div>
                         </div>
-                        <div id="test-no-results" style="color: #888; padding: 20px; text-align: center; display: none;">
+                        <div id="test-no-results"
+                            style="color: #888; padding: 20px; text-align: center; display: none;">
                             No tests have been executed yet
                         </div>
                     </div>
@@ -1816,7 +2007,8 @@ The AI will choose the best language and framework for your specific needs." row
                             <span id="docs-status-badge" style="font-size: 24px;">❓</span>
                         </div>
                         <div style="display: grid; gap: 8px; margin-top: 10px;">
-                            <div style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
                                 <span>README Complete</span><span id="docs-readme">❓</span>
                             </div>
                         </div>
@@ -1824,25 +2016,32 @@ The AI will choose the best language and framework for your specific needs." row
                 </div>
 
                 <!-- Artifacts Viewer -->
-                <div id="artifactsViewer" style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div id="artifactsViewer"
+                    style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: #4a9eff; margin: 0;">Generated Artifacts</h3>
-                        <button onclick="closeArtifactsViewer()" class="btn-secondary" style="background: #4a5568;">Close</button>
+                        <button onclick="closeArtifactsViewer()" class="btn-secondary"
+                            style="background: #4a5568;">Close</button>
                     </div>
                     <div id="artifactsList"></div>
                 </div>
 
                 <!-- Task History Viewer -->
-                <div id="taskHistoryViewer" style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div id="taskHistoryViewer"
+                    style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: #a77bff; margin: 0;">Task Execution History</h3>
-                        <button onclick="closeTaskHistoryViewer()" class="btn-secondary" style="background: #4a5568;">Close</button>
+                        <button onclick="closeTaskHistoryViewer()" class="btn-secondary"
+                            style="background: #4a5568;">Close</button>
                     </div>
                     <div id="taskHistoryList"></div>
                 </div>
 
                 <!-- Phase Execution Log -->
-                <div id="phaseLog" style="margin-top: 25px; padding: 15px; background: #1a1a1a; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; display: none;">
+                <div id="phaseLog"
+                    style="margin-top: 25px; padding: 15px; background: #1a1a1a; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; display: none;">
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
@@ -1934,12 +2133,18 @@ The AI will choose the best language and framework for your specific needs." row
                 const response = await fetch(`${API_URL}/health`);
                 const data = await response.json();
 
-                if (data.status === 'healthy') {
+                if (data.status === 'healthy' || data.status === 'degraded') {
                     document.getElementById('status').className = 'status online';
-                    document.getElementById('statusText').textContent = 'Server Online - Ollama Connected';
+                    if (data.status === 'degraded') {
+                        document.getElementById('statusText').textContent = 'Server Online - Degraded (Missing Claude API Key?)';
+                        document.getElementById('status').style.background = '#ecc94b'; // Yellow
+                    } else {
+                        document.getElementById('statusText').textContent = 'Server Online - Ollama Connected';
+                    }
                 } else {
                     throw new Error('Server unhealthy');
                 }
+
             } catch (error) {
                 document.getElementById('status').className = 'status offline';
                 document.getElementById('statusText').textContent = 'Server Offline';
@@ -2113,7 +2318,7 @@ The AI will choose the best language and framework for your specific needs." row
         function createAgentCard(title, agentData, icon) {
             const cardId = `agent-${title.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
             const statusClass = agentData.status === 'passed' ? 'status-passed' :
-                               agentData.status === 'warning' ? 'status-warning' : 'status-failed';
+                agentData.status === 'warning' ? 'status-warning' : 'status-failed';
 
             return `
                 <div class="agent-card" id="${cardId}">
@@ -2468,35 +2673,35 @@ The AI will choose the best language and framework for your specific needs." row
                     input: idea
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showError(data.error);
-                    return;
-                }
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
 
-                // Store session data with enhanced fields from API
-                currentDiscoverSession = {
-                    id: data.discover_id,
-                    raw_idea: data.raw_idea || idea,
-                    idea_type: data.idea_type || 'General Application',
-                    questions: data.questions || []
-                };
-                currentDiscoverAnswers = [];
+                    // Store session data with enhanced fields from API
+                    currentDiscoverSession = {
+                        id: data.discover_id,
+                        raw_idea: data.raw_idea || idea,
+                        idea_type: data.idea_type || 'General Application',
+                        questions: data.questions || []
+                    };
+                    currentDiscoverAnswers = [];
 
-                // Show idea summary
-                document.getElementById('ideaSummary').textContent = idea;
+                    // Show idea summary
+                    document.getElementById('ideaSummary').textContent = idea;
 
-                // Display first question
-                displayQuestion(data);
+                    // Display first question
+                    displayQuestion(data);
 
-                // Switch to questions phase
-                document.getElementById('discover-input-phase').classList.remove('active');
-                document.getElementById('discover-questions-phase').classList.add('active');
-            })
-            .catch(error => {
-                showError('Failed to start discovery: ' + error.message);
-            });
+                    // Switch to questions phase
+                    document.getElementById('discover-input-phase').classList.remove('active');
+                    document.getElementById('discover-questions-phase').classList.add('active');
+                })
+                .catch(error => {
+                    showError('Failed to start discovery: ' + error.message);
+                });
         }
 
         function displayQuestion(data) {
@@ -2535,24 +2740,24 @@ The AI will choose the best language and framework for your specific needs." row
                     input: answer
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showError(data.error);
-                    return;
-                }
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
 
-                // Check if complete
-                if (data.status === 'complete') {
-                    displayVerdict(data);
-                } else {
-                    // Display next question
-                    displayQuestion(data);
-                }
-            })
-            .catch(error => {
-                showError('Failed to submit answer: ' + error.message);
-            });
+                    // Check if complete
+                    if (data.status === 'complete') {
+                        displayVerdict(data);
+                    } else {
+                        // Display next question
+                        displayQuestion(data);
+                    }
+                })
+                .catch(error => {
+                    showError('Failed to submit answer: ' + error.message);
+                });
         }
 
         function displayVerdict(data) {
@@ -2859,7 +3064,7 @@ Deliver code that is ready to run.`;
             const answers = session.answers || session.Answers || [];
             const qaHTML = questions.map((q, i) => `
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <strong style="color: #495057; font-size: 14px;">Q${i+1}: ${q}</strong>
+                    <strong style="color: #495057; font-size: 14px;">Q${i + 1}: ${q}</strong>
                     <p style="margin: 10px 0 0 0; color: #666; line-height: 1.6;">${answers[i] || '<em>Not answered</em>'}</p>
                 </div>
             `).join('');
@@ -2952,7 +3157,7 @@ Deliver code that is ready to run.`;
                 const questions = session.questions || session.Questions || [];
                 const answers = session.answers || session.Answers || [];
                 questions.forEach((q, i) => {
-                    md += `**Q${i+1}:** ${q}\n`;
+                    md += `**Q${i + 1}:** ${q}\n`;
                     md += `**A:** ${answers[i] || 'Not answered'}\n\n`;
                 });
 
@@ -3107,9 +3312,9 @@ Deliver code that is ready to run.`;
                                 <span class="kanban-column-count">${projectsByPhase[phase].length}</span>
                             </div>
                             ${projectsByPhase[phase].map(p => {
-                                const completion = calculateCompletion(p);
-                                const statusIcon = getStatusIcon(p.status);
-                                return `
+                const completion = calculateCompletion(p);
+                const statusIcon = getStatusIcon(p.status);
+                return `
                                     <div class="kanban-card phase-${phase}" onclick="openProjectDashboard('${p.id}')">
                                         <div class="kanban-card-title">${p.name}</div>
                                         <div class="progress-bar">
@@ -3121,7 +3326,7 @@ Deliver code that is ready to run.`;
                                         </div>
                                     </div>
                                 `;
-                            }).join('') || '<div style="color: #666; font-size: 13px; padding: 10px; text-align: center;">No projects</div>'}
+            }).join('') || '<div style="color: #666; font-size: 13px; padding: 10px; text-align: center;">No projects</div>'}
                         </div>
                     `).join('')}
                 </div>
@@ -3186,10 +3391,13 @@ Deliver code that is ready to run.`;
                     loadProjectMetrics(projectID);
                 }
 
-                // Load quality report if in QA phase or later
                 if (['qa', 'docs', 'complete'].includes(project.current_phase)) {
                     loadQualityReport(projectID);
                 }
+
+                // Check schema validation
+                checkProjectSchema(projectID);
+
             } catch (error) {
                 showToast(`❌ Error: ${error.message}`, 'error');
             }
@@ -3681,7 +3889,7 @@ Deliver code that is ready to run.`;
 
         // Load projects when switching to projects tab
         const originalSwitchTab = switchTab;
-        switchTab = function(tabName) {
+        switchTab = function (tabName) {
             originalSwitchTab(tabName);
             if (tabName === 'projects') {
                 loadProjects();
@@ -3691,9 +3899,104 @@ Deliver code that is ready to run.`;
         // Load history when page loads
         document.addEventListener('DOMContentLoaded', () => {
             // Wait a bit for server to be ready
-            setTimeout(loadDiscoveryHistory, 1000);
         });
+
+        // Schema Validation Function
+        async function checkProjectSchema(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/validate_schema?id=${projectID}`);
+                if (!response.ok) return;
+
+                const result = await response.json();
+
+                // Find or create warnings container
+                const dashboard = document.getElementById('projectDashboard');
+                let warningsContainer = document.getElementById('schemaWarnings');
+
+                if (!warningsContainer) {
+                    warningsContainer = document.createElement('div');
+                    warningsContainer.id = 'schemaWarnings';
+                    warningsContainer.style.cssText = `
+                        background: #4d1a1a; 
+                        border: 1px solid #ff6b6b; 
+                        border-radius: 4px; 
+                        padding: 15px; 
+                        margin: 20px; 
+                        display: none;
+                    `;
+                    // Insert after the top tabs/header (approximate location)
+                    const target = dashboard.querySelector('.dashboard-content') || dashboard.firstElementChild;
+                    if (target) {
+                        target.insertBefore(warningsContainer, target.firstElementChild);
+                    } else {
+                        dashboard.prepend(warningsContainer);
+                    }
+                }
+
+                if (!result.valid && result.issues && result.issues.length > 0) {
+                    warningsContainer.innerHTML = `
+                        <h4 style="margin-top: 0; color: #ff6b6b;">⚠️ Project Data Integrity Warning</h4>
+                        <p style="color: #ccc; margin-bottom: 10px;">The project file has schema validation issues:</p>
+                        <ul style="color: #e0e0e0; margin-bottom: 0;">
+                            ${result.issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
+                    `;
+                    warningsContainer.style.display = 'block';
+                } else {
+                    warningsContainer.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to validate schema:', error);
+            }
+        }
+
+        // UI Smoke Test for Schema Validation
+        window.runUISmokeTest = async function () {
+            console.log('Running UI Smoke Test for Schema Validation...');
+
+            // 1. Create a dummy invalid project (simulated)
+            // Since we can't easily corrupt a file from UI, we will mock the fetch response for validation
+
+            const originalFetch = window.fetch;
+            const mockProjectId = 'test-invalid-project';
+
+            // Mock fetch to return invalid schema result for specific URL
+            window.fetch = async function (url, options) {
+                if (url.includes('/project/validate_schema') && url.includes(mockProjectId)) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            valid: false,
+                            issues: ['Missing ID', 'Invalid Status']
+                        })
+                    };
+                }
+                return originalFetch(url, options);
+            };
+
+            try {
+                // Simulate checking schema for this mock project
+                // We need to valid warnings container handles it
+                await checkProjectSchema(mockProjectId);
+
+                const warnings = document.getElementById('schemaWarnings');
+                if (warnings && warnings.style.display !== 'none' && warnings.innerHTML.includes('Missing ID')) {
+                    console.log('%c✅ PASS: Warning displayed correctly', 'color: green; font-weight: bold;');
+                    alert('✅ UI Test Passed: Warnings displayed correctly');
+                } else {
+                    console.log('%c❌ FAIL: Warning not displayed', 'color: red; font-weight: bold;');
+                    alert('❌ UI Test Failed: Warnings not displayed');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('❌ UI Test Error: ' + e.message);
+            } finally {
+                // Restore fetch
+                window.fetch = originalFetch;
+            }
+        };
+
     </script>
 </body>
-</html>
 
+</html>

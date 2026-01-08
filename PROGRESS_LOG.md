@@ -717,3 +717,78 @@ Completed validation results persistence and web UI quality visualization to fin
 - Test with real project generation
 - Create demo script for business partner
 - Generate first client deliverable with quality certificate
+
+---
+
+## 2026-01-08: Robustness & Reliability Enhancements (Phase 4+)
+
+### Overview
+Addressed key stability gaps identified for commercial launch, specifically focused on data integrity and user feedback during project loading.
+
+### Changes Made
+
+#### Data Integrity
+1. **project/manager.go**
+   - Implemented `ValidateProjectSchema(project *Project)`
+   - Integrated schema validation into `LoadProject` and `loadAllProjects`
+   - Added validation for critical fields (ID, Name, Status, Phase)
+
+#### API & Monitoring
+2. **api/server.go**
+   - Added `GET /project/validate_schema` endpoint
+   - Added startup logging to list loaded projects and their status/phases
+
+#### User Interface
+3. **web/index.html**
+   - Added dynamic "Project Data Integrity Warning" banner
+   - Implemented `checkProjectSchema()` to run on dashboard load
+   - Added `runUISmokeTest()` verification script
+
+### Impact
+- **Stability**: Corrupted project files are now detected on startup/load rather than causing silent failures
+- **Observability**: Server console now provides clear inventory state
+- **UX**: Users (and developers) are immediately warned if a project file is invalid
+
+### Testing
+- ✅ Unit tests passed
+- ✅ Build successful
+- ✅ UI verification script ready for acceptance testing
+
+---
+
+## 2026-01-08: CodeGen Stability & Orchestrator Finalization
+
+### Overview
+Successfully resolved persistent CodeGen failures and implemented system-wide robustness fixes to ensure reliable MVP generation using local LLMs.
+
+### Changes Made
+
+#### LLM Robustness & Resiliency
+1. **supervisor/supervised_manager.go**
+   - Implemented **Ollama Fallback**: If Claude Code API is unreachable, tasks automatically re-route to local Ollama.
+2. **config/config.go & config.json**
+   - Standardized **10-minute timeout** (600s) for all tasks to accommodate local model processing times.
+
+#### CodeGen Precision
+3. **project/orchestrator.go**
+   - Implemented **Context Injection**: Planning phase outputs are now passed into the CodeGen prompt, ensuring the coder agent has the full roadmap.
+4. **task/manager.go**
+   - Refined `ParseFilesFromOutput` regex: Now strictly requires file extensions to prevent generic headers from being misidentified as filenames.
+
+#### User Experience
+5. **web/index.html**
+   - Fixed "Server Offline" bug: UI now distinguishes between "Offline" and "Online - Degraded" (Claude missing).
+   - Fixed Dashboard visibility (z-index issue).
+   - Added **Welcome Modal Close Button**: Integrated "X" button for improved first-time UX.
+
+### E2E Verification Results: "Chronocraft"
+- ✅ **Discovery**: Requirements gathered for steampunk game.
+- ✅ **Validation**: Tech stack (Node.js/Canvas) approved.
+- ✅ **Planning**: Milestone-based roadmap generated.
+- ✅ **CodeGen**: Successfully generated playable prototype using fallback route.
+- ✅ **Stability**: Project transitioned through all phases without JSON corruption or timeout errors.
+
+### Next Steps (Phase 5+)
+- [ ] Implement parallel agent execution for faster review phases.
+- [ ] Add direct terminal integration in web UI for local build logs.
+- [ ] Optimize local model parameters for cleaner code output.

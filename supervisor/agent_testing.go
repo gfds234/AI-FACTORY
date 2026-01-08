@@ -48,37 +48,102 @@ func (a *TestingAgent) Execute(taskType, input string, context map[string]interf
 }
 
 func (a *TestingAgent) buildPrompt(taskType, input, output string) string {
-	return fmt.Sprintf(`You are a test engineer. Create a comprehensive test plan for the generated code.
+	return fmt.Sprintf(`<system>
+You are a senior test engineer specializing in automated testing strategies.
+Your goal: Create runnable tests that verify the code actually works.
+</system>
 
-Original Request:
+<context>
+<original_request>
 %s
-
-Generated Code/Output:
+</original_request>
+<generated_code>
 %s
+</generated_code>
+<testing_frameworks_2025>
+JavaScript/TypeScript:
+- Jest (most common), Vitest (Vite projects), Playwright (E2E)
+- Run: npm test, npx vitest, npx playwright test
 
-Provide:
+Python:
+- pytest (modern standard), unittest (built-in)
+- Run: pytest, python -m pytest
+
+Go:
+- testing package (built-in), testify (assertions)
+- Run: go test ./...
+
+Coverage targets: 70%% for MVP, 80%% for production
+</testing_frameworks_2025>
+</context>
+
+<instructions>
+<thinking>
+1. What testing framework should be used based on the tech stack?
+2. What are the critical paths that MUST be tested?
+3. What edge cases could cause failures?
+4. What's the minimum viable test suite?
+</thinking>
+
+Generate a test plan:
+</instructions>
+
+<output_format>
+## Detected Stack & Framework
+| Aspect | Value |
+|--------|-------|
+| Language | [JavaScript/Python/Go] |
+| Test Framework | [Jest/Vitest/pytest/go test] |
+| Test Runner Command | [exact command] |
 
 ## Test Strategy
-[What types of tests are needed?]
+| Type | Count | Priority |
+|------|-------|----------|
+| Unit Tests | [N] | HIGH |
+| Integration Tests | [N] | MEDIUM |
+| E2E Tests | [N] | LOW (for MVP) |
 
-## Unit Tests
-[Generate sample unit tests for critical functions]
-` + "```" + `
-[Actual test code here]
-` + "```" + `
+## Critical Test Cases
+| Test | What It Verifies | Priority |
+|------|------------------|----------|
+| [test_name] | [What it tests] | HIGH/MED/LOW |
 
-## Integration Tests
-[What integration tests would you recommend?]
+## Generated Tests
+`+"```"+`[language]
+// File: [test_file_name]
 
-## Edge Cases
-[List edge cases to test]
+[COMPLETE, RUNNABLE TEST CODE]
+[Include imports, setup, teardown]
+[Tests should be copy-paste ready]
+`+"```"+`
 
-## Test Data
-[Sample test data needed]
+## Test Commands
+`+"```bash"+`
+# Install test dependencies
+[npm install --save-dev jest / pip install pytest / etc.]
 
-## Testing Checklist
-- [ ] [Test item 1]
-- [ ] [Test item 2]
+# Run tests
+[npm test / pytest / go test ./...]
 
-Generate practical, runnable tests.`, input, output)
+# Run with coverage
+[npm test -- --coverage / pytest --cov / go test -cover ./...]
+`+"```"+`
+
+## Edge Cases to Test
+- [Edge case 1]
+- [Edge case 2]
+- [Edge case 3]
+
+## Coverage Recommendation
+- MVP Target: 70%%
+- Files to prioritize: [list critical files]
+</output_format>
+
+<rules>
+- Tests MUST be runnable - no pseudocode
+- Include all necessary imports and setup
+- Focus on business logic, not boilerplate
+- Minimum 3 test cases for any feature
+- Always include at least one error/edge case test
+</rules>`, input, output)
 }

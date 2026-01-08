@@ -93,6 +93,22 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (interface
 
 	if complexity.RecommendedRoute == "claude_code" && stm.claudeCodeClient != nil {
 		baseResult, err = stm.executeWithClaudeCode(taskType, input)
+		if err != nil {
+			log.Printf("⚠️  Claude Code execution failed, falling back to Ollama: %v", err)
+			// Reset error and try Ollama
+			err = nil
+			execResult, execErr := stm.baseManager.ExecuteTask(taskType, input)
+			err = execErr
+			if execErr == nil {
+				var ok bool
+				baseResult, ok = execResult.(*task.Result)
+				if !ok {
+					err = fmt.Errorf("unexpected result type from base manager")
+				} else {
+					result.ExecutionRoute = "ollama (fallback)"
+				}
+			}
+		}
 	} else {
 		execResult, execErr := stm.baseManager.ExecuteTask(taskType, input)
 		err = execErr

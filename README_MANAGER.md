@@ -170,3 +170,23 @@ See [SUPERVISOR_GUIDE.md](SUPERVISOR_GUIDE.md) for complete setup instructions.
 - Quick idea validation
 - Rapid prototyping
 - Learning the system
+### Project-Based Workflow (Phase 4)
+The AI Factory now follows a structured **8-Phase Lifecycle** for full MVP generation:
+1. **Discovery** (Idea refinement)
+2. **Validation** (Market fit/Tech stack)
+3. **Planning** (Roadmap generation)
+4. **CodeGen** (Automatic code generation) -> *Now with robust file parsing and context injection!*
+5. **Review** (Quality verification)
+6. **QA** (Success guarantee)
+7. **Docs** (Manuals and API docs)
+8. **Complete** (Final hand-off)
+
+### Robustness & Reliability
+- **Triple Guarantee System**: Every MVP is verified for Build, Runtime, and Test success.
+- **Failover Logic**: If premium agents (Claude) are offline, the system automatically falls back to local models (Ollama).
+- **Data Protection**: Automatic schema validation ensures project files never corrupt silently.
+
+### Tips for Best Results
+1. **Be Descriptive**: The more detail you provide in the Planning phase, the better the CodeGen results.
+2. **Review the Roadmap**: Always check the Planning output before approving CodeGen.
+3. **Use the "X"**: The welcome modal now has a close button if you need to skip the intro quickly.

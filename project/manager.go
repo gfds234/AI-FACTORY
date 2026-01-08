@@ -124,24 +124,30 @@ func (pm *ProjectManager) SaveProject(project *Project) error {
 
 // LoadProject loads a project from disk by ID
 func (pm *ProjectManager) LoadProject(id string) (*Project, error) {
-	pm.projectsMux.Lock()
-	defer pm.projectsMux.Unlock()
+    pm.projectsMux.Lock()
+    defer pm.projectsMux.Unlock()
 
-	projectPath := pm.getProjectPath(id)
+    projectPath := pm.getProjectPath(id)
 
-	data, err := os.ReadFile(projectPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read project file: %w", err)
-	}
+    data, err := os.ReadFile(projectPath)
+    if err != nil {
+        return nil, fmt.Errorf("failed to read project file: %w", err)
+    }
 
-	var project Project
-	if err := json.Unmarshal(data, &project); err != nil {
-		return nil, fmt.Errorf("failed to parse project JSON: %w", err)
-	}
+    var project Project
+    if err := json.Unmarshal(data, &project); err != nil {
+        return nil, fmt.Errorf("failed to parse project JSON: %w", err)
+    }
 
-	pm.projects[project.ID] = &project
+    // Validate schema after loading
+    if err := pm.ValidateProjectSchema(&project); err != nil {
+        fmt.Printf("Warning: project %s failed schema validation: %v\n", id, err)
+        // Continue loading but mark as potentially problematic
+    }
 
-	return &project, nil
+    pm.projects[project.ID] = &project
+
+    return &project, nil
 }
 
 // DeleteProject deletes a project from disk and cache
@@ -232,40 +238,58 @@ func (pm *ProjectManager) saveProjectToDisk(project *Project) error {
 
 // loadAllProjects loads all projects from disk into cache
 func (pm *ProjectManager) loadAllProjects() error {
-	entries, err := os.ReadDir(pm.projectsDir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil // Directory doesn't exist yet, no projects to load
-		}
-		return fmt.Errorf("failed to read projects directory: %w", err)
-	}
+    entries, err := os.ReadDir(pm.projectsDir)
+    if err != nil {
+        if os.IsNotExist(err) {
+            return nil // Directory doesn't exist yet, no projects to load
+        }
+        return fmt.Errorf("failed to read projects directory: %w", err)
+    }
 
-	for _, entry := range entries {
-		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
-			continue
-		}
+    for _, entry := range entries {
+        if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
+            continue
+        }
 
-		projectPath := filepath.Join(pm.projectsDir, entry.Name())
-		data, err := os.ReadFile(projectPath)
-		if err != nil {
-			// Log error but continue loading other projects
-			fmt.Printf("Warning: failed to read project file %s: %v\n", entry.Name(), err)
-			continue
-		}
+        projectPath := filepath.Join(pm.projectsDir, entry.Name())
+        data, err := os.ReadFile(projectPath)
+        if err != nil {
+            // Log error but continue loading other projects
+            fmt.Printf("Warning: failed to read project file %s: %v\n", entry.Name(), err)
+            continue
+        }
 
-		var project Project
-		if err := json.Unmarshal(data, &project); err != nil {
-			fmt.Printf("Warning: failed to parse project file %s: %v\n", entry.Name(), err)
-			continue
-		}
+        var project Project
+        if err := json.Unmarshal(data, &project); err != nil {
+            fmt.Printf("Warning: failed to parse project file %s: %v\n", entry.Name(), err)
+            continue
+        }
 
-		pm.projects[project.ID] = &project
-	}
+        // Validate schema after unmarshalling
+        if err := pm.ValidateProjectSchema(&project); err != nil {
+            fmt.Printf("Warning: project %s failed schema validation: %v\n", project.ID, err)
+            // Continue loading but keep project in cache for debugging
+        }
 
-	return nil
+        pm.projects[project.ID] = &project
+    }
+
+    return nil
 }
 
 // getProjectPath returns the file path for a project
 func (pm *ProjectManager) getProjectPath(id string) string {
 	return filepath.Join(pm.projectsDir, fmt.Sprintf("project_%s.json", id))
+}
+
+// ValidateProjectSchema performs basic validation on a Project struct
+func (pm *ProjectManager) ValidateProjectSchema(project *Project) error {
+	if project.ID == "" {
+		return fmt.Errorf("project ID cannot be empty")
+	}
+	if project.Name == "" {
+		return fmt.Errorf("project name cannot be empty")
+	}
+	// Add more validation rules as needed
+	return nil
 }

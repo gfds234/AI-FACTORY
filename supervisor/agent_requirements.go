@@ -51,33 +51,75 @@ func (a *RequirementsAgent) Execute(taskType, input string, context map[string]i
 }
 
 func (a *RequirementsAgent) buildPrompt(taskType, input string) string {
-	return fmt.Sprintf(`You are a requirements analysis agent. Evaluate if the following request has complete requirements for a %s task.
+	return fmt.Sprintf(`<system>
+You are a senior requirements analyst specializing in MVP validation for AI-generated software projects.
+Your goal: Ensure we have enough information to build a working MVP, not a perfect spec.
+</system>
 
-User Request:
+<context>
+<task_type>%s</task_type>
+<user_request>
 %s
+</user_request>
+<market_context>
+- Target: Solo developers or small teams
+- Timeline: MVP should be buildable in under 1 week
+- Stack: Modern, lightweight frameworks (avoid enterprise complexity)
+- Deployment: Should be deployable on free tiers (Vercel, Railway, Fly.io)
+</market_context>
+</context>
 
-Analyze and respond in this format:
+<instructions>
+Think step by step before providing your analysis:
 
+<thinking>
+1. What is the core user problem being solved?
+2. What is the absolute minimum feature set for a usable MVP?
+3. Are there any scope creep indicators (too many features, enterprise requirements)?
+4. What assumptions can we safely make vs. what MUST be clarified?
+</thinking>
+
+Now provide your structured analysis:
+</instructions>
+
+<output_format>
 ## Completeness Score
-[Rate 1-10 how complete the requirements are]
+[Rate 1-10: 7+ means we can proceed with reasonable assumptions]
+
+## Core Problem Identified
+[One sentence describing the user's actual need]
+
+## MVP Feature Set
+[Bullet list of ONLY the essential features - trim anything that isn't launch-critical]
 
 ## Missing Information
-[List any critical missing details - be specific]
-- [Item 1]
-- [Item 2]
+[List ONLY blockers - things we genuinely cannot assume]
+- [Blocker 1]
+- [Blocker 2]
+
+## Safe Assumptions
+[Things we can reasonably decide without asking]
+- [Assumption 1]
+- [Assumption 2]
 
 ## Clarifying Questions
-[Questions to ask the user to complete requirements]
+[ONLY if truly blocking - keep to max 2 questions]
 1. [Question 1]
 2. [Question 2]
 
 ## Status
-[One word: COMPLETE, NEEDS_CLARIFICATION, or INCOMPLETE]
+COMPLETE | NEEDS_CLARIFICATION | INCOMPLETE
 
 ## Recommendation
-[Should we proceed, or gather more information first?]
+[One sentence: proceed, clarify, or reject with reason]
+</output_format>
 
-Be practical - don't demand perfection. Mark COMPLETE if we have enough to build an MVP.`, taskType, input)
+<rules>
+- Bias toward COMPLETE - MVPs should ship fast
+- Assume modern defaults (REST API, SQLite/PostgreSQL, JWT auth if needed)
+- Flag scope creep aggressively
+- Never ask for details that can be decided during implementation
+</rules>`, taskType, input)
 }
 
 func (a *RequirementsAgent) parseStatus(response string) string {
