@@ -6,6 +6,13 @@ orchestrator.exe
 *.so
 *.dylib
 
+# Environment files - SENSITIVE!
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
 # Runtime generated files
 config.json
 artifacts/
@@ -37,3 +44,7 @@ tmp/
 temp/
 *.tmp
 nul
+
+# Downloaded tools and temporary archives
+ngrok.zip
+Users*.zip

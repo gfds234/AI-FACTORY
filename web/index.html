@@ -1162,6 +1162,179 @@
             color: #e0e0e0;
             font-size: 14px;
         }
+
+        /* Welcome Modal */
+        .welcome-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .welcome-modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .welcome-content {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid #4a9eff;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #4a9eff;
+        }
+
+        .welcome-header .tagline {
+            font-size: 16px;
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .welcome-section {
+            margin-bottom: 25px;
+        }
+
+        .welcome-section h3 {
+            color: #4a9eff;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .welcome-section p {
+            color: #c0c0c0;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .welcome-section li {
+            color: #c0c0c0;
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .welcome-section li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .example-projects {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .example-project {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-project:hover {
+            border-color: #4a9eff;
+            background: #222;
+        }
+
+        .example-project-title {
+            color: #4a9eff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .example-project-desc {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn-welcome {
+            padding: 14px 32px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-welcome-primary {
+            background: linear-gradient(135deg, #4a9eff, #357abd);
+            color: white;
+        }
+
+        .btn-welcome-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-welcome-secondary {
+            background: #1a1a1a;
+            color: #c0c0c0;
+            border: 1px solid #444;
+        }
+
+        .btn-welcome-secondary:hover {
+            background: #222;
+            border-color: #4a9eff;
+        }
     </style>
 </head>
 <body>
@@ -1170,6 +1343,63 @@
         <div class="loading-spinner"></div>
         <p id="codeLoadingMessage">Generating code...</p>
         <p class="loading-hint">This may take 10-30 seconds depending on complexity</p>
+    </div>
+
+    <!-- Welcome Modal for First-Time Users -->
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h1>Welcome to AI FACTORY!</h1>
+                <p class="tagline">Autonomous MVP Generation with Quality Guarantees</p>
+            </div>
+
+            <div class="welcome-section">
+                <h3>🚀 What is AI FACTORY?</h3>
+                <p>AI FACTORY autonomously generates production-ready MVPs through a 6-phase process. Unlike other tools, we <strong>prove every deliverable works</strong> through automated testing.</p>
+            </div>
+
+            <div class="welcome-section">
+                <h3>✨ How It Works</h3>
+                <ul>
+                    <li>Describe your project idea</li>
+                    <li>Watch AI build it through 6 automated phases</li>
+                    <li>Get quality-verified code with test results</li>
+                    <li>Download your complete, working MVP</li>
+                </ul>
+            </div>
+
+            <div class="welcome-section">
+                <h3>💡 Try These Example Projects</h3>
+                <div class="example-projects">
+                    <div class="example-project" onclick="useExample('todo')">
+                        <div class="example-project-title">Simple Todo App</div>
+                        <div class="example-project-desc">React-based task manager with add, complete, and delete features</div>
+                    </div>
+                    <div class="example-project" onclick="useExample('landing')">
+                        <div class="example-project-title">Landing Page</div>
+                        <div class="example-project-desc">Modern SaaS landing with hero, features, pricing, and contact form</div>
+                    </div>
+                    <div class="example-project" onclick="useExample('api')">
+                        <div class="example-project-title">REST API</div>
+                        <div class="example-project-desc">User management API with Node.js, Express, and MongoDB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-section">
+                <h3>🎯 Getting Started</h3>
+                <p>Click "Projects" tab above, then "Create New Project". Fill in your project name and description, then watch the magic happen!</p>
+            </div>
+
+            <div class="welcome-actions">
+                <button class="btn-welcome btn-welcome-primary" onclick="closeWelcome(true)">
+                    Get Started
+                </button>
+                <button class="btn-welcome btn-welcome-secondary" onclick="closeWelcome(false)">
+                    Don't Show Again
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -1644,6 +1874,59 @@ The AI will choose the best language and framework for your specific needs." row
 
     <script>
         const API_URL = window.location.origin;
+
+        // Welcome Modal Functions
+        function checkFirstVisit() {
+            const hasVisited = localStorage.getItem('ai_factory_visited');
+            if (!hasVisited) {
+                document.getElementById('welcomeModal').classList.add('show');
+            }
+        }
+
+        function closeWelcome(showAgain) {
+            document.getElementById('welcomeModal').classList.remove('show');
+            if (!showAgain) {
+                localStorage.setItem('ai_factory_visited', 'true');
+            }
+            // Switch to Projects tab
+            switchTab('projects');
+        }
+
+        function useExample(type) {
+            const examples = {
+                'todo': {
+                    name: 'Simple Todo List',
+                    description: 'A web-based todo app with React. Users can add new tasks, mark them as complete, and delete tasks. Include basic styling with CSS.'
+                },
+                'landing': {
+                    name: 'Product Landing Page',
+                    description: 'A modern landing page for a SaaS product. Include hero section, features section, pricing table, and contact form. Use Tailwind CSS for styling.'
+                },
+                'api': {
+                    name: 'User Management API',
+                    description: 'A REST API for user management with Node.js and Express. Include endpoints for user registration, login (JWT auth), get user profile, and update profile. Use MongoDB for storage.'
+                }
+            };
+
+            const example = examples[type];
+            if (example) {
+                closeWelcome(true);
+                switchTab('projects');
+
+                // Fill in the form
+                setTimeout(() => {
+                    document.getElementById('projectName').value = example.name;
+                    document.getElementById('projectDescription').value = example.description;
+
+                    // Scroll to form
+                    document.getElementById('projectName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+
+        function showWelcomeModal() {
+            document.getElementById('welcomeModal').classList.add('show');
+        }
 
         // Check server health on load
         async function checkHealth() {
@@ -2133,6 +2416,8 @@ The AI will choose the best language and framework for your specific needs." row
 
         // Initialize
         checkHealth();
+        checkFirstVisit(); // Show welcome modal for first-time visitors
+
         // Code Generation Functions
         function copyCodeResults() {
             const content = document.getElementById('codeResultContent').innerText;

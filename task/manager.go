@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -246,31 +248,481 @@ Your task:
 
 ## Implementation
 
+**IMPORTANT: Output each file separately using this exact format:**
+
+### filename.ext
 ` + "```" + `[language]
-[Your complete, production-quality code here]
-[Include comments explaining architecture and key decisions]
+[Complete file content here]
 ` + "```" + `
 
-## Project Structure
-[Explain file/folder organization if this would be multi-file]
+**For web projects, you MUST create separate files:**
+- index.html (main HTML structure)
+- css/styles.css (all styling)
+- js/app.js (all JavaScript logic)
+- README.md (setup instructions)
+
+**For full-stack web projects, ALSO include backend:**
+- backend/server.js (or server.py, main.go) - Main server file
+- backend/routes/ - API route handlers
+- backend/models/ - Data models (if using database)
+- backend/.env.example - Environment variable template
+- backend/package.json (or requirements.txt, go.mod) - Dependencies
+
+**For backend/API projects:**
+- server.js (or main.go, app.py) - Main entry point
+- routes/ - API endpoints
+- controllers/ - Business logic
+- models/ - Data models
+- middleware/ - Authentication, error handling
+- config/ - Configuration files
+- .env.example - Environment variables
+- README.md - Setup and API documentation
+
+**For projects requiring a database, ALSO include:**
+- database/schema.sql (or schema.prisma) - Database schema definition
+- database/migrations/ - Migration files for schema changes
+- models/ - ORM models (Sequelize, Prisma, TypeORM, GORM)
+- database/seeds/ - Initial data/fixtures (optional)
+- database/connection.js (or db.js, database.go) - Database connection setup
+- Include database URL in .env.example
+
+**For other projects, organize logically:**
+- Separate concerns (UI, logic, data, config)
+- Follow the chosen framework's best practices
+- Include README.md with setup instructions
+
+**Example multi-file output:**
+
+### index.html
+` + "```" + `html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Name</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- HTML content -->
+    <script src="js/app.js"></script>
+</body>
+</html>
+` + "```" + `
+
+### css/styles.css
+` + "```" + `css
+/* Stylesheet content */
+body {
+    margin: 0;
+    padding: 0;
+}
+` + "```" + `
+
+### js/app.js
+` + "```" + `javascript
+// JavaScript logic
+console.log('App initialized');
+` + "```" + `
+
+### README.md
+` + "```" + `markdown
+# Project Name
 
 ## Setup Instructions
-1. [Step-by-step instructions to run this code]
-2. [Required dependencies/tools]
-3. [How to test/verify it works]
+1. [Steps to run]
+2. [Dependencies needed]
+
+## Usage
+[How to use the application]
+` + "```" + `
+
+**For projects requiring a backend, also include backend files:**
+
+### backend/server.js
+` + "```" + `javascript
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.get('/api/data', (req, res) => {
+    res.json({ message: 'API response' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(\` + "`" + `Server running on port ${PORT}\` + "`" + `));
+` + "```" + `
+
+### backend/package.json
+` + "```" + `json
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}
+` + "```" + `
+
+### backend/.env.example
+` + "```" + `
+PORT=3000
+DATABASE_URL=your_database_url_here
+` + "```" + `
+
+**For projects with databases, also include schema and models:**
+
+### database/schema.sql
+` + "```" + `sql
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+` + "```" + `
+
+### models/User.js
+` + "```" + `javascript
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+    return sequelize.define('User', {
+        username: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
+        }
+    });
+};
+` + "```" + `
+
+### database/connection.js
+` + "```" + `javascript
+const { Sequelize } = require('sequelize');
+require('dotenv').config();
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false
+});
+
+module.exports = sequelize;
+` + "```" + `
+
+**For projects requiring authentication, ALSO include:**
+
+### middleware/auth.js
+` + "```" + `javascript
+const jwt = require('jsonwebtoken');
+
+module.exports = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+        return res.status(401).json({ error: 'Access denied' });
+    }
+
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified;
+        next();
+    } catch (err) {
+        res.status(400).json({ error: 'Invalid token' });
+    }
+};
+` + "```" + `
+
+### routes/auth.js
+` + "```" + `javascript
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const router = express.Router();
+
+router.post('/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        res.status(201).json({ message: 'User created', userId: user.id });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+        res.json({ token });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+module.exports = router;
+` + "```" + `
+
+**For production deployment, ALSO include:**
+
+### Dockerfile
+` + "```" + `dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]
+` + "```" + `
+
+### docker-compose.yml
+` + "```" + `yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:password@db:5432/dbname
+      - JWT_SECRET=your-secret-key
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dbname
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+` + "```" + `
+
+### .dockerignore
+` + "```" + `
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+` + "```" + `
+
+### DEPLOYMENT.md
+` + "```" + `markdown
+# Deployment Guide
+
+## Option 1: Docker (Recommended)
+
+1. Build and run with Docker Compose:
+   \` + "`" + `\` + "`" + `\` + "`" + `bash
+   docker-compose up -d
+   \` + "`" + `\` + "`" + `\` + "`" + `
+
+2. Check logs:
+   \` + "`" + `\` + "`" + `\` + "`" + `bash
+   docker-compose logs -f
+   \` + "`" + `\` + "`" + `\` + "`" + `
+
+## Option 2: Railway
+
+1. Install Railway CLI: \` + "`" + `npm i -g @railway/cli\` + "`" + `
+2. Login: \` + "`" + `railway login\` + "`" + `
+3. Initialize: \` + "`" + `railway init\` + "`" + `
+4. Add PostgreSQL: \` + "`" + `railway add\` + "`" + `
+5. Deploy: \` + "`" + `railway up\` + "`" + `
+
+## Option 3: Vercel (Frontend) + Railway (Backend)
+
+**Frontend (Vercel):**
+1. Push to GitHub
+2. Import project on vercel.com
+3. Set environment variables
+
+**Backend (Railway):**
+1. Connect GitHub repo
+2. Add PostgreSQL database
+3. Set environment variables
+4. Deploy automatically on push
+
+## Environment Variables
+
+Required variables:
+- \` + "`" + `PORT\` + "`" + ` - Server port (default: 3000)
+- \` + "`" + `DATABASE_URL\` + "`" + ` - PostgreSQL connection string
+- \` + "`" + `JWT_SECRET\` + "`" + ` - Secret key for JWT tokens
+- \` + "`" + `NODE_ENV\` + "`" + ` - Environment (production/development)
+` + "```" + `
+
+**For Python/FastAPI projects, use similar structure:**
+
+### main.py
+` + "```" + `python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Task(BaseModel):
+    title: str
+    description: str
+
+@app.get("/api/tasks")
+async def get_tasks():
+    return {"tasks": []}
+
+@app.post("/api/tasks")
+async def create_task(task: Task):
+    return {"id": 1, **task.dict()}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+` + "```" + `
+
+**For Go projects, use similar structure:**
+
+### main.go
+` + "```" + `go
+package main
+
+import (
+    "encoding/json"
+    "net/http"
+    "github.com/gorilla/mux"
+)
+
+type Task struct {
+    ID          int    \` + "`" + `json:"id"\` + "`" + `
+    Title       string \` + "`" + `json:"title"\` + "`" + `
+    Description string \` + "`" + `json:"description"\` + "`" + `
+}
+
+func getTasks(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode([]Task{})
+}
+
+func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/api/tasks", getTasks).Methods("GET")
+    http.ListenAndServe(":8000", r)
+}
+` + "```" + `
+
+## Setup Instructions
+[Brief summary - detailed instructions should be in README.md]
 
 ## Next Steps
 [What to implement next to expand this project]
 
-Focus on practical, working code that a solo developer can immediately use and understand.`, input)
+Focus on practical, working code with proper file organization that a solo developer can immediately use and understand. Always separate HTML, CSS, and JavaScript into different files for web projects. For Python projects, use virtual environments. For Go projects, use Go modules.`, input)
+}
+
+// FileContent represents a parsed file from LLM output
+type FileContent struct {
+	Path    string
+	Content string
+}
+
+// ParseFilesFromOutput extracts multiple files from LLM output
+// Looks for patterns like "### filename.ext" or "#### filename.ext" followed by code blocks
+func ParseFilesFromOutput(output string) []FileContent {
+	files := make([]FileContent, 0)
+
+	// Pattern: ### or #### filename.ext followed by ```language\n content \n```
+	// Using regex to find file markers (flexible with 3 or 4 hashes)
+	// Allow optional description in parentheses after filename
+	fileMarkerRegex := regexp.MustCompile(`###+\s+([^\s\n(]+).*\n`)
+	// Use (?s) flag for DOTALL mode - allows . to match newlines
+	// Match both uppercase and lowercase language names
+	codeBlockRegex := regexp.MustCompile("(?s)```[a-zA-Z]*\\n(.*?)```")
+
+	// Find all file markers
+	fileMarkers := fileMarkerRegex.FindAllStringSubmatchIndex(output, -1)
+
+	if len(fileMarkers) == 0 {
+		// No multi-file format found, return empty
+		return files
+	}
+
+	for i, match := range fileMarkers {
+		// Extract filename from capture group
+		filenameStart := match[2]
+		filenameEnd := match[3]
+		filename := output[filenameStart:filenameEnd]
+
+		// Find the content after this marker (until next marker or end)
+		contentStart := match[1] // End of the marker line
+		contentEnd := len(output)
+
+		// If there's a next marker, content ends there
+		if i+1 < len(fileMarkers) {
+			contentEnd = fileMarkers[i+1][0]
+		}
+
+		contentSection := output[contentStart:contentEnd]
+
+		// Extract code from code block
+		codeMatch := codeBlockRegex.FindStringSubmatch(contentSection)
+		if len(codeMatch) > 1 {
+			content := strings.TrimSpace(codeMatch[1])
+			files = append(files, FileContent{
+				Path:    filename,
+				Content: content,
+			})
+		}
+	}
+
+	return files
 }
 
 // saveArtifact saves the task result to a file
+// For code generation tasks, it detects multi-file projects and saves them properly
 func (m *Manager) saveArtifact(result *Result) (string, error) {
-	filename := fmt.Sprintf("%s_%d.md", 
-		result.TaskType, 
+	filename := fmt.Sprintf("%s_%d.md",
+		result.TaskType,
 		result.Timestamp.Unix())
-	
+
 	path := m.cfg.GetArtifactPath(filename)
 
 	// Create artifact content
@@ -285,7 +737,7 @@ func (m *Manager) saveArtifact(result *Result) (string, error) {
 
 ## Output
 %s
-`, 
+`,
 		result.TaskType,
 		result.Timestamp.Format(time.RFC3339),
 		result.Model,
@@ -300,12 +752,56 @@ func (m *Manager) saveArtifact(result *Result) (string, error) {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// Write file
+	// Write artifact file
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 		return "", fmt.Errorf("failed to write artifact: %w", err)
 	}
 
+	// For code generation tasks, check if multi-file format exists
+	if result.TaskType == "code" {
+		files := ParseFilesFromOutput(result.Output)
+
+		if len(files) > 0 {
+			// Multi-file project detected - save to projects directory
+			projectDir := filepath.Join("projects", fmt.Sprintf("generated_%d", result.Timestamp.Unix()))
+
+			if err := m.saveMultiFileProject(projectDir, files); err != nil {
+				// Non-fatal - artifact is already saved
+				return path + fmt.Sprintf(" (multi-file save failed: %v)", err), nil
+			}
+
+			// Return path indicating multi-file project was created
+			return fmt.Sprintf("%s (project: %s)", path, projectDir), nil
+		}
+	}
+
 	return path, nil
+}
+
+// saveMultiFileProject saves parsed files to a project directory
+func (m *Manager) saveMultiFileProject(projectDir string, files []FileContent) error {
+	// Create project directory
+	if err := os.MkdirAll(projectDir, 0755); err != nil {
+		return fmt.Errorf("failed to create project directory: %w", err)
+	}
+
+	// Save each file
+	for _, file := range files {
+		fullPath := filepath.Join(projectDir, file.Path)
+
+		// Create subdirectories if needed (e.g., css/, js/)
+		fileDir := filepath.Dir(fullPath)
+		if err := os.MkdirAll(fileDir, 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+
+		// Write file
+		if err := os.WriteFile(fullPath, []byte(file.Content), 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
+	}
+
+	return nil
 }
 
 // Ping checks if the LLM backend is accessible

@@ -88,6 +88,31 @@ AI FACTORY/
 
 ## Quick Start
 
+### 🚀 One-Click Launch (Recommended)
+
+**Windows:**
+```bash
+# 1. Clone and build
+git clone https://github.com/gfds234/AI-FACTORY
+cd AI-FACTORY
+go build -o orchestrator.exe .
+
+# 2. Run quickstart
+QUICKSTART.bat
+```
+
+The script automatically:
+- ✅ Prompts for API key
+- ✅ Starts orchestrator
+- ✅ Launches ngrok tunnel (if available)
+- ✅ Opens browser
+
+**See [QUICKSTART_GUIDE.md](QUICKSTART_GUIDE.md) for detailed instructions.**
+
+---
+
+### Manual Setup
+
 1. **Clone and build:**
 ```bash
 git clone https://github.com/gfds234/AI-FACTORY
@@ -111,6 +136,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 4. **Create your first MVP:**
 - Open web dashboard
 - Click "New Project"
+- Toggle between List and Kanban views
 - Enter project idea
 - Watch autonomous generation with real-time phase updates
 - Get quality-verified deliverable
