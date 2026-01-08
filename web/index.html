@@ -957,6 +957,211 @@
         @keyframes fadeOut {
             to { opacity: 0; transform: translateY(20px); }
         }
+        /* AutoClaude-Inspired Enhancements */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .view-toggle button {
+            flex: 1;
+            padding: 10px 20px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-toggle button.active {
+            background: #1a3a4d;
+            color: #4a9eff;
+        }
+
+        /* Kanban Board Styles */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kanban-column {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 400px;
+        }
+
+        .kanban-column-header {
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kanban-column-count {
+            background: #2a2a2a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .kanban-card {
+            background: #2a2a2a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .kanban-card:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .kanban-card.phase-discovery { border-left-color: #4a9eff; }
+        .kanban-card.phase-validation { border-left-color: #a77bff; }
+        .kanban-card.phase-planning { border-left-color: #ff9f43; }
+        .kanban-card.phase-codegen { border-left-color: #4ade80; }
+        .kanban-card.phase-review { border-left-color: #ffd93d; }
+        .kanban-card.phase-qa { border-left-color: #6bcf7f; }
+        .kanban-card.phase-docs { border-left-color: #00d2ff; }
+        .kanban-card.phase-complete { border-left-color: #4ade80; }
+
+        .kanban-card-title {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .kanban-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* Enhanced Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #4ade80);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Status Icons */
+        .status-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-icon.active { background: #4ade80; animation: pulse 2s infinite; }
+        .status-icon.pending { background: #ff9f43; }
+        .status-icon.complete { background: #4a9eff; }
+        .status-icon.error { background: #ff6b6b; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Phase Badge */
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .phase-badge.discovery { background: #1a3a4d; color: #4a9eff; }
+        .phase-badge.validation { background: #3a1a4d; color: #a77bff; }
+        .phase-badge.planning { background: #4d3a1a; color: #ff9f43; }
+        .phase-badge.codegen { background: #1a4d2e; color: #4ade80; }
+        .phase-badge.review { background: #4d4a1a; color: #ffd93d; }
+        .phase-badge.qa { background: #1a4d3a; color: #6bcf7f; }
+        .phase-badge.docs { background: #1a4a4d; color: #00d2ff; }
+        .phase-badge.complete { background: #1a4d2e; color: #4ade80; }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 30px;
+            bottom: -20px;
+            width: 2px;
+            background: #2a2a2a;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4a9eff;
+            flex-shrink: 0;
+            margin-top: 4px;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -1203,6 +1408,17 @@ The AI will choose the best language and framework for your specific needs." row
                     <h2>My Projects</h2>
                     <button onclick="loadProjects()" class="btn-secondary btn-small">Refresh</button>
                 </div>
+
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <button id="listViewBtn" class="active" onclick="toggleView('list')">
+                        📋 List View
+                    </button>
+                    <button id="kanbanViewBtn" onclick="toggleView('kanban')">
+                        📊 Kanban Board
+                    </button>
+                </div>
+
                 <div id="projectsList">
                     <div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>
                 </div>
@@ -1427,7 +1643,7 @@ The AI will choose the best language and framework for your specific needs." row
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8080';
+        const API_URL = window.location.origin;
 
         // Check server health on load
         async function checkHealth() {
@@ -2515,6 +2731,8 @@ Deliver code that is ready to run.`;
             }
         }
 
+        let currentView = 'list';
+
         async function loadProjects() {
             try {
                 const response = await fetch(`${API_URL}/project/list`);
@@ -2523,24 +2741,120 @@ Deliver code that is ready to run.`;
                 const data = await response.json();
                 const projects = data.projects || [];
 
-                const listHTML = projects.length === 0
-                    ? '<div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>'
-                    : projects.map(p => `
-                        <div style="padding: 15px; background: #1a1a1a; border-radius: 4px; margin-bottom: 10px; cursor: pointer;" onclick="openProjectDashboard('${p.id}')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-weight: 600; color: #4a9eff; margin-bottom: 5px;">${p.name}</div>
-                                    <div style="font-size: 13px; color: #888;">Phase: ${p.current_phase} | Status: ${p.status}</div>
-                                </div>
-                                <div style="font-size: 18px; font-weight: 600; color: #4ade80;">${calculateCompletion(p)}%</div>
-                            </div>
-                        </div>
-                    `).join('');
+                if (projects.length === 0) {
+                    document.getElementById('projectsList').innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>';
+                    return;
+                }
 
-                document.getElementById('projectsList').innerHTML = listHTML;
+                if (currentView === 'kanban') {
+                    renderKanbanView(projects);
+                } else {
+                    renderListView(projects);
+                }
             } catch (error) {
                 document.getElementById('projectsList').innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Project orchestrator not enabled. Set "enabled": true in config.json.</div>';
             }
+        }
+
+        function toggleView(view) {
+            currentView = view;
+            document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
+            document.getElementById('kanbanViewBtn').classList.toggle('active', view === 'kanban');
+            loadProjects();
+        }
+
+        function renderListView(projects) {
+            const listHTML = projects.map(p => {
+                const completion = calculateCompletion(p);
+                const statusIcon = getStatusIcon(p.status);
+                return `
+                    <div style="padding: 15px; background: #1a1a1a; border-radius: 4px; margin-bottom: 10px; cursor: pointer;" onclick="openProjectDashboard('${p.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span class="status-icon ${statusIcon}"></span>
+                                    <div style="font-weight: 600; color: #4a9eff;">${p.name}</div>
+                                    <span class="phase-badge ${p.current_phase}">${p.current_phase}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width: ${completion}%"></div>
+                                </div>
+                                <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                                    Status: ${p.status} • ${completion}% Complete
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('projectsList').innerHTML = listHTML;
+        }
+
+        function renderKanbanView(projects) {
+            const phases = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const phaseNames = {
+                discovery: '🔍 Discovery',
+                validation: '✅ Validation',
+                planning: '📋 Planning',
+                codegen: '⚙️ Code Gen',
+                review: '👁️ Review',
+                qa: '🧪 QA',
+                docs: '📚 Docs',
+                complete: '✨ Complete'
+            };
+
+            const projectsByPhase = {};
+            phases.forEach(phase => projectsByPhase[phase] = []);
+
+            projects.forEach(p => {
+                if (projectsByPhase[p.current_phase]) {
+                    projectsByPhase[p.current_phase].push(p);
+                }
+            });
+
+            const kanbanHTML = `
+                <div class="kanban-board">
+                    ${phases.map(phase => `
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span>${phaseNames[phase]}</span>
+                                <span class="kanban-column-count">${projectsByPhase[phase].length}</span>
+                            </div>
+                            ${projectsByPhase[phase].map(p => {
+                                const completion = calculateCompletion(p);
+                                const statusIcon = getStatusIcon(p.status);
+                                return `
+                                    <div class="kanban-card phase-${phase}" onclick="openProjectDashboard('${p.id}')">
+                                        <div class="kanban-card-title">${p.name}</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar-fill" style="width: ${completion}%"></div>
+                                        </div>
+                                        <div class="kanban-card-meta">
+                                            <span><span class="status-icon ${statusIcon}"></span>${p.status}</span>
+                                            <span style="font-weight: 600; color: #4ade80;">${completion}%</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') || '<div style="color: #666; font-size: 13px; padding: 10px; text-align: center;">No projects</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('projectsList').innerHTML = kanbanHTML;
+        }
+
+        function getStatusIcon(status) {
+            const statusMap = {
+                'active': 'active',
+                'pending': 'pending',
+                'complete': 'complete',
+                'completed': 'complete',
+                'error': 'error',
+                'failed': 'error'
+            };
+            return statusMap[status.toLowerCase()] || 'pending';
         }
 
         function calculateCompletion(project) {
@@ -3097,3 +3411,4 @@ Deliver code that is ready to run.`;
     </script>
 </body>
 </html>
+
