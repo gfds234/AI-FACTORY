@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -46,6 +47,11 @@ func NewManager(cfg *config.Config) *Manager {
 
 // ExecuteTask routes and executes a task
 func (m *Manager) ExecuteTask(taskType, input string) (interface{}, error) {
+	return m.ExecuteTaskWithThinking(taskType, input, "normal")
+}
+
+// ExecuteTaskWithThinking routes and executes a task with specified thinking mode
+func (m *Manager) ExecuteTaskWithThinking(taskType, input, thinkingMode string) (interface{}, error) {
 	start := time.Now()
 	result := &Result{
 		TaskType:  taskType,
@@ -68,16 +74,18 @@ func (m *Manager) ExecuteTask(taskType, input string) (interface{}, error) {
 		return result, err
 	}
 
-	// Execute with retries
+	// Execute with retries and thinking mode
 	var output string
 	var lastErr error
-	
+
+	log.Printf("Executing task with %s thinking mode", thinkingMode)
+
 	for attempt := 0; attempt <= m.cfg.MaxRetries; attempt++ {
-		output, lastErr = m.client.Generate(model, prompt)
+		output, lastErr = m.client.GenerateWithThinking(model, prompt, thinkingMode)
 		if lastErr == nil {
 			break
 		}
-		
+
 		if attempt < m.cfg.MaxRetries {
 			time.Sleep(time.Second * time.Duration(attempt+1)) // Exponential backoff
 		}
@@ -238,6 +246,14 @@ Your task:
    - Structure code clearly and maintainably
    - Include error handling where appropriate
 
+**CRITICAL REQUIREMENTS - READ CAREFULLY:**
+1. DO NOT generate a README template with placeholders like "Give examples" or "Add examples"
+2. DO NOT output generic instructions or placeholder text
+3. YOU MUST generate ACTUAL, COMPLETE, RUNNABLE source code
+4. Every file must contain real implementation code, NOT TODOs or placeholders
+5. The code must be production-quality and immediately executable
+6. If you generate a README, it must have ACTUAL setup instructions, not placeholder text
+
 4. **Provide complete output in this format:**
 
 ## Tech Stack Decision
@@ -248,12 +264,19 @@ Your task:
 
 ## Implementation
 
-**IMPORTANT: Output each file separately using this exact format:**
+**CRITICAL: You MUST use this EXACT format for EVERY file:**
 
 ### filename.ext
 ` + "```" + `[language]
-[Complete file content here]
+[COMPLETE file content - NO PLACEHOLDERS, NO TODOS, ACTUAL WORKING CODE]
 ` + "```" + `
+
+**REQUIREMENTS FOR EVERY FILE:**
+- Use ### followed by the filename with extension (e.g., ### src/App.jsx)
+- Wrap code in triple backticks with language specified
+- Include COMPLETE, WORKING code - not comments like "// Add implementation here"
+- Every function must have a real implementation, not just a comment
+- If generating React components, write the FULL component with actual JSX and logic
 
 **For web projects, you MUST create separate files:**
 - index.html (main HTML structure)
@@ -285,6 +308,17 @@ Your task:
 - database/seeds/ - Initial data/fixtures (optional)
 - database/connection.js (or db.js, database.go) - Database connection setup
 - Include database URL in .env.example
+
+**For React/Vite projects (MUST include all these files with REAL code):**
+- package.json (with vite, react, vitest dependencies)
+- vite.config.js (Vite configuration)
+- index.html (entry HTML file)
+- src/main.jsx (React entry point)
+- src/App.jsx (main App component with REAL functionality)
+- src/App.css (actual styles)
+- src/index.css (global styles)
+- src/App.test.jsx (Vitest tests)
+- README.md (ACTUAL setup instructions, not placeholders)
 
 **For other projects, organize logically:**
 - Separate concerns (UI, logic, data, config)
@@ -335,6 +369,143 @@ console.log('App initialized');
 
 ## Usage
 [How to use the application]
+` + "```" + `
+
+**COMPLETE React/Vite Project Example (use this structure for React projects):**
+
+### package.json
+` + "```" + `json
+{
+  "name": "react-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.1.0"
+  }
+}
+` + "```" + `
+
+### vite.config.js
+` + "```" + `javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: { port: 5173 }
+})
+` + "```" + `
+
+### index.html
+` + "```" + `html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+` + "```" + `
+
+### src/main.jsx
+` + "```" + `javascript
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+` + "```" + `
+
+### src/App.jsx
+` + "```" + `javascript
+import { useState } from 'react'
+import './App.css'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      <h1>React App</h1>
+      <button onClick={() => setCount(count + 1)}>
+        Count: {count}
+      </button>
+    </div>
+  )
+}
+
+export default App
+` + "```" + `
+
+### src/App.test.jsx
+` + "```" + `javascript
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import App from './App'
+
+describe('App', () => {
+  it('renders without crashing', () => {
+    render(<App />)
+    expect(screen.getByText('React App')).toBeInTheDocument()
+  })
+
+  it('displays count button', () => {
+    render(<App />)
+    expect(screen.getByRole('button')).toBeInTheDocument()
+  })
+})
+` + "```" + `
+
+### src/App.css
+` + "```" + `css
+.App {
+  text-align: center;
+  padding: 2rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+` + "```" + `
+
+### src/index.css
+` + "```" + `css
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
 ` + "```" + `
 
 **For projects requiring a backend, also include backend files:**
@@ -760,6 +931,39 @@ func (m *Manager) saveArtifact(result *Result) (string, error) {
 	if result.TaskType == "code" {
 		files := ParseFilesFromOutput(result.Output)
 
+		// Validate parsed files - detect README template errors
+		if len(files) == 0 {
+			log.Printf("[WARN] No files parsed from output. First 500 chars: %s",
+				truncateString(result.Output, 500))
+		} else {
+			// Check for README template indicators
+			templateIndicators := []string{
+				"Give examples",
+				"Add examples",
+				"Add_Names",
+				"Add_inspiration",
+				"your-repo-link",
+				"your-directory-name",
+			}
+
+			hasTemplateError := false
+			for _, file := range files {
+				for _, indicator := range templateIndicators {
+					if strings.Contains(file.Content, indicator) {
+						hasTemplateError = true
+						log.Printf("[ERROR] Detected README template in file %s: contains '%s'",
+							file.Path, indicator)
+					}
+				}
+			}
+
+			if hasTemplateError {
+				log.Printf("[ERROR] Code generation produced README template instead of actual code")
+				// Clear files array to prevent saving template fragments
+				files = []FileContent{}
+			}
+		}
+
 		if len(files) > 0 {
 			// Multi-file project detected - save to projects directory
 			projectDir := filepath.Join("projects", fmt.Sprintf("generated_%d", result.Timestamp.Unix()))
@@ -771,6 +975,9 @@ func (m *Manager) saveArtifact(result *Result) (string, error) {
 
 			// Return path indicating multi-file project was created
 			return fmt.Sprintf("%s (project: %s)", path, projectDir), nil
+		} else if result.TaskType == "code" {
+			// No files extracted - likely a template or error
+			return path + " (no files extracted - check artifact for template errors)", nil
 		}
 	}
 
@@ -801,6 +1008,14 @@ func (m *Manager) saveMultiFileProject(projectDir string, files []FileContent) e
 	}
 
 	return nil
+}
+
+// truncateString truncates string to maxLen characters
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
 }
 
 // Ping checks if the LLM backend is accessible
@@ -838,4 +1053,9 @@ func (m *Manager) GetHistory(taskType string) []Result {
 // GetClient returns the LLM client (for chat functionality)
 func (m *Manager) GetClient() *llm.Client {
 	return m.client
+}
+
+// GetWebSocketHub returns nil (Manager doesn't use WebSocket)
+func (m *Manager) GetWebSocketHub() interface{} {
+	return nil
 }

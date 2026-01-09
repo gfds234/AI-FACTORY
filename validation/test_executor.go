@@ -119,6 +119,8 @@ func (te *TestExecutor) executeNodeJSTests(projectPath string) (*TestResult, err
 		framework = "jest"
 	} else if _, hasMocha := deps["mocha"]; hasMocha {
 		framework = "mocha"
+	} else if _, hasVitest := deps["vitest"]; hasVitest {
+		framework = "vitest"
 	}
 	result.TestFramework = framework
 
@@ -142,6 +144,8 @@ func (te *TestExecutor) executeNodeJSTests(projectPath string) (*TestResult, err
 		te.parseJestOutput(output, result)
 	} else if framework == "mocha" {
 		te.parseMochaOutput(output, result)
+	} else if framework == "vitest" {
+		te.parseVitestOutput(output, result)
 	} else {
 		// Try to parse generic output
 		te.parseGenericNodeOutput(output, result)
@@ -308,6 +312,57 @@ func (te *TestExecutor) parseMochaOutput(output string, result *TestResult) {
 	}
 
 	result.TotalTests = result.TestsPassed + result.TestsFailed
+}
+
+// parseVitestOutput parses Vitest test output
+func (te *TestExecutor) parseVitestOutput(output string, result *TestResult) {
+	// Vitest output formats:
+	// "Test Files  1 passed (1)"
+	// "Tests  5 passed (5)"
+	// "Tests  3 passed | 2 failed (5)"
+
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
+		// Match lines starting with "Tests " or "Test Files "
+		if strings.HasPrefix(line, "Tests ") || strings.HasPrefix(line, "Test Files ") {
+			// Extract numbers using regex
+			passedRe := regexp.MustCompile(`(\d+)\s+passed`)
+			failedRe := regexp.MustCompile(`(\d+)\s+failed`)
+			skippedRe := regexp.MustCompile(`(\d+)\s+skipped`)
+			totalRe := regexp.MustCompile(`\((\d+)\)`)
+
+			if match := passedRe.FindStringSubmatch(line); len(match) > 1 {
+				if count, err := strconv.Atoi(match[1]); err == nil {
+					result.TestsPassed = count
+				}
+			}
+
+			if match := failedRe.FindStringSubmatch(line); len(match) > 1 {
+				if count, err := strconv.Atoi(match[1]); err == nil {
+					result.TestsFailed = count
+				}
+			}
+
+			if match := skippedRe.FindStringSubmatch(line); len(match) > 1 {
+				if count, err := strconv.Atoi(match[1]); err == nil {
+					result.TestsSkipped = count
+				}
+			}
+
+			if match := totalRe.FindStringSubmatch(line); len(match) > 1 {
+				if count, err := strconv.Atoi(match[1]); err == nil {
+					result.TotalTests = count
+				}
+			}
+		}
+	}
+
+	// Fallback: if total not detected, calculate from passed + failed + skipped
+	if result.TotalTests == 0 && (result.TestsPassed > 0 || result.TestsFailed > 0 || result.TestsSkipped > 0) {
+		result.TotalTests = result.TestsPassed + result.TestsFailed + result.TestsSkipped
+	}
 }
 
 // parseGenericNodeOutput tries to parse generic test output

@@ -66,6 +66,7 @@ type ComplexityAnalysis struct {
 	Indicators       map[string]int `json:"indicators"`
 	Reasoning        string         `json:"reasoning"`
 	RecommendedRoute string         `json:"recommended_route"`
+	ThinkingMode     string         `json:"thinking_mode"` // "fast", "normal", "extended"
 }
 
 // Agent interface that all agents must implement

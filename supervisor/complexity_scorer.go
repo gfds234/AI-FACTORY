@@ -26,6 +26,7 @@ func (cs *ComplexityScorer) Score(taskType, input string) *ComplexityAnalysis {
 	if taskType != "code" {
 		analysis.RecommendedRoute = "ollama"
 		analysis.Reasoning = "Non-code task - use Ollama"
+		analysis.ThinkingMode = "fast" // Non-code tasks use fast mode
 		return analysis
 	}
 
@@ -111,18 +112,30 @@ func (cs *ComplexityScorer) Score(taskType, input string) *ComplexityAnalysis {
 		analysis.Score = 10
 	}
 
+	// Determine thinking mode based on complexity score
+	// Low complexity (1-3): Fast mode - quick, direct responses
+	// Medium complexity (4-6): Normal mode - balanced reasoning
+	// High complexity (7-10): Extended mode - deep thinking
+	if analysis.Score <= 3 {
+		analysis.ThinkingMode = "fast"
+	} else if analysis.Score <= 6 {
+		analysis.ThinkingMode = "normal"
+	} else {
+		analysis.ThinkingMode = "extended"
+	}
+
 	// Determine route based on threshold
 	if analysis.Score >= cs.cfg.ComplexityThreshold {
 		analysis.RecommendedRoute = "claude_code"
 		analysis.Reasoning = fmt.Sprintf(
-			"Complexity score %d >= threshold %d - route to Claude Code for advanced capabilities",
-			analysis.Score, cs.cfg.ComplexityThreshold,
+			"Complexity score %d >= threshold %d - route to Claude Code with %s thinking mode",
+			analysis.Score, cs.cfg.ComplexityThreshold, analysis.ThinkingMode,
 		)
 	} else {
 		analysis.RecommendedRoute = "ollama"
 		analysis.Reasoning = fmt.Sprintf(
-			"Complexity score %d < threshold %d - handle with Ollama",
-			analysis.Score, cs.cfg.ComplexityThreshold,
+			"Complexity score %d < threshold %d - handle with Ollama using %s thinking mode",
+			analysis.Score, cs.cfg.ComplexityThreshold, analysis.ThinkingMode,
 		)
 	}
 

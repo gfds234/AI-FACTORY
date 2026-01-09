@@ -1,0 +1,4002 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Manager Console</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: #4a9eff;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .status.online {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        .status.offline {
+            background: #4d1a1a;
+            color: #ff6b6b;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-card {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid #333;
+        }
+
+        .task-card h2 {
+            color: #4a9eff;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .task-card p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 12px;
+            color: #e0e0e0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 200px;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid #333;
+            display: none;
+        }
+
+        .result-section.visible {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .result-header h2 {
+            color: #4a9eff;
+            font-size: 20px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .meta-item {
+            color: #999;
+        }
+
+        .meta-item span {
+            color: #4a9eff;
+            font-weight: 600;
+        }
+
+        .result-content {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 20px;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #4a9eff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: #4d1a1a;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.visible {
+            display: block;
+        }
+
+        .btn-secondary {
+            background: #444;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #555;
+        }
+
+        .artifacts-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid #333;
+            margin-top: 20px;
+        }
+
+        .artifacts-section h2 {
+            color: #4a9eff;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .artifact-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .artifact-item {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .artifact-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+        }
+
+        .artifact-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #00d9ff;
+            border-bottom-color: #00d9ff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* History Tab */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .history-controls select {
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .history-item:hover {
+            border-color: #00d9ff;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-item-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #00d9ff;
+            color: #000;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .history-item-time {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .history-item-preview {
+            color: #ccc;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-expanded {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+            display: none;
+        }
+
+        .history-item.expanded .history-item-expanded {
+            display: block;
+        }
+
+        .history-item-expanded h4 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .history-item-expanded pre {
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        /* Chat UI */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-welcome {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .chat-message.assistant {
+            align-self: flex-start;
+        }
+
+        .chat-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .chat-message.user .chat-message-avatar {
+            background: #00d9ff;
+            color: #000;
+        }
+
+        .chat-message.assistant .chat-message-avatar {
+            background: #555;
+            color: #fff;
+        }
+
+        .chat-message-content {
+            background: #333;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .chat-message.user .chat-message-content {
+            background: #00d9ff;
+            color: #000;
+        }
+
+        .chat-message-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #444;
+        }
+
+        .chat-input-container textarea {
+            flex: 1;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .chat-input-container button {
+            padding: 12px 24px;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            animation: blink 1.4s infinite;
+        }
+
+        /* Supervisor System Styles */
+        .supervisor-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 10px;
+        }
+
+        .complexity-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .route-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .route-ollama {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        .route-claude {
+            background: #4d1a2e;
+            color: #ff6b9d;
+        }
+
+        .supervisor-section {
+            background: #232323;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .supervisor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .supervisor-header h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .agent-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .agent-card {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .agent-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .agent-card-title {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agent-duration {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: white;
+        }
+
+        .agent-card-body {
+            padding: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .agent-card.expanded .agent-card-body {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .agent-card.expanded .agent-card-header {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .agent-output {
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .agent-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-passed {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        .status-warning {
+            background: #4d3a1a;
+            color: #fbbf24;
+        }
+
+        .status-failed {
+            background: #4d1a1a;
+            color: #ff6b6b;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+            font-size: 16px;
+        }
+
+        .agent-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .complexity-meter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .meter-bar {
+            flex: 1;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80 0%, #fbbf24 50%, #ff6b6b 100%);
+            transition: width 0.5s ease;
+        }
+
+        .meter-label {
+            font-size: 13px;
+            color: #999;
+            min-width: 60px;
+        }
+
+        /* Discover Tab Styles */
+        .discover-phase {
+            display: none;
+        }
+
+        .discover-phase.active {
+            display: block;
+        }
+
+        .discover-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .discover-header h2 {
+            margin-bottom: 10px;
+        }
+
+        .discover-header p {
+            color: #999;
+        }
+
+        #discoverIdeaInput {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            background: #1e1e1e;
+            color: #fff;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .discover-progress {
+            background: #2a2a2a;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .discover-idea-summary {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .discover-idea-summary strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #0ea5e9;
+        }
+
+        .discover-idea-summary p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        .discover-question-card {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .discover-question-card h3 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        #questionAnswer {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            background: #1e1e1e;
+            color: #fff;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .verdict-card {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #333;
+        }
+
+        .verdict-card.verdict-GO {
+            border-color: #4ade80;
+            background: linear-gradient(135deg, #1e1e1e, #1e3a28);
+        }
+
+        .verdict-card.verdict-REFINE {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, #1e1e1e, #3a2f1e);
+        }
+
+        .verdict-card.verdict-PASS {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #1e1e1e, #3a1e1e);
+        }
+
+        .verdict-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .verdict-card h2 {
+            margin-bottom: 15px;
+        }
+
+        .verdict-card.verdict-GO h2 span {
+            color: #4ade80;
+        }
+
+        .verdict-card.verdict-REFINE h2 span {
+            color: #fbbf24;
+        }
+
+        .verdict-card.verdict-PASS h2 span {
+            color: #ff6b6b;
+        }
+
+        #verdictReasoning {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .verdict-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .discover-summary {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .discover-summary h3 {
+            margin-bottom: 15px;
+        }
+
+        #answersSummary {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .answer-item {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #0ea5e9;
+        }
+
+        .answer-item strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #0ea5e9;
+        }
+
+        .answer-item p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-hint {
+            margin-top: 10px;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-error {
+            background: #f44336;
+        }
+
+        .toast.fade-out {
+            animation: fadeOut 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        /* AutoClaude-Inspired Enhancements */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .view-toggle button {
+            flex: 1;
+            padding: 10px 20px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-toggle button.active {
+            background: #1a3a4d;
+            color: #4a9eff;
+        }
+
+        /* Kanban Board Styles */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kanban-column {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 400px;
+        }
+
+        .kanban-column-header {
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kanban-column-count {
+            background: #2a2a2a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .kanban-card {
+            background: #2a2a2a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .kanban-card:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .kanban-card.phase-discovery {
+            border-left-color: #4a9eff;
+        }
+
+        .kanban-card.phase-validation {
+            border-left-color: #a77bff;
+        }
+
+        .kanban-card.phase-planning {
+            border-left-color: #ff9f43;
+        }
+
+        .kanban-card.phase-codegen {
+            border-left-color: #4ade80;
+        }
+
+        .kanban-card.phase-review {
+            border-left-color: #ffd93d;
+        }
+
+        .kanban-card.phase-qa {
+            border-left-color: #6bcf7f;
+        }
+
+        .kanban-card.phase-docs {
+            border-left-color: #00d2ff;
+        }
+
+        .kanban-card.phase-complete {
+            border-left-color: #4ade80;
+        }
+
+        .kanban-card-title {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .kanban-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* Enhanced Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #4ade80);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Status Icons */
+        .status-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-icon.active {
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        .status-icon.pending {
+            background: #ff9f43;
+        }
+
+        .status-icon.complete {
+            background: #4a9eff;
+        }
+
+        .status-icon.error {
+            background: #ff6b6b;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Phase Badge */
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .phase-badge.discovery {
+            background: #1a3a4d;
+            color: #4a9eff;
+        }
+
+        .phase-badge.validation {
+            background: #3a1a4d;
+            color: #a77bff;
+        }
+
+        .phase-badge.planning {
+            background: #4d3a1a;
+            color: #ff9f43;
+        }
+
+        .phase-badge.codegen {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        .phase-badge.review {
+            background: #4d4a1a;
+            color: #ffd93d;
+        }
+
+        .phase-badge.qa {
+            background: #1a4d3a;
+            color: #6bcf7f;
+        }
+
+        .phase-badge.docs {
+            background: #1a4a4d;
+            color: #00d2ff;
+        }
+
+        .phase-badge.complete {
+            background: #1a4d2e;
+            color: #4ade80;
+        }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 30px;
+            bottom: -20px;
+            width: 2px;
+            background: #2a2a2a;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4a9eff;
+            flex-shrink: 0;
+            margin-top: 4px;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        /* Welcome Modal */
+        .welcome-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .welcome-modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .welcome-content {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid #4a9eff;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #4a9eff;
+        }
+
+        .welcome-header .tagline {
+            font-size: 16px;
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .welcome-section {
+            margin-bottom: 25px;
+        }
+
+        .welcome-section h3 {
+            color: #4a9eff;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .welcome-section p {
+            color: #c0c0c0;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .welcome-section li {
+            color: #c0c0c0;
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .welcome-section li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .example-projects {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .example-project {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-project:hover {
+            border-color: #4a9eff;
+            background: #222;
+        }
+
+        .example-project-title {
+            color: #4a9eff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .example-project-desc {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .welcome-close-x {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+        }
+
+        .welcome-close-x:hover {
+            color: #4a9eff;
+        }
+
+        .btn-welcome {
+            padding: 14px 32px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-welcome-primary {
+            background: linear-gradient(135deg, #4a9eff, #357abd);
+            color: white;
+        }
+
+        .btn-welcome-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-welcome-secondary {
+            background: #1a1a1a;
+            color: #c0c0c0;
+            border: 1px solid #444;
+        }
+
+        .btn-welcome-secondary:hover {
+            background: #222;
+            border-color: #4a9eff;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Code Generation Loading Overlay -->
+    <div id="codeLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="codeLoadingMessage">Generating code...</p>
+        <p class="loading-hint">This may take 10-30 seconds depending on complexity</p>
+    </div>
+
+    <!-- Welcome Modal for First-Time Users -->
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="welcome-content">
+            <div class="welcome-close-x" onclick="closeWelcome(true)">×</div>
+            <div class="welcome-header">
+                <h1>Welcome to AI FACTORY!</h1>
+                <p class="tagline">Autonomous MVP Generation with Quality Guarantees</p>
+            </div>
+
+            <div class="welcome-section">
+                <h3>🚀 What is AI FACTORY?</h3>
+                <p>AI FACTORY autonomously generates production-ready MVPs through a 6-phase process. Unlike other
+                    tools, we <strong>prove every deliverable works</strong> through automated testing.</p>
+            </div>
+
+            <div class="welcome-section">
+                <h3>✨ How It Works</h3>
+                <ul>
+                    <li>Describe your project idea</li>
+                    <li>Watch AI build it through 6 automated phases</li>
+                    <li>Get quality-verified code with test results</li>
+                    <li>Download your complete, working MVP</li>
+                </ul>
+            </div>
+
+            <div class="welcome-section">
+                <h3>💡 Try These Example Projects</h3>
+                <div class="example-projects">
+                    <div class="example-project" onclick="useExample('todo')">
+                        <div class="example-project-title">Simple Todo App</div>
+                        <div class="example-project-desc">React-based task manager with add, complete, and delete
+                            features</div>
+                    </div>
+                    <div class="example-project" onclick="useExample('landing')">
+                        <div class="example-project-title">Landing Page</div>
+                        <div class="example-project-desc">Modern SaaS landing with hero, features, pricing, and contact
+                            form</div>
+                    </div>
+                    <div class="example-project" onclick="useExample('api')">
+                        <div class="example-project-title">REST API</div>
+                        <div class="example-project-desc">User management API with Node.js, Express, and MongoDB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-section">
+                <h3>🎯 Getting Started</h3>
+                <p>Click "Projects" tab above, then "Create New Project". Fill in your project name and description,
+                    then watch the magic happen!</p>
+            </div>
+
+            <div class="welcome-actions">
+                <button class="btn-welcome btn-welcome-primary" onclick="closeWelcome(true)">
+                    Get Started
+                </button>
+                <button class="btn-welcome btn-welcome-secondary" onclick="closeWelcome(false)">
+                    Don't Show Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>AI Studio - Manager Console</h1>
+            <div class="status" id="status">
+                <span id="statusText">Checking...</span>
+            </div>
+        </header>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('tasks')">Tasks</button>
+            <button class="tab-btn" onclick="switchTab('code')">Generate Code</button>
+            <button class="tab-btn" onclick="switchTab('discover')">Discover</button>
+            <button class="tab-btn" onclick="switchTab('chat')">Chat</button>
+            <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
+            <button class="tab-btn" onclick="switchTab('history')">History</button>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <!-- Tasks Tab -->
+        <div id="tasks-tab" class="tab-panel active">
+            <div class="main-grid">
+                <!-- Validate Task -->
+                <div class="task-card">
+                    <h2>Validate Game Idea</h2>
+                    <p>Get structured feedback on game concepts. Returns strengths, issues, market viability, and next
+                        steps.</p>
+                    <textarea id="validateInput"
+                        placeholder="Enter your game idea here...
+
+Example:
+A cooperative multiplayer game where players are members of a space station crew dealing with escalating system failures..."></textarea>
+                    <button onclick="submitTask('validate')" id="validateBtn">Validate Idea</button>
+                </div>
+
+                <!-- Review Task -->
+                <div class="task-card">
+                    <h2>Review Architecture</h2>
+                    <p>Get technical feedback on architecture decisions. Returns risk assessment, recommendations, and
+                        verdict.</p>
+                    <textarea id="reviewInput" placeholder="Enter your architecture document here...
+
+Example:
+# Game Architecture - Strategy Game
+
+## Core Systems
+- Hex grid pathfinding with A* algorithm
+- Component-based unit system
+..."></textarea>
+                    <button onclick="submitTask('review')" id="reviewBtn">Review Architecture</button>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Processing... This may take 4-50 seconds depending on model state.</div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section" id="results">
+                <div class="result-header">
+                    <h2>Results</h2>
+                    <div>
+                        <button onclick="copyResults()" class="btn-secondary btn-small">Copy</button>
+                        <button onclick="closeResults()" class="btn-secondary btn-small">Close</button>
+                    </div>
+                </div>
+                <div class="result-meta">
+                    <div class="meta-item">Task: <span id="resultTask"></span></div>
+                    <div class="meta-item">Model: <span id="resultModel"></span></div>
+                    <div class="meta-item">Duration: <span id="resultDuration"></span>s</div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+
+            <!-- Artifacts Section -->
+            <div class="artifacts-section">
+                <h2>Recent Artifacts</h2>
+                <div class="artifact-list" id="artifactList">
+                    <div style="color: #999; font-size: 14px;">Artifacts saved to: ./artifacts/</div>
+                    <div style="color: #666; font-size: 13px;">Check the artifacts folder for all saved results.</div>
+                </div>
+            </div>
+        </div>
+        <!-- End Tasks Tab -->
+
+        <!-- Code Generation Tab -->
+        <div id="code-tab" class="tab-panel">
+            <div class="task-card" style="max-width: 900px; margin: 0 auto;">
+                <h2>Generate Code</h2>
+                <p>AI will analyze your request, choose the optimal tech stack (language/framework), and generate
+                    production-quality code.</p>
+                <p style="font-size: 14px; color: #888; margin-top: 10px;">
+                    <strong>Works for:</strong> Games • Mobile Apps • Web Apps • Backend APIs • Desktop Tools
+                </p>
+                <textarea id="codeInput" placeholder="Describe what you want to build...
+
+Examples:
+• A roguelike game where you play as a virus infecting a human body
+• Mobile app to track daily habits with charts and reminders
+• REST API for user authentication with JWT tokens
+• Desktop tool to batch resize and convert images
+• 2D platformer with wall-jumping mechanics
+
+The AI will choose the best language and framework for your specific needs." rows="8"></textarea>
+                <button onclick="submitTask('code')" id="codeBtn">Generate Code</button>
+                <div style="margin-top: 15px; padding: 12px; background: #2a2a2a; border-radius: 4px; font-size: 13px;">
+                    <strong>💡 Tip:</strong> After generation, use the "Review Architecture" task to evaluate the tech
+                    stack choices and code quality.
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="codeLoading" style="display: none;">
+                <div class="spinner"></div>
+                <div>Generating code... This may take 10-60 seconds for complex projects.</div>
+            </div>
+
+            <!-- Code Results Section -->
+            <div class="result-section" id="codeResults" style="display: none;">
+                <div class="result-header">
+                    <h2>Generated Code</h2>
+                    <div>
+                        <button onclick="copyCodeResults()" class="btn-secondary btn-small">Copy All</button>
+                        <button onclick="closeCodeResults()" class="btn-secondary btn-small">Close</button>
+                    </div>
+                </div>
+                <div class="result-meta">
+                    <div class="meta-item">Model: <span id="codeResultModel"></span></div>
+                    <div class="meta-item">Duration: <span id="codeResultDuration"></span>s</div>
+                </div>
+                <div class="result-content" id="codeResultContent"></div>
+            </div>
+        </div>
+        <!-- End Code Generation Tab -->
+
+        <!-- Chat Tab -->
+        <div id="chat-tab" class="tab-panel">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>Brainstorm with AI</h2>
+                    <button onclick="newConversation()" class="btn-secondary">New Conversation</button>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <div class="chat-welcome">
+                        <p>Start brainstorming your game ideas!</p>
+                        <p>The AI will remember context throughout the conversation.</p>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <textarea id="chatInput" placeholder="Type your message... (Shift+Enter for new line)"
+                        rows="3"></textarea>
+                    <button onclick="sendChatMessage()" id="chatSendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+        <!-- End Chat Tab -->
+
+        <!-- Discover Tab -->
+        <div id="discover-tab" class="tab-panel">
+            <!-- Phase 1: Initial Input -->
+            <div id="discover-input-phase" class="discover-phase active">
+                <div class="discover-header">
+                    <h2>Discover & Validate Your Idea</h2>
+                    <p>Let's validate your product idea with 3 key questions to ensure you're ready to build.</p>
+                </div>
+                <textarea id="discoverIdeaInput" placeholder="Describe your product idea in detail..."
+                    rows="6"></textarea>
+                <button onclick="startDiscovery()" class="btn-primary">Start Discovery</button>
+            </div>
+
+            <!-- Phase 2: Answering Questions -->
+            <div id="discover-questions-phase" class="discover-phase">
+                <div class="discover-progress">
+                    Question <span id="questionNum">1</span> of 3
+                </div>
+                <div class="discover-idea-summary">
+                    <strong>Your Idea:</strong>
+                    <p id="ideaSummary"></p>
+                </div>
+                <div class="discover-question-card">
+                    <h3 id="currentQuestion"></h3>
+                    <textarea id="questionAnswer" placeholder="Your answer..." rows="5"></textarea>
+                    <button onclick="submitAnswer()" id="answerBtn" class="btn-primary">Next Question</button>
+                </div>
+            </div>
+
+            <!-- Phase 3: Verdict Display -->
+            <div id="discover-verdict-phase" class="discover-phase">
+                <div id="verdictCard" class="verdict-card">
+                    <div class="verdict-icon" id="verdictIcon"></div>
+                    <h2>Verdict: <span id="verdictText"></span></h2>
+                    <p id="verdictReasoning"></p>
+                </div>
+                <div class="verdict-actions">
+                    <button onclick="autoGenerateFromDiscovery()" id="codeGenBtn" class="btn-primary"
+                        style="display: none;">
+                        🚀 Start Building (Auto-Generate)
+                    </button>
+                    <button onclick="startNewDiscovery()" class="btn-secondary">
+                        Start New Discovery
+                    </button>
+                </div>
+                <div class="discover-summary">
+                    <h3>Your Answers:</h3>
+                    <div id="answersSummary"></div>
+                </div>
+            </div>
+
+            <!-- Discovery History Section -->
+            <div id="discover-history-section" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">
+                <div class="discover-history-header">
+                    <h3>📚 Discovery History</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="loadDiscoveryHistory()" class="btn-secondary">Refresh History</button>
+                        <button onclick="exportAllDiscoveries()" class="btn-secondary">Export All</button>
+                    </div>
+                </div>
+                <div id="discovery-history-list" style="margin-top: 20px;">
+                    <!-- Populated by JavaScript -->
+                    <p style="color: #999;">Loading history...</p>
+                </div>
+            </div>
+        </div>
+        <!-- End Discover Tab -->
+
+        <!-- Projects Tab -->
+        <div id="projects-tab" class="tab-panel">
+            <!-- Create New Project -->
+            <div class="task-card" style="max-width: 900px; margin: 0 auto 30px;">
+                <h2>Create New Project</h2>
+                <p>Start a new AI-guided project workflow from idea to hand-off ready completion.</p>
+                <input type="text" id="projectName" placeholder="Project name (e.g., '2D Roguelike Game')"
+                    style="width: 100%; padding: 12px; margin-bottom: 15px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0; font-size: 14px;">
+                <textarea id="projectDescription" placeholder="Describe your project idea in detail..."
+                    rows="6"></textarea>
+                <button onclick="createProject()" id="createProjectBtn">Create Project</button>
+            </div>
+
+            <!-- Project List -->
+            <div class="task-card" style="max-width: 900px; margin: 0 auto;">
+                <div class="result-header"
+                    style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2>My Projects</h2>
+                    <button onclick="loadProjects()" class="btn-secondary btn-small">Refresh</button>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <button id="listViewBtn" class="active" onclick="toggleView('list')">
+                        📋 List View
+                    </button>
+                    <button id="kanbanViewBtn" onclick="toggleView('kanban')">
+                        📊 Kanban Board
+                    </button>
+                </div>
+
+                <div id="projectsList">
+                    <div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Dashboard (Hidden by default) -->
+            <div id="projectDashboard" class="task-card"
+                style="max-width: 900px; margin: 30px auto; display: none; position: relative; z-index: 100;">
+
+                <div class="result-header"
+                    style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2 id="dashboardProjectName">Project Name</h2>
+                    <button onclick="closeDashboard()" class="btn-secondary btn-small">Close</button>
+                </div>
+
+                <!-- Project Status -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Current Phase</div>
+                        <div id="dashboardPhase" style="color: #4a9eff; font-size: 18px; font-weight: 600;">Discovery
+                        </div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Completion</div>
+                        <div id="dashboardCompletion" style="color: #4ade80; font-size: 18px; font-weight: 600;">10%
+                        </div>
+                    </div>
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Status</div>
+                        <div id="dashboardStatus" style="color: #4ade80; font-size: 18px; font-weight: 600;">Active
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase Progress -->
+                <div style="margin-bottom: 25px;">
+                    <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Phase Progress</div>
+                    <div style="display: flex; gap: 8px;">
+                        <div id="phase-discovery" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Discovery</div>
+                        <div id="phase-validation" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Validation</div>
+                        <div id="phase-planning" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Planning</div>
+                        <div id="phase-codegen" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            CodeGen</div>
+                        <div id="phase-review" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Review</div>
+                        <div id="phase-qa" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            QA</div>
+                        <div id="phase-docs" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Docs</div>
+                        <div id="phase-complete" class="phase-indicator"
+                            style="flex: 1; padding: 8px; background: #2a2a2a; border-radius: 4px; text-align: center; font-size: 12px;">
+                            Complete</div>
+                    </div>
+                </div>
+
+                <!-- Lead Agent Recommendation -->
+                <div id="leadAgentRecommendation"
+                    style="background: #1a4d2e; border-left: 4px solid #4ade80; padding: 15px; border-radius: 4px; margin-bottom: 25px; display: none;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Lead Agent Recommendation</div>
+                    <div style="color: #888; font-size: 14px; margin-bottom: 8px;">
+                        <strong>Decision:</strong> <span id="agentDecision">PROCEED</span>
+                    </div>
+                    <div style="color: #ccc; font-size: 14px; margin-bottom: 8px;">
+                        <strong>Reasoning:</strong> <span id="agentReasoning">Analysis complete.</span>
+                    </div>
+                    <div style="color: #ccc; font-size: 14px;">
+                        <strong>Next Steps:</strong> <span id="agentNextSteps">Proceed to next phase.</span>
+                    </div>
+                </div>
+
+                <!-- Phase Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button onclick="executeCurrentPhase()" id="executePhaseBtn" style="flex: 1;">Execute Current
+                        Phase</button>
+                    <button onclick="showGoBackOptions()" id="goBackBtn" class="btn-secondary"
+                        style="padding: 10px 20px; background: #4a5568; color: white;">← Go Back</button>
+                    <button onclick="approvePhase()" id="approvePhaseBtn" class="btn-secondary"
+                        style="flex: 1; background: #1a4d2e; color: #4ade80;">Approve & Continue</button>
+                    <button onclick="rejectPhase()" id="rejectPhaseBtn" class="btn-secondary"
+                        style="flex: 1; background: #4d1a1a; color: #ff6b6b;">Reject Phase</button>
+                </div>
+
+                <!-- Project Actions -->
+                <div
+                    style="display: flex; gap: 10px; margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px;">
+                    <button onclick="viewArtifacts()" class="btn-secondary"
+                        style="flex: 1; background: #1a3a4d; color: #4a9eff;">📄 View Artifacts</button>
+                    <button onclick="viewTaskHistory()" class="btn-secondary"
+                        style="flex: 1; background: #3a1a4d; color: #a77bff;">📊 Task History</button>
+                    <button onclick="exportProject()" class="btn-secondary"
+                        style="flex: 1; background: #1a4d3a; color: #4aff7b;">📥 Export Report</button>
+                    <button onclick="deleteCurrentProject()" class="btn-secondary"
+                        style="background: #4d1a1a; color: #ff6b6b;">🗑 Delete</button>
+                </div>
+
+                <!-- Hand-off Ready Criteria -->
+                <div id="handoffCriteria"
+                    style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none;">
+                    <h3 style="color: #4a9eff; margin-bottom: 15px;">Hand-Off Ready Criteria</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <div id="criteria-build"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>Runnable Build</span>
+                            <span id="criteria-build-status">❌</span>
+                        </div>
+                        <div id="criteria-tests"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>Tests Exist</span>
+                            <span id="criteria-tests-status">❌</span>
+                        </div>
+                        <div id="criteria-readme"
+                            style="padding: 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between;">
+                            <span>README Documentation</span>
+                            <span id="criteria-readme-status">❌</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Triple Guarantee Quality Report -->
+                <div id="qualityReport"
+                    style="background: #2a2a2a; padding: 20px; border-radius: 4px; display: none; margin-top: 20px;">
+                    <h3 style="color: #4a9eff; margin-bottom: 15px;">🛡️ Triple Guarantee Quality Report</h3>
+
+                    <!-- Overall Score -->
+                    <div
+                        style="background: #1a1a1a; padding: 20px; border-radius: 4px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: bold; color: #4aff7b;" id="quality-score">--</div>
+                        <div style="color: #888; margin-top: 5px;">Quality Score</div>
+                        <div style="margin-top: 10px; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold;"
+                            id="quality-status"></div>
+                    </div>
+
+                    <!-- Build Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">🔨 Build Verification</h4>
+                            <span id="build-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Syntax Valid</span><span id="build-syntax">❓</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Dependencies OK</span><span id="build-deps">❓</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Entry Point Valid</span><span id="build-entry">❓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Runtime Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">🚀 Runtime Verification</h4>
+                            <span id="runtime-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Application Starts</span><span id="runtime-starts">❓</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Health Check</span><span id="runtime-health">❓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="color: #4a9eff; margin: 0;">✅ Test Verification</h4>
+                            <span id="test-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div id="test-results" style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Tests Passed</span><span id="test-passed">0</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Tests Failed</span><span id="test-failed">0</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>Total Tests</span><span id="test-total">0</span>
+                            </div>
+                        </div>
+                        <div id="test-no-results"
+                            style="color: #888; padding: 20px; text-align: center; display: none;">
+                            No tests have been executed yet
+                        </div>
+                    </div>
+
+                    <!-- Documentation Status -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="color: #4a9eff; margin: 0;">📚 Documentation</h4>
+                            <span id="docs-status-badge" style="font-size: 24px;">❓</span>
+                        </div>
+                        <div style="display: grid; gap: 8px; margin-top: 10px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 8px; background: #0f0f0f; border-radius: 4px;">
+                                <span>README Complete</span><span id="docs-readme">❓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Artifacts Viewer -->
+                <div id="artifactsViewer"
+                    style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #4a9eff; margin: 0;">Generated Artifacts</h3>
+                        <button onclick="closeArtifactsViewer()" class="btn-secondary"
+                            style="background: #4a5568;">Close</button>
+                    </div>
+                    <div id="artifactsList"></div>
+                </div>
+
+                <!-- Task History Viewer -->
+                <div id="taskHistoryViewer"
+                    style="display: none; background: #2a2a2a; padding: 20px; border-radius: 4px; margin-top: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #a77bff; margin: 0;">Task Execution History</h3>
+                        <button onclick="closeTaskHistoryViewer()" class="btn-secondary"
+                            style="background: #4a5568;">Close</button>
+                    </div>
+                    <div id="taskHistoryList"></div>
+                </div>
+
+                <!-- Phase Execution Log -->
+                <div id="phaseLog"
+                    style="margin-top: 25px; padding: 15px; background: #1a1a1a; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; display: none;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        <!-- End Projects Tab -->
+
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-panel">
+            <div class="history-header">
+                <h2>Task History</h2>
+                <div class="history-controls">
+                    <select id="historyFilter" onchange="filterHistory()">
+                        <option value="all">All Tasks</option>
+                        <option value="validate">Validate Only</option>
+                        <option value="review">Review Only</option>
+                        <option value="code">Code Only</option>
+                        <option value="chat">Chat Only</option>
+                    </select>
+                    <button onclick="exportHistory()">Export as Markdown</button>
+                </div>
+            </div>
+            <div id="history-list" class="history-list">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        <!-- End History Tab -->
+
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        // Welcome Modal Functions
+        function checkFirstVisit() {
+            const hasVisited = localStorage.getItem('ai_factory_visited');
+            if (!hasVisited) {
+                document.getElementById('welcomeModal').classList.add('show');
+            }
+        }
+
+        function closeWelcome(showAgain) {
+            document.getElementById('welcomeModal').classList.remove('show');
+            if (!showAgain) {
+                localStorage.setItem('ai_factory_visited', 'true');
+            }
+            // Switch to Projects tab
+            switchTab('projects');
+        }
+
+        function useExample(type) {
+            const examples = {
+                'todo': {
+                    name: 'Simple Todo List',
+                    description: 'A web-based todo app with React. Users can add new tasks, mark them as complete, and delete tasks. Include basic styling with CSS.'
+                },
+                'landing': {
+                    name: 'Product Landing Page',
+                    description: 'A modern landing page for a SaaS product. Include hero section, features section, pricing table, and contact form. Use Tailwind CSS for styling.'
+                },
+                'api': {
+                    name: 'User Management API',
+                    description: 'A REST API for user management with Node.js and Express. Include endpoints for user registration, login (JWT auth), get user profile, and update profile. Use MongoDB for storage.'
+                }
+            };
+
+            const example = examples[type];
+            if (example) {
+                closeWelcome(true);
+                switchTab('projects');
+
+                // Fill in the form
+                setTimeout(() => {
+                    document.getElementById('projectName').value = example.name;
+                    document.getElementById('projectDescription').value = example.description;
+
+                    // Scroll to form
+                    document.getElementById('projectName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+
+        function showWelcomeModal() {
+            document.getElementById('welcomeModal').classList.add('show');
+        }
+
+        // Check server health on load
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+
+                if (data.status === 'healthy' || data.status === 'degraded') {
+                    document.getElementById('status').className = 'status online';
+                    if (data.status === 'degraded') {
+                        document.getElementById('statusText').textContent = 'Server Online - Degraded (Missing Claude API Key?)';
+                        document.getElementById('status').style.background = '#ecc94b'; // Yellow
+                    } else {
+                        document.getElementById('statusText').textContent = 'Server Online - Ollama Connected';
+                    }
+                } else {
+                    throw new Error('Server unhealthy');
+                }
+
+            } catch (error) {
+                document.getElementById('status').className = 'status offline';
+                document.getElementById('statusText').textContent = 'Server Offline';
+                showError('Cannot connect to orchestrator. Make sure the server is running:\n./orchestrator -mode=server -port=8080');
+            }
+        }
+
+        // Submit task
+        async function submitTask(taskType) {
+            // Map task types to input/button IDs
+            const inputId = `${taskType}Input`;
+            const btnId = `${taskType}Btn`;
+            const loadingId = taskType === 'code' ? 'codeLoading' : 'loading';
+            const resultsId = taskType === 'code' ? 'codeResults' : 'results';
+
+            const input = document.getElementById(inputId).value.trim();
+
+            if (!input) {
+                showError('Please enter some text before submitting.');
+                return;
+            }
+
+            // Hide previous results and errors
+            hideError();
+            if (taskType === 'code') {
+                document.getElementById('codeResults').style.display = 'none';
+            } else {
+                document.getElementById('results').classList.remove('visible');
+            }
+
+            // Show loading
+            if (taskType === 'code') {
+                document.getElementById('codeLoading').style.display = 'flex';
+            } else {
+                document.getElementById('loading').classList.add('visible');
+            }
+
+            // Disable all task buttons
+            document.getElementById('validateBtn').disabled = true;
+            document.getElementById('reviewBtn').disabled = true;
+            document.getElementById('codeBtn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/task`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        task_type: taskType,
+                        input: input
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Task execution failed');
+                }
+
+                const result = await response.json();
+
+                // Display results based on task type
+                if (taskType === 'code') {
+                    displayCodeResults(result);
+                } else {
+                    displayResults(result);
+                }
+
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            } finally {
+                // Hide loading and re-enable buttons
+                if (taskType === 'code') {
+                    document.getElementById('codeLoading').style.display = 'none';
+                } else {
+                    document.getElementById('loading').classList.remove('visible');
+                }
+                document.getElementById('validateBtn').disabled = false;
+                document.getElementById('reviewBtn').disabled = false;
+                document.getElementById('codeBtn').disabled = false;
+            }
+        }
+
+        // Display code generation results
+        function displayCodeResults(result) {
+            document.getElementById('codeResultModel').textContent = result.model;
+            document.getElementById('codeResultDuration').textContent = result.duration_seconds ? result.duration_seconds.toFixed(2) : 'N/A';
+            document.getElementById('codeResultContent').textContent = result.output;
+
+            // Add supervisor metadata if available
+            const metaDiv = document.querySelector('#codeResults .result-meta');
+            if (result.complexity_score !== undefined) {
+                const complexityHTML = `<div class="meta-item">
+                    Complexity: <span class="complexity-badge supervisor-badge">Score: ${result.complexity_score}/10</span>
+                    <span class="route-badge ${result.execution_route === 'ollama' ? 'route-ollama' : 'route-claude'}">${result.execution_route || 'N/A'}</span>
+                </div>`;
+                metaDiv.innerHTML += complexityHTML;
+
+                // Add supervisor section with agents
+                addSupervisorSection('codeResults', result);
+            }
+
+            document.getElementById('codeResults').style.display = 'block';
+            document.getElementById('codeResults').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Display results
+        function displayResults(result) {
+            document.getElementById('resultTask').textContent = result.task_type;
+            document.getElementById('resultModel').textContent = result.model;
+            document.getElementById('resultDuration').textContent = result.duration_seconds ? result.duration_seconds.toFixed(2) : 'N/A';
+            document.getElementById('resultContent').textContent = result.output;
+
+            // Add supervisor metadata if available
+            const metaDiv = document.querySelector('#results .result-meta');
+            if (result.complexity_score !== undefined) {
+                const complexityHTML = `<div class="meta-item">
+                    Complexity: <span class="complexity-badge supervisor-badge">Score: ${result.complexity_score}/10</span>
+                    <span class="route-badge ${result.execution_route === 'ollama' ? 'route-ollama' : 'route-claude'}">${result.execution_route || 'N/A'}</span>
+                </div>`;
+                metaDiv.innerHTML += complexityHTML;
+
+                // Add supervisor section with agents
+                addSupervisorSection('results', result);
+            }
+
+            document.getElementById('results').classList.add('visible');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Add supervisor section with agent outputs
+        function addSupervisorSection(parentId, result) {
+            // Remove existing supervisor section if any
+            const existing = document.querySelector(`#${parentId} .supervisor-section`);
+            if (existing) existing.remove();
+
+            // Check if there are any agent outputs
+            const hasAgents = result.qa_review || result.test_plan || result.documentation;
+            if (!hasAgents && result.complexity_score === undefined) return;
+
+            const supervisorHTML = `
+                <div class="supervisor-section">
+                    <div class="supervisor-header">
+                        <h3>🤖 AI Supervisor Analysis</h3>
+                        ${result.total_duration_seconds ? `<span style="color: #999; font-size: 13px;">Total: ${result.total_duration_seconds.toFixed(2)}s</span>` : ''}
+                    </div>
+
+                    ${result.complexity_score !== undefined ? `
+                    <div class="complexity-meter">
+                        <span class="meter-label">Complexity:</span>
+                        <div class="meter-bar">
+                            <div class="meter-fill" style="width: ${result.complexity_score * 10}%"></div>
+                        </div>
+                        <span class="complexity-badge supervisor-badge">${result.complexity_score}/10</span>
+                    </div>
+                    ` : ''}
+
+                    <div class="agent-cards">
+                        ${result.qa_review ? createAgentCard('QA Review', result.qa_review, '🔍') : ''}
+                        ${result.test_plan ? createAgentCard('Test Plan', result.test_plan, '🧪') : ''}
+                        ${result.documentation ? createAgentCard('Documentation', result.documentation, '📚') : ''}
+                    </div>
+                </div>
+            `;
+
+            const contentEl = document.querySelector(`#${parentId} .result-content`);
+            contentEl.insertAdjacentHTML('afterend', supervisorHTML);
+        }
+
+        // Create individual agent card
+        function createAgentCard(title, agentData, icon) {
+            const cardId = `agent-${title.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
+            const statusClass = agentData.status === 'passed' ? 'status-passed' :
+                agentData.status === 'warning' ? 'status-warning' : 'status-failed';
+
+            return `
+                <div class="agent-card" id="${cardId}">
+                    <div class="agent-card-header" onclick="toggleAgentCard('${cardId}')">
+                        <div class="agent-card-title">
+                            <span>${icon}</span>
+                            <span>${title}</span>
+                            <span class="agent-status ${statusClass}">${agentData.status}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            ${agentData.duration_seconds ? `<span class="agent-duration">${agentData.duration_seconds.toFixed(2)}s</span>` : ''}
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="agent-card-body">
+                        <div class="agent-output">${escapeHtml(agentData.output)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle agent card expansion
+        function toggleAgentCard(cardId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('expanded');
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Copy results to clipboard
+        function copyResults() {
+            const content = document.getElementById('resultContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Results copied to clipboard!');
+            });
+        }
+
+        // Close results
+        function closeResults() {
+            document.getElementById('results').classList.remove('visible');
+        }
+
+        // Show error
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.classList.add('visible');
+        }
+
+        // Hide error
+        function hideError() {
+            document.getElementById('error').classList.remove('visible');
+        }
+
+        // Tab Management
+        let historyData = [];
+
+        function switchTab(tabName) {
+            // Hide all panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected panel
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Activate clicked button
+            event.target.classList.add('active');
+
+            // Load history if switching to history tab
+            if (tabName === 'history') {
+                loadHistory();
+            }
+        }
+
+        // History Management
+        async function loadHistory() {
+            try {
+                const filter = document.getElementById('historyFilter').value;
+                const response = await fetch(`${API_URL}/history?task_type=${filter}`);
+                historyData = await response.json();
+                renderHistory();
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                document.getElementById('history-list').innerHTML =
+                    '<p style="color: #ff6b6b; text-align: center; padding: 40px;">Failed to load history. Server may be offline.</p>';
+            }
+        }
+
+        function renderHistory() {
+            const listEl = document.getElementById('history-list');
+
+            if (!historyData || historyData.length === 0) {
+                listEl.innerHTML = '<p style="color: #888; text-align: center; padding: 40px;">No tasks in history yet. Run some tasks to see them here!</p>';
+                return;
+            }
+
+            listEl.innerHTML = historyData.map((task, index) => `
+                <div class="history-item" onclick="toggleHistoryItem(${index})">
+                    <div class="history-item-header">
+                        <span class="history-item-type">${task.task_type}</span>
+                        <span class="history-item-time">${formatTimestamp(task.timestamp)} • ${task.duration_seconds.toFixed(2)}s</span>
+                    </div>
+                    <div class="history-item-preview">${escapeHtml(task.input.substring(0, 100))}...</div>
+                    <div class="history-item-expanded">
+                        <h4>Input:</h4>
+                        <pre>${escapeHtml(task.input)}</pre>
+                        <h4>Output:</h4>
+                        <pre>${escapeHtml(task.output)}</pre>
+                        <button onclick="rerunTask(${index}, event)" class="btn-secondary">Re-run This Task</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleHistoryItem(index) {
+            const items = document.querySelectorAll('.history-item');
+            items[index].classList.toggle('expanded');
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function rerunTask(index, event) {
+            event.stopPropagation(); // Prevent collapsing
+
+            const task = historyData[index];
+
+            // Switch to tasks tab
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tasks-tab').classList.add('active');
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+
+            // Fill the appropriate textarea
+            if (task.task_type === 'validate') {
+                document.getElementById('validateInput').value = task.input;
+            } else if (task.task_type === 'review') {
+                document.getElementById('reviewInput').value = task.input;
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function exportHistory() {
+            try {
+                const response = await fetch(`${API_URL}/export`);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `history_${Date.now()}.md`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export history. Server may be offline.');
+            }
+        }
+
+        // Chat Management
+        let currentConversationId = null;
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Disable input
+            input.disabled = true;
+            document.getElementById('chatSendBtn').disabled = true;
+
+            // Add user message to UI
+            addChatMessage('user', message);
+
+            // Clear input
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversation_id: currentConversationId,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // Update conversation ID
+                currentConversationId = data.conversation_id;
+
+                // Remove typing indicator
+                removeTypingIndicator(typingId);
+
+                // Add AI response
+                addChatMessage('assistant', data.response);
+
+            } catch (error) {
+                console.error('Chat error:', error);
+                removeTypingIndicator(typingId);
+                addChatMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                document.getElementById('chatSendBtn').disabled = false;
+                input.focus();
+            }
+        }
+
+        function addChatMessage(role, content) {
+            const messagesDiv = document.getElementById('chat-messages');
+
+            // Remove welcome message if present
+            const welcome = messagesDiv.querySelector('.chat-welcome');
+            if (welcome) welcome.remove();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+
+            const avatar = role === 'user' ? 'M' : 'AI';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div class="chat-message-avatar">${avatar}</div>
+                <div>
+                    <div class="chat-message-content">${escapeHtml(content)}</div>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            const id = 'typing_' + Date.now();
+            typingDiv.id = id;
+            typingDiv.className = 'chat-message assistant';
+            typingDiv.innerHTML = `
+                <div class="chat-message-avatar">AI</div>
+                <div class="chat-message-content">
+                    <span class="typing-indicator">●●●</span>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function newConversation() {
+            if (currentConversationId && !confirm('Start a new conversation? Current context will be lost.')) {
+                return;
+            }
+
+            currentConversationId = null;
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML = `
+                <div class="chat-welcome">
+                    <p>Start brainstorming your game ideas!</p>
+                    <p>The AI will remember context throughout the conversation.</p>
+                </div>
+            `;
+        }
+
+        // Initialize
+        checkHealth();
+        checkFirstVisit(); // Show welcome modal for first-time visitors
+
+        // Code Generation Functions
+        function copyCodeResults() {
+            const content = document.getElementById('codeResultContent').innerText;
+            navigator.clipboard.writeText(content);
+        }
+
+        function closeCodeResults() {
+            document.getElementById('codeResults').style.display = 'none';
+        }
+
+        setInterval(checkHealth, 30000); // Check every 30 seconds
+
+        // Chat keyboard shortcuts
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendChatMessage();
+                    }
+                });
+            }
+        });
+
+        // ============================================
+        // Discover Tab Functions
+        // ============================================
+
+        let currentDiscoverSession = null;
+        let currentDiscoverAnswers = [];
+
+        function startDiscovery() {
+            const ideaInput = document.getElementById('discoverIdeaInput');
+            const idea = ideaInput.value.trim();
+
+            if (!idea) {
+                showError('Please enter your product idea');
+                return;
+            }
+
+            // Start discovery session
+            fetch('/discover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'start',
+                    input: idea
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+
+                    // Store session data with enhanced fields from API
+                    currentDiscoverSession = {
+                        id: data.discover_id,
+                        raw_idea: data.raw_idea || idea,
+                        idea_type: data.idea_type || 'General Application',
+                        questions: data.questions || []
+                    };
+                    currentDiscoverAnswers = [];
+
+                    // Show idea summary
+                    document.getElementById('ideaSummary').textContent = idea;
+
+                    // Display first question
+                    displayQuestion(data);
+
+                    // Switch to questions phase
+                    document.getElementById('discover-input-phase').classList.remove('active');
+                    document.getElementById('discover-questions-phase').classList.add('active');
+                })
+                .catch(error => {
+                    showError('Failed to start discovery: ' + error.message);
+                });
+        }
+
+        function displayQuestion(data) {
+            document.getElementById('questionNum').textContent = data.current_question;
+            document.getElementById('currentQuestion').textContent = data.question;
+            document.getElementById('questionAnswer').value = '';
+
+            // Update button text for last question
+            const answerBtn = document.getElementById('answerBtn');
+            if (data.current_question === 3) {
+                answerBtn.textContent = 'Get Verdict';
+            } else {
+                answerBtn.textContent = 'Next Question';
+            }
+        }
+
+        function submitAnswer() {
+            const answerInput = document.getElementById('questionAnswer');
+            const answer = answerInput.value.trim();
+
+            if (!answer) {
+                showError('Please provide an answer');
+                return;
+            }
+
+            // Store answer locally
+            currentDiscoverAnswers.push(answer);
+
+            // Send answer to server
+            fetch('/discover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    discover_id: currentDiscoverSession.id,
+                    action: 'answer',
+                    input: answer
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+
+                    // Check if complete
+                    if (data.status === 'complete') {
+                        displayVerdict(data);
+                    } else {
+                        // Display next question
+                        displayQuestion(data);
+                    }
+                })
+                .catch(error => {
+                    showError('Failed to submit answer: ' + error.message);
+                });
+        }
+
+        function displayVerdict(data) {
+            // Update session with verdict response data
+            if (currentDiscoverSession) {
+                currentDiscoverSession.idea_type = data.idea_type || currentDiscoverSession.idea_type;
+                currentDiscoverSession.questions = data.questions || currentDiscoverSession.questions;
+                currentDiscoverSession.raw_idea = data.raw_idea || currentDiscoverSession.raw_idea;
+                currentDiscoverSession.verdict = data.verdict;
+                currentDiscoverSession.reasoning = data.reasoning;
+            }
+
+            // Set verdict text and icon
+            const verdictIcon = document.getElementById('verdictIcon');
+            const verdictText = document.getElementById('verdictText');
+            const verdictReasoning = document.getElementById('verdictReasoning');
+            const verdictCard = document.getElementById('verdictCard');
+            const codeGenBtn = document.getElementById('codeGenBtn');
+
+            verdictText.textContent = data.verdict;
+            verdictReasoning.textContent = data.reasoning;
+
+            // Set icon based on verdict
+            if (data.verdict === 'GO') {
+                verdictIcon.textContent = '✅';
+                verdictCard.className = 'verdict-card verdict-GO';
+                codeGenBtn.style.display = 'inline-block';
+            } else if (data.verdict === 'REFINE') {
+                verdictIcon.textContent = '🔄';
+                verdictCard.className = 'verdict-card verdict-REFINE';
+                codeGenBtn.style.display = 'none';
+            } else {
+                verdictIcon.textContent = '❌';
+                verdictCard.className = 'verdict-card verdict-PASS';
+                codeGenBtn.style.display = 'none';
+            }
+
+            // Display answers summary with DYNAMIC questions from session
+            const answersSummary = document.getElementById('answersSummary');
+            const questions = currentDiscoverSession?.questions || [
+                'What makes it different from existing solutions?',
+                'Who is your target audience?',
+                'How would you monetize this?'
+            ];
+
+            answersSummary.innerHTML = currentDiscoverAnswers.map((answer, i) => `
+                <div class="answer-item">
+                    <strong>Q${i + 1}: ${questions[i]}</strong>
+                    <p>${answer}</p>
+                </div>
+            `).join('');
+
+            // Switch to verdict phase
+            document.getElementById('discover-questions-phase').classList.remove('active');
+            document.getElementById('discover-verdict-phase').classList.add('active');
+        }
+
+        function passToCodeGen() {
+            if (!currentDiscoverSession) {
+                return;
+            }
+
+            // Construct enriched prompt
+            const prompt = `${currentDiscoverSession.raw_idea}
+
+Target Audience: ${currentDiscoverAnswers[1]}
+Unique Features: ${currentDiscoverAnswers[0]}
+Monetization Strategy: ${currentDiscoverAnswers[2]}
+
+Generate a production-ready implementation with detailed architecture and setup instructions.`;
+
+            // Switch to Code tab and pre-fill
+            document.getElementById('codeInput').value = prompt;
+            switchTab('code');
+
+            // Reset discover tab
+            startNewDiscovery();
+        }
+
+        // Build enriched prompt with ALL discovery context (dynamic questions)
+        function buildEnrichedPrompt(session, answers) {
+            let prompt = `# Product Idea
+${session.raw_idea}
+
+# Category
+${session.idea_type || 'General Application'}
+
+# Validation Insights
+`;
+
+            // Dynamically include ALL Q&A pairs from discovery
+            for (let i = 0; i < session.questions.length; i++) {
+                prompt += `\n**${session.questions[i]}**\n${answers[i]}\n`;
+            }
+
+            prompt += `\n# Task
+Generate production-ready code implementation with:
+1. Optimal tech stack for a ${session.idea_type}
+2. Complete, commented source code following best practices
+3. Project structure and file organization
+4. Setup instructions with all dependencies
+5. Architecture documentation and next steps
+
+Deliver code that is ready to run.`;
+
+            return prompt;
+        }
+
+        // Auto-generate code from discovery session (seamless integration)
+        async function autoGenerateFromDiscovery() {
+            if (!currentDiscoverSession) {
+                showToast('❌ No discovery session found', 'error');
+                return;
+            }
+
+            // Build enriched prompt
+            const enrichedPrompt = buildEnrichedPrompt(currentDiscoverSession, currentDiscoverAnswers);
+
+            // Show confirmation
+            if (!confirm("🚀 Ready to generate code! This will use all your discovery insights. Continue?")) {
+                return;
+            }
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('codeLoading');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('visible');
+                document.getElementById('codeLoadingMessage').textContent = 'Generating code from your validated idea...';
+            }
+
+            try {
+                // Submit code generation task
+                const response = await fetch(`${API_URL}/task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_type: 'code',
+                        input: enrichedPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Hide loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('visible');
+                }
+
+                // Display code result
+                displayCodeResults(result);
+
+                // Switch to tasks tab to show result
+                switchTab('tasks');
+
+                // Show success toast
+                showToast('✅ Code generated successfully!');
+
+            } catch (error) {
+                // Hide loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('visible');
+                }
+                showToast('❌ Code generation failed: ' + error.message, 'error');
+                console.error('Code generation error:', error);
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function startNewDiscovery() {
+            // Reset all phases
+            document.getElementById('discover-verdict-phase').classList.remove('active');
+            document.getElementById('discover-questions-phase').classList.remove('active');
+            document.getElementById('discover-input-phase').classList.add('active');
+
+            // Clear inputs
+            document.getElementById('discoverIdeaInput').value = '';
+            document.getElementById('questionAnswer').value = '';
+
+            // Reset state
+            currentDiscoverSession = null;
+            currentDiscoverAnswers = [];
+        }
+
+        // ============================================
+        // Discovery History Functions
+        // ============================================
+
+        function loadDiscoveryHistory() {
+            fetch('/discover/history')
+                .then(res => res.json())
+                .then(data => {
+                    displayDiscoveryHistory(data.sessions || []);
+                })
+                .catch(error => {
+                    console.error('Failed to load history:', error);
+                    document.getElementById('discovery-history-list').innerHTML = '<p style="color: #ff6b6b;">Failed to load history</p>';
+                });
+        }
+
+        function displayDiscoveryHistory(sessions) {
+            const container = document.getElementById('discovery-history-list');
+
+            if (!sessions || sessions.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No discovery sessions yet. Complete a discovery to see it here!</p>';
+                return;
+            }
+
+            container.innerHTML = sessions.map(session => {
+                const date = new Date(session.created_at || session.CreatedAt);
+                const verdictClass = (session.verdict || '').toLowerCase();
+                const verdictBadge = session.verdict ? `<span class="verdict-badge verdict-${verdictClass}" style="
+                    display: inline-block; padding: 4px 12px; border-radius: 12px;
+                    font-size: 12px; font-weight: 600; text-transform: uppercase;
+                    ${verdictClass === 'go' ? 'background: #d4edda; color: #155724;' : ''}
+                    ${verdictClass === 'refine' ? 'background: #fff3cd; color: #856404;' : ''}
+                    ${verdictClass === 'pass' ? 'background: #f8d7da; color: #721c24;' : ''}
+                ">${session.verdict}</span>` : '<span style="color: #999;">In Progress</span>';
+
+                const categoryBadge = session.idea_type || session.IdeaType ? `<span style="
+                    display: inline-block; padding: 4px 8px; border-radius: 8px;
+                    background: #e3f2fd; color: #1976d2; font-size: 11px;
+                    font-weight: 600; text-transform: uppercase; margin-left: 8px;
+                ">${session.idea_type || session.IdeaType}</span>` : '';
+
+                return `
+                    <div class="history-item" style="
+                        border: 1px solid #e0e0e0; border-radius: 8px;
+                        padding: 16px; margin-bottom: 12px;
+                        background: white; transition: box-shadow 0.2s;
+                    " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                       onmouseout="this.style.boxShadow='none'">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                ${verdictBadge}
+                                ${categoryBadge}
+                            </div>
+                            <span style="color: #999; font-size: 13px;">${date.toLocaleDateString()}</span>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong style="font-size: 14px; color: #333;">${session.raw_idea || session.RawIdea || 'Untitled'}</strong>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="viewDiscoverySession('${session.id || session.ID}')" class="btn-secondary" style="font-size: 13px; padding: 6px 12px;">
+                                View Details
+                            </button>
+                            ${session.verdict === 'GO' || session.Verdict === 'GO' ? `
+                                <button onclick="useSessionForCodeGen('${session.id || session.ID}')" class="btn-primary" style="font-size: 13px; padding: 6px 12px;">
+                                    🚀 Use for Code Gen
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewDiscoverySession(sessionID) {
+            fetch(`/discover/session?discover_id=${sessionID}`)
+                .then(res => res.json())
+                .then(session => {
+                    showSessionDetailsModal(session);
+                })
+                .catch(error => {
+                    console.error('Failed to load session:', error);
+                    showToast('❌ Failed to load session details', 'error');
+                });
+        }
+
+        function showSessionDetailsModal(session) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.5); z-index: 1000;
+                display: flex; align-items: center; justify-content: center;
+                padding: 20px;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white; border-radius: 12px; padding: 30px;
+                max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            `;
+
+            const questions = session.questions || session.Questions || [];
+            const answers = session.answers || session.Answers || [];
+            const qaHTML = questions.map((q, i) => `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <strong style="color: #495057; font-size: 14px;">Q${i + 1}: ${q}</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; line-height: 1.6;">${answers[i] || '<em>Not answered</em>'}</p>
+                </div>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <h2 style="margin-top: 0; color: #333;">Discovery Session Details</h2>
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <strong>Idea:</strong> ${session.raw_idea || session.RawIdea}
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <strong>Category:</strong> ${session.idea_type || session.IdeaType}
+                    &nbsp;|&nbsp;
+                    <strong>Verdict:</strong> ${session.verdict || session.Verdict}
+                </div>
+                <h3 style="margin-top: 25px;">Questions & Answers:</h3>
+                ${qaHTML}
+                ${session.reasoning || session.Reasoning ? `
+                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                        <strong>Reasoning:</strong>
+                        <p style="margin: 10px 0 0 0;">${session.reasoning || session.Reasoning}</p>
+                    </div>
+                ` : ''}
+                <button onclick="this.closest('[style*=\\'position: fixed\\']').remove()" class="btn-secondary" style="margin-top: 20px; width: 100%;">
+                    Close
+                </button>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function useSessionForCodeGen(sessionID) {
+            fetch(`/discover/session?discover_id=${sessionID}`)
+                .then(res => res.json())
+                .then(session => {
+                    const enrichedPrompt = buildEnrichedPrompt(session, session.answers || session.Answers || []);
+                    document.getElementById('codeInput').value = enrichedPrompt;
+                    switchTab('code');
+                    showToast('✅ Enriched prompt loaded from discovery session!', 'success');
+                })
+                .catch(error => {
+                    console.error('Failed to load session:', error);
+                    showToast('❌ Failed to load session', 'error');
+                });
+        }
+
+        function exportAllDiscoveries() {
+            fetch('/discover/history')
+                .then(res => res.json())
+                .then(data => {
+                    const markdown = generateDiscoveryReport(data.sessions || []);
+                    downloadMarkdown(markdown, 'all_discoveries.md');
+                    showToast('✅ Discovery history exported!', 'success');
+                })
+                .catch(error => {
+                    console.error('Failed to export:', error);
+                    showToast('❌ Export failed', 'error');
+                });
+        }
+
+        function generateDiscoveryReport(sessions) {
+            let md = '# Discovery Session History\n\n';
+            md += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
+
+            const byVerdict = {
+                GO: sessions.filter(s => (s.verdict || s.Verdict) === 'GO'),
+                REFINE: sessions.filter(s => (s.verdict || s.Verdict) === 'REFINE'),
+                PASS: sessions.filter(s => (s.verdict || s.Verdict) === 'PASS')
+            };
+
+            md += `**Summary:** ${sessions.length} total sessions\n`;
+            md += `- ✅ GO: ${byVerdict.GO.length}\n`;
+            md += `- 🔄 REFINE: ${byVerdict.REFINE.length}\n`;
+            md += `- ❌ PASS: ${byVerdict.PASS.length}\n\n`;
+            md += '---\n\n';
+
+            sessions.forEach((session, idx) => {
+                md += `## ${idx + 1}. ${session.raw_idea || session.RawIdea}\n\n`;
+                md += `**Category:** ${session.idea_type || session.IdeaType}\n`;
+                md += `**Verdict:** ${session.verdict || session.Verdict}\n`;
+                md += `**Date:** ${new Date(session.created_at || session.CreatedAt).toLocaleDateString()}\n\n`;
+
+                const questions = session.questions || session.Questions || [];
+                const answers = session.answers || session.Answers || [];
+                questions.forEach((q, i) => {
+                    md += `**Q${i + 1}:** ${q}\n`;
+                    md += `**A:** ${answers[i] || 'Not answered'}\n\n`;
+                });
+
+                if (session.reasoning || session.Reasoning) {
+                    md += `**Reasoning:** ${session.reasoning || session.Reasoning}\n\n`;
+                }
+                md += '---\n\n';
+            });
+
+            return md;
+        }
+
+        function downloadMarkdown(content, filename) {
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Project Management Functions
+        let currentProjectID = null;
+
+        async function createProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+
+            if (!name || !description) {
+                alert('Please provide both project name and description');
+                return;
+            }
+
+            const btn = document.getElementById('createProjectBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            try {
+                const response = await fetch(`${API_URL}/project`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create project');
+                }
+
+                const project = await response.json();
+                document.getElementById('projectName').value = '';
+                document.getElementById('projectDescription').value = '';
+                showToast(`✅ Project "${project.name}" created successfully!`, 'success');
+                loadProjects();
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Project';
+            }
+        }
+
+        let currentView = 'list';
+
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_URL}/project/list`);
+                if (!response.ok) throw new Error('Project orchestrator not enabled');
+
+                const data = await response.json();
+                const projects = data.projects || [];
+
+                if (projects.length === 0) {
+                    document.getElementById('projectsList').innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">No projects yet. Create one above!</div>';
+                    return;
+                }
+
+                if (currentView === 'kanban') {
+                    renderKanbanView(projects);
+                } else {
+                    renderListView(projects);
+                }
+            } catch (error) {
+                document.getElementById('projectsList').innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Project orchestrator not enabled. Set "enabled": true in config.json.</div>';
+            }
+        }
+
+        function toggleView(view) {
+            currentView = view;
+            document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
+            document.getElementById('kanbanViewBtn').classList.toggle('active', view === 'kanban');
+            loadProjects();
+        }
+
+        function renderListView(projects) {
+            const listHTML = projects.map(p => {
+                const completion = calculateCompletion(p);
+                const statusIcon = getStatusIcon(p.status);
+                return `
+                    <div style="padding: 15px; background: #1a1a1a; border-radius: 4px; margin-bottom: 10px; cursor: pointer;" onclick="openProjectDashboard('${p.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span class="status-icon ${statusIcon}"></span>
+                                    <div style="font-weight: 600; color: #4a9eff;">${p.name}</div>
+                                    <span class="phase-badge ${p.current_phase}">${p.current_phase}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width: ${completion}%"></div>
+                                </div>
+                                <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                                    Status: ${p.status} • ${completion}% Complete
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('projectsList').innerHTML = listHTML;
+        }
+
+        function renderKanbanView(projects) {
+            const phases = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const phaseNames = {
+                discovery: '🔍 Discovery',
+                validation: '✅ Validation',
+                planning: '📋 Planning',
+                codegen: '⚙️ Code Gen',
+                review: '👁️ Review',
+                qa: '🧪 QA',
+                docs: '📚 Docs',
+                complete: '✨ Complete'
+            };
+
+            const projectsByPhase = {};
+            phases.forEach(phase => projectsByPhase[phase] = []);
+
+            projects.forEach(p => {
+                if (projectsByPhase[p.current_phase]) {
+                    projectsByPhase[p.current_phase].push(p);
+                }
+            });
+
+            const kanbanHTML = `
+                <div class="kanban-board">
+                    ${phases.map(phase => `
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span>${phaseNames[phase]}</span>
+                                <span class="kanban-column-count">${projectsByPhase[phase].length}</span>
+                            </div>
+                            ${projectsByPhase[phase].map(p => {
+                const completion = calculateCompletion(p);
+                const statusIcon = getStatusIcon(p.status);
+                return `
+                                    <div class="kanban-card phase-${phase}" onclick="openProjectDashboard('${p.id}')">
+                                        <div class="kanban-card-title">${p.name}</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-bar-fill" style="width: ${completion}%"></div>
+                                        </div>
+                                        <div class="kanban-card-meta">
+                                            <span><span class="status-icon ${statusIcon}"></span>${p.status}</span>
+                                            <span style="font-weight: 600; color: #4ade80;">${completion}%</span>
+                                        </div>
+                                    </div>
+                                `;
+            }).join('') || '<div style="color: #666; font-size: 13px; padding: 10px; text-align: center;">No projects</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('projectsList').innerHTML = kanbanHTML;
+        }
+
+        function getStatusIcon(status) {
+            const statusMap = {
+                'active': 'active',
+                'pending': 'pending',
+                'complete': 'complete',
+                'completed': 'complete',
+                'error': 'error',
+                'failed': 'error'
+            };
+            return statusMap[status.toLowerCase()] || 'pending';
+        }
+
+        function calculateCompletion(project) {
+            const phaseWeights = {
+                discovery: 10,
+                validation: 10,
+                planning: 10,
+                codegen: 30,
+                review: 20,
+                qa: 10,
+                docs: 10
+            };
+
+            let total = 0;
+            (project.phases || []).forEach(phase => {
+                if (phase.status === 'complete') {
+                    total += phaseWeights[phase.phase] || 0;
+                }
+            });
+
+            return Math.round(total);
+        }
+
+        async function openProjectDashboard(projectID) {
+            currentProjectID = projectID;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${projectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+
+                document.getElementById('dashboardProjectName').textContent = project.name;
+                document.getElementById('dashboardPhase').textContent = project.current_phase;
+                document.getElementById('dashboardStatus').textContent = project.status;
+                document.getElementById('dashboardCompletion').textContent = `${calculateCompletion(project)}%`;
+
+                updatePhaseIndicators(project);
+                document.getElementById('projectDashboard').style.display = 'block';
+                document.getElementById('leadAgentRecommendation').style.display = 'none';
+                document.getElementById('phaseLog').style.display = 'none';
+
+                if (project.current_phase === 'qa') {
+                    loadProjectMetrics(projectID);
+                }
+
+                if (['qa', 'docs', 'complete'].includes(project.current_phase)) {
+                    loadQualityReport(projectID);
+                }
+
+                // Check schema validation
+                checkProjectSchema(projectID);
+
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function closeDashboard() {
+            document.getElementById('projectDashboard').style.display = 'none';
+            currentProjectID = null;
+        }
+
+        function updatePhaseIndicators(project) {
+            const phases = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const completedPhases = (project.phases || []).filter(p => p.status === 'complete').map(p => p.phase);
+
+            phases.forEach(phase => {
+                const el = document.getElementById(`phase-${phase}`);
+                if (!el) return;
+
+                if (completedPhases.includes(phase)) {
+                    el.style.background = '#1a4d2e';
+                    el.style.color = '#4ade80';
+                } else if (project.current_phase === phase) {
+                    el.style.background = '#1a3a4d';
+                    el.style.color = '#4a9eff';
+                } else {
+                    el.style.background = '#2a2a2a';
+                    el.style.color = '#888';
+                }
+            });
+        }
+
+        async function executeCurrentPhase() {
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('executePhaseBtn');
+            btn.disabled = true;
+            btn.textContent = 'Executing...';
+
+            const logDiv = document.getElementById('phaseLog');
+            logDiv.style.display = 'block';
+            logDiv.innerHTML = '<div style="color: #4a9eff;">⏳ Executing phase...</div>';
+
+            try {
+                const projectResponse = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                const project = await projectResponse.json();
+
+                const response = await fetch(`${API_URL}/project/phase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        phase: project.current_phase
+                    })
+                });
+
+                if (!response.ok) throw new Error('Phase execution failed');
+
+                const result = await response.json();
+
+                logDiv.innerHTML += `<div style="color: #4ade80;">✓ Phase executed successfully</div>`;
+                logDiv.innerHTML += `<div style="color: #ccc; margin-top: 10px;">Decision: ${result.decision}</div>`;
+                logDiv.innerHTML += `<div style="color: #ccc;">Reasoning: ${result.reasoning}</div>`;
+
+                document.getElementById('agentDecision').textContent = result.decision;
+                document.getElementById('agentReasoning').textContent = result.reasoning;
+                document.getElementById('agentNextSteps').textContent = result.next_steps;
+                document.getElementById('leadAgentRecommendation').style.display = 'block';
+
+                if (result.decision === 'PROCEED') {
+                    document.getElementById('approvePhaseBtn').disabled = false;
+                }
+
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                logDiv.innerHTML += `<div style="color: #ff6b6b;">❌ Error: ${error.message}</div>`;
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Execute Current Phase';
+            }
+        }
+
+        async function approvePhase() {
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('approvePhaseBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: currentProjectID })
+                });
+
+                if (!response.ok) throw new Error('Failed to approve phase');
+
+                showToast('✅ Phase approved and transitioned!', 'success');
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function rejectPhase() {
+            const reason = prompt('Reason for rejection:');
+            if (!reason) return;
+
+            if (!currentProjectID) return;
+
+            const btn = document.getElementById('rejectPhaseBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        reason: reason
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to reject phase');
+
+                showToast('❌ Phase rejected', 'error');
+                openProjectDashboard(currentProjectID);
+            } catch (error) {
+                showToast(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function showGoBackOptions() {
+            if (!currentProject) {
+                alert('No project loaded');
+                return;
+            }
+
+            // Get list of completed phases before current
+            const phaseOrder = ['discovery', 'validation', 'planning', 'codegen', 'review', 'qa', 'docs', 'complete'];
+            const currentIdx = phaseOrder.indexOf(currentProject.current_phase);
+
+            if (currentIdx <= 0) {
+                alert('Already at the first phase - cannot go back');
+                return;
+            }
+
+            const availablePhases = [];
+            for (let i = 0; i < currentIdx; i++) {
+                const phaseName = phaseOrder[i];
+                // Check if this phase was completed
+                const phaseExec = currentProject.phases.find(p => p.phase === phaseName && p.status === 'complete');
+                if (phaseExec) {
+                    availablePhases.push({
+                        name: phaseName,
+                        label: capitalizePhase(phaseName),
+                        completedAt: phaseExec.completed_at
+                    });
+                }
+            }
+
+            if (availablePhases.length === 0) {
+                alert('No previous completed phases to go back to');
+                return;
+            }
+
+            // Show selection dialog
+            let options = availablePhases.map((p, idx) =>
+                `${idx + 1}. ${p.label} (completed ${new Date(p.completedAt).toLocaleString()})`
+            ).join('\n');
+
+            const selection = prompt(
+                `Select which phase to go back to:\n\n${options}\n\nEnter phase number (1-${availablePhases.length}):`,
+                availablePhases.length.toString()
+            );
+
+            if (!selection) return;
+
+            const selectedIdx = parseInt(selection) - 1;
+            if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= availablePhases.length) {
+                alert('Invalid selection');
+                return;
+            }
+
+            const targetPhase = availablePhases[selectedIdx].name;
+            const reason = prompt('Why are you going back? (optional note):', 'User requested revert');
+
+            if (reason !== null) {
+                goBackToPhase(targetPhase, reason || 'User requested revert');
+            }
+        }
+
+        async function goBackToPhase(targetPhase, reason) {
+            const btn = document.getElementById('goBackBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/project/revert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: currentProjectID,
+                        target_phase: targetPhase,
+                        reason: reason
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to revert phase');
+                }
+
+                showToast(`✅ Reverted to ${capitalizePhase(targetPhase)} phase`, 'success');
+                setTimeout(() => openProjectDashboard(currentProjectID), 500);
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function capitalizePhase(phase) {
+            return phase.charAt(0).toUpperCase() + phase.slice(1);
+        }
+
+        async function loadProjectMetrics(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/metrics?project_id=${projectID}`);
+                if (!response.ok) return;
+
+                const metrics = await response.json();
+
+                document.getElementById('criteria-build-status').textContent = metrics.has_runnable_build ? '✅' : '❌';
+                document.getElementById('criteria-tests-status').textContent = metrics.has_tests ? '✅' : '❌';
+                document.getElementById('criteria-readme-status').textContent = metrics.has_readme ? '✅' : '❌';
+                document.getElementById('handoffCriteria').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load metrics:', error);
+            }
+        }
+
+        async function loadQualityReport(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/quality?project_id=${projectID}`);
+                if (!response.ok) return;
+                const qr = await response.json();
+
+                // Overall score and status
+                document.getElementById('quality-score').textContent = qr.OverallScore + '/100';
+                const statusBadge = document.getElementById('quality-status');
+                if (qr.Status === 'READY') {
+                    statusBadge.textContent = '✅ READY FOR DELIVERY';
+                    statusBadge.style.background = '#1a4d2e';
+                    statusBadge.style.color = '#4ade80';
+                    document.getElementById('quality-score').style.color = '#4ade80';
+                } else if (qr.Status === 'NEEDS_WORK') {
+                    statusBadge.textContent = '⚠️ NEEDS WORK';
+                    statusBadge.style.background = '#4d3a1a';
+                    statusBadge.style.color = '#ffbb33';
+                    document.getElementById('quality-score').style.color = '#ffbb33';
+                } else {
+                    statusBadge.textContent = '❌ BLOCKED';
+                    statusBadge.style.background = '#4d1a1a';
+                    statusBadge.style.color = '#ff6b6b';
+                    document.getElementById('quality-score').style.color = '#ff6b6b';
+                }
+
+                // Build verification
+                document.getElementById('build-status-badge').textContent = qr.BuildPassed ? '✅' : '❌';
+                document.getElementById('build-syntax').textContent = qr.SyntaxValid ? '✅' : '❌';
+                document.getElementById('build-deps').textContent = qr.DependenciesOK ? '✅' : '❌';
+                document.getElementById('build-entry').textContent = qr.EntryPointValid ? '✅' : '❌';
+
+                // Runtime verification
+                document.getElementById('runtime-status-badge').textContent = qr.RuntimePassed ? '✅' : '❌';
+                document.getElementById('runtime-starts').textContent = qr.ApplicationStarts ? '✅' : '❌';
+                document.getElementById('runtime-health').textContent = qr.HealthCheckPassed ? '✅' : '❌';
+
+                // Test verification
+                if (qr.TotalTests > 0) {
+                    const allPassed = qr.TestsFailed === 0;
+                    document.getElementById('test-status-badge').textContent = allPassed ? '✅' : '⚠️';
+                    document.getElementById('test-passed').textContent = qr.TestsPassed;
+                    document.getElementById('test-failed').textContent = qr.TestsFailed;
+                    document.getElementById('test-total').textContent = qr.TotalTests;
+                    document.getElementById('test-results').style.display = 'grid';
+                    document.getElementById('test-no-results').style.display = 'none';
+                } else {
+                    document.getElementById('test-status-badge').textContent = '⚠️';
+                    document.getElementById('test-results').style.display = 'none';
+                    document.getElementById('test-no-results').style.display = 'block';
+                }
+
+                // Documentation
+                document.getElementById('docs-status-badge').textContent = qr.ReadmeComplete ? '✅' : '❌';
+                document.getElementById('docs-readme').textContent = qr.ReadmeComplete ? '✅' : '❌';
+
+                // Show quality report
+                document.getElementById('qualityReport').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load quality report:', error);
+            }
+        }
+
+        async function viewArtifacts() {
+            if (!currentProjectID) return;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+                const artifactsList = document.getElementById('artifactsList');
+
+                if (!project.artifact_paths || project.artifact_paths.length === 0) {
+                    artifactsList.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">No artifacts generated yet</div>';
+                } else {
+                    let html = '<div style="display: grid; gap: 10px;">';
+                    for (const artifactPath of project.artifact_paths) {
+                        const fileName = artifactPath.split(/[\\\/]/).pop();
+                        html += `
+                            <div style="background: #1a1a1a; padding: 15px; border-radius: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span style="color: #4a9eff; font-weight: 600;">${fileName}</span>
+                                    <button onclick="viewArtifactContent('${artifactPath}')" class="btn-secondary" style="font-size: 12px; padding: 5px 10px;">View Content</button>
+                                </div>
+                                <div style="color: #888; font-size: 12px;">${artifactPath}</div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    artifactsList.innerHTML = html;
+                }
+
+                document.getElementById('artifactsViewer').style.display = 'block';
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        async function viewArtifactContent(path) {
+            try {
+                const response = await fetch(`${API_URL}/artifact/view?path=${encodeURIComponent(path)}`);
+                if (!response.ok) throw new Error('Failed to load artifact');
+
+                const data = await response.json();
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.9); z-index: 10000;
+                    display: flex; align-items: center; justify-content: center;
+                    padding: 20px;
+                `;
+                modal.innerHTML = `
+                    <div style="background: #1a1a1a; width: 90%; max-width: 1200px; max-height: 90vh; border-radius: 8px; display: flex; flex-direction: column;">
+                        <div style="padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; color: #4a9eff;">${path.split(/[\\\/]/).pop()}</h3>
+                            <button onclick="this.closest('div').parentElement.parentElement.remove()" class="btn-secondary">Close</button>
+                        </div>
+                        <div style="flex: 1; overflow: auto; padding: 20px;">
+                            <pre style="margin: 0; white-space: pre-wrap; font-family: Consolas, monospace; font-size: 13px; line-height: 1.5;">${escapeHtml(data.content)}</pre>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.remove();
+                });
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function closeArtifactsViewer() {
+            document.getElementById('artifactsViewer').style.display = 'none';
+        }
+
+        async function viewTaskHistory() {
+            if (!currentProjectID) return;
+
+            try {
+                const response = await fetch(`${API_URL}/project?id=${currentProjectID}`);
+                if (!response.ok) throw new Error('Failed to load project');
+
+                const project = await response.json();
+                const taskHistoryList = document.getElementById('taskHistoryList');
+
+                if (!project.tasks || project.tasks.length === 0) {
+                    taskHistoryList.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">No task executions yet</div>';
+                } else {
+                    let html = '<div style="display: grid; gap: 15px;">';
+                    project.tasks.forEach((task, index) => {
+                        html += `
+                            <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; border-left: 3px solid #a77bff;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span style="color: #a77bff; font-weight: 600;">Task #${index + 1}: ${task.task_type.toUpperCase()}</span>
+                                    <span style="color: #888; font-size: 12px;">${new Date(task.created_at).toLocaleString()}</span>
+                                </div>
+                                <div style="color: #ccc; font-size: 14px; margin-bottom: 5px;">
+                                    <strong>Phase:</strong> ${task.phase} |
+                                    <strong>Complexity:</strong> ${task.complexity_score}/10 |
+                                    <strong>Route:</strong> ${task.execution_route}
+                                </div>
+                                ${task.artifact_path ? `<div style="color: #888; font-size: 12px; margin-top: 5px;">📄 ${task.artifact_path}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    taskHistoryList.innerHTML = html;
+                }
+
+                document.getElementById('taskHistoryViewer').style.display = 'block';
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function closeTaskHistoryViewer() {
+            document.getElementById('taskHistoryViewer').style.display = 'none';
+        }
+
+        async function exportProject() {
+            if (!currentProjectID) return;
+
+            try {
+                showToast('📥 Generating report...', 'info');
+                window.open(`${API_URL}/project/export?id=${currentProjectID}`, '_blank');
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteCurrentProject() {
+            if (!currentProjectID) return;
+
+            const project = await fetch(`${API_URL}/project?id=${currentProjectID}`).then(r => r.json());
+
+            if (!confirm(`Are you sure you want to delete project "${project.name}"? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/project/delete?id=${currentProjectID}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete project');
+
+                showToast('✅ Project deleted successfully', 'success');
+                closeDashboard();
+                loadProjectsList();
+            } catch (error) {
+                showToast(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#1a4d2e' : '#4d1a1a'};
+                color: ${type === 'success' ? '#4ade80' : '#ff6b6b'};
+                border-radius: 4px;
+                z-index: 10000;
+                font-weight: 600;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Load projects when switching to projects tab
+        const originalSwitchTab = switchTab;
+        switchTab = function (tabName) {
+            originalSwitchTab(tabName);
+            if (tabName === 'projects') {
+                loadProjects();
+            }
+        };
+
+        // Load history when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit for server to be ready
+        });
+
+        // Schema Validation Function
+        async function checkProjectSchema(projectID) {
+            try {
+                const response = await fetch(`${API_URL}/project/validate_schema?id=${projectID}`);
+                if (!response.ok) return;
+
+                const result = await response.json();
+
+                // Find or create warnings container
+                const dashboard = document.getElementById('projectDashboard');
+                let warningsContainer = document.getElementById('schemaWarnings');
+
+                if (!warningsContainer) {
+                    warningsContainer = document.createElement('div');
+                    warningsContainer.id = 'schemaWarnings';
+                    warningsContainer.style.cssText = `
+                        background: #4d1a1a; 
+                        border: 1px solid #ff6b6b; 
+                        border-radius: 4px; 
+                        padding: 15px; 
+                        margin: 20px; 
+                        display: none;
+                    `;
+                    // Insert after the top tabs/header (approximate location)
+                    const target = dashboard.querySelector('.dashboard-content') || dashboard.firstElementChild;
+                    if (target) {
+                        target.insertBefore(warningsContainer, target.firstElementChild);
+                    } else {
+                        dashboard.prepend(warningsContainer);
+                    }
+                }
+
+                if (!result.valid && result.issues && result.issues.length > 0) {
+                    warningsContainer.innerHTML = `
+                        <h4 style="margin-top: 0; color: #ff6b6b;">⚠️ Project Data Integrity Warning</h4>
+                        <p style="color: #ccc; margin-bottom: 10px;">The project file has schema validation issues:</p>
+                        <ul style="color: #e0e0e0; margin-bottom: 0;">
+                            ${result.issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
+                    `;
+                    warningsContainer.style.display = 'block';
+                } else {
+                    warningsContainer.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to validate schema:', error);
+            }
+        }
+
+        // UI Smoke Test for Schema Validation
+        window.runUISmokeTest = async function () {
+            console.log('Running UI Smoke Test for Schema Validation...');
+
+            // 1. Create a dummy invalid project (simulated)
+            // Since we can't easily corrupt a file from UI, we will mock the fetch response for validation
+
+            const originalFetch = window.fetch;
+            const mockProjectId = 'test-invalid-project';
+
+            // Mock fetch to return invalid schema result for specific URL
+            window.fetch = async function (url, options) {
+                if (url.includes('/project/validate_schema') && url.includes(mockProjectId)) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            valid: false,
+                            issues: ['Missing ID', 'Invalid Status']
+                        })
+                    };
+                }
+                return originalFetch(url, options);
+            };
+
+            try {
+                // Simulate checking schema for this mock project
+                // We need to valid warnings container handles it
+                await checkProjectSchema(mockProjectId);
+
+                const warnings = document.getElementById('schemaWarnings');
+                if (warnings && warnings.style.display !== 'none' && warnings.innerHTML.includes('Missing ID')) {
+                    console.log('%c✅ PASS: Warning displayed correctly', 'color: green; font-weight: bold;');
+                    alert('✅ UI Test Passed: Warnings displayed correctly');
+                } else {
+                    console.log('%c❌ FAIL: Warning not displayed', 'color: red; font-weight: bold;');
+                    alert('❌ UI Test Failed: Warnings not displayed');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('❌ UI Test Error: ' + e.message);
+            } finally {
+                // Restore fetch
+                window.fetch = originalFetch;
+            }
+        };
+
+    </script>
+</body>
+
+</html>

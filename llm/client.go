@@ -141,6 +141,64 @@ func (c *Client) GenerateWithContext(model, prompt string, context []int) (strin
 	return genResp.Response, genResp.Context, nil
 }
 
+// GenerateWithThinking sends a prompt to Ollama with specified thinking mode
+// Thinking mode affects the system prompt to control reasoning depth
+func (c *Client) GenerateWithThinking(model, prompt, thinkingMode string) (string, error) {
+	// Add thinking mode system prompt prefix
+	enhancedPrompt := addThinkingModePrefix(prompt, thinkingMode)
+
+	req := GenerateRequest{
+		Model:  model,
+		Prompt: enhancedPrompt,
+		Stream: false,
+	}
+
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	resp, err := c.client.Post(
+		c.baseURL+"/api/generate",
+		"application/json",
+		bytes.NewBuffer(jsonData),
+	)
+	if err != nil {
+		return "", fmt.Errorf("ollama request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("ollama returned status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var genResp GenerateResponse
+	if err := json.NewDecoder(resp.Body).Decode(&genResp); err != nil {
+		return "", fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return genResp.Response, nil
+}
+
+// addThinkingModePrefix adds appropriate system prompt based on thinking mode
+func addThinkingModePrefix(prompt, thinkingMode string) string {
+	var prefix string
+
+	switch thinkingMode {
+	case "fast":
+		prefix = "[FAST MODE: Provide direct, concise responses. Skip detailed reasoning.]\n\n"
+	case "extended":
+		prefix = "[EXTENDED THINKING MODE: Think step-by-step. Consider edge cases, alternatives, and potential issues. Provide thorough reasoning before answering.]\n\n"
+	case "normal":
+		fallthrough
+	default:
+		prefix = "[NORMAL MODE: Provide balanced responses with clear reasoning.]\n\n"
+	}
+
+	return prefix + prompt
+}
+
 // Ping checks if Ollama is accessible
 func (c *Client) Ping() error {
 	resp, err := c.client.Get(c.baseURL + "/api/tags")

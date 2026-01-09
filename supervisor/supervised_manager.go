@@ -85,9 +85,10 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (interface
 	result.ComplexityScore = complexity.Score
 	result.ExecutionRoute = complexity.RecommendedRoute
 
-	log.Printf("Complexity score: %d, route: %s", complexity.Score, complexity.RecommendedRoute)
+	log.Printf("Complexity score: %d, route: %s, thinking mode: %s",
+		complexity.Score, complexity.RecommendedRoute, complexity.ThinkingMode)
 
-	// Phase 3: Execute task (Ollama or Claude Code)
+	// Phase 3: Execute task (Ollama or Claude Code) with thinking mode
 	var baseResult *task.Result
 	var err error
 
@@ -95,9 +96,9 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (interface
 		baseResult, err = stm.executeWithClaudeCode(taskType, input)
 		if err != nil {
 			log.Printf("⚠️  Claude Code execution failed, falling back to Ollama: %v", err)
-			// Reset error and try Ollama
+			// Reset error and try Ollama with thinking mode
 			err = nil
-			execResult, execErr := stm.baseManager.ExecuteTask(taskType, input)
+			execResult, execErr := stm.baseManager.ExecuteTaskWithThinking(taskType, input, complexity.ThinkingMode)
 			err = execErr
 			if execErr == nil {
 				var ok bool
@@ -110,7 +111,7 @@ func (stm *SupervisedTaskManager) ExecuteTask(taskType, input string) (interface
 			}
 		}
 	} else {
-		execResult, execErr := stm.baseManager.ExecuteTask(taskType, input)
+		execResult, execErr := stm.baseManager.ExecuteTaskWithThinking(taskType, input, complexity.ThinkingMode)
 		err = execErr
 		if execErr == nil {
 			// Type assert the result back to *task.Result
@@ -331,4 +332,14 @@ func (stm *SupervisedTaskManager) GetTestingAgent() *TestingAgent {
 // GetDocsAgent returns the documentation agent
 func (stm *SupervisedTaskManager) GetDocsAgent() *DocumentationAgent {
 	return stm.docsAgent
+}
+
+// GetComplexityScorer returns the complexity scorer
+func (stm *SupervisedTaskManager) GetComplexityScorer() *ComplexityScorer {
+	return stm.complexityScorer
+}
+
+// GetWebSocketHub returns nil (SupervisedTaskManager doesn't use WebSocket)
+func (stm *SupervisedTaskManager) GetWebSocketHub() interface{} {
+	return nil
 }

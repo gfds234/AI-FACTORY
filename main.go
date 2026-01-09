@@ -65,6 +65,7 @@ func main() {
 			supervisedMgr.GetQAAgent(),
 			supervisedMgr.GetTestingAgent(),
 			supervisedMgr.GetDocsAgent(),
+			supervisedMgr.GetComplexityScorer(),
 		)
 		if err != nil {
 			log.Fatalf("Failed to create ProjectOrchestrator: %v", err)
@@ -77,6 +78,13 @@ func main() {
 	case "server":
 		// Start HTTP server
 		server := api.NewServer(taskMgr, *port)
+
+		// Wire up WebSocket hub to orchestrator (if it's a ProjectOrchestrator)
+		if orchestrator, ok := taskMgr.(interface{ SetWebSocketHub(interface{}) }); ok {
+			orchestrator.SetWebSocketHub(server.GetWebSocketHub())
+			log.Printf("✓ WebSocket real-time updates enabled")
+		}
+
 		log.Printf("Starting AI Studio Orchestrator on port %d", *port)
 		log.Printf("Models: %v", baseConfig.Models)
 		if err := server.Start(); err != nil {

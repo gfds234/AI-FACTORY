@@ -6,15 +6,16 @@ import (
 
 // Project represents a project in the AI Factory workflow
 type Project struct {
-	ID            string            `json:"id"`
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	CurrentPhase  Phase             `json:"current_phase"`
-	Phases        []PhaseExecution  `json:"phases"`
-	Tasks         []TaskExecution   `json:"tasks"`
+	ID                string             `json:"id"`
+	Name              string             `json:"name"`
+	Description       string             `json:"description"`
+	CurrentPhase      Phase              `json:"current_phase"`
+	Phases            []PhaseExecution   `json:"phases"`
+	Tasks             []TaskExecution    `json:"tasks"`
 	ArtifactPaths     []string           `json:"artifact_paths"`
 	Metadata          ProjectMetadata    `json:"metadata"`
 	ValidationResults *ValidationResults `json:"validation_results,omitempty"`
+	PlanDocument      *PlanDocument      `json:"plan_document,omitempty"`      // NEW: Generated plan for approval
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
 	CompletedAt       *time.Time         `json:"completed_at,omitempty"`
@@ -25,14 +26,15 @@ type Project struct {
 type Phase string
 
 const (
-	PhaseDiscovery   Phase = "discovery"
-	PhaseValidation  Phase = "validation"
-	PhasePlanning    Phase = "planning"
-	PhaseCodeGen     Phase = "codegen"
-	PhaseReview      Phase = "review"
-	PhaseQA          Phase = "qa"
-	PhaseDocs        Phase = "docs"
-	PhaseComplete    Phase = "complete"
+	PhaseDiscovery        Phase = "discovery"
+	PhaseValidation       Phase = "validation"
+	PhasePlanning         Phase = "planning"
+	PhaseWaitingApproval  Phase = "waiting_approval" // NEW: Plan approval phase
+	PhaseCodeGen          Phase = "codegen"
+	PhaseReview           Phase = "review"
+	PhaseQA               Phase = "qa"
+	PhaseDocs             Phase = "docs"
+	PhaseComplete         Phase = "complete"
 )
 
 // PhaseExecution tracks execution of a single phase
@@ -72,13 +74,40 @@ type TaskExecution struct {
 	CreatedAt       time.Time              `json:"created_at"`
 }
 
+// ThinkingMode represents the AI reasoning depth
+type ThinkingMode string
+
+const (
+	ThinkingModeFast     ThinkingMode = "fast"     // Quick responses, minimal reasoning
+	ThinkingModeNormal   ThinkingMode = "normal"   // Standard reasoning depth
+	ThinkingModeExtended ThinkingMode = "extended" // Deep reasoning for complex tasks
+)
+
 // ProjectMetadata holds additional project information
 type ProjectMetadata struct {
-	ProjectType       string   `json:"project_type"`        // game, web_app, mobile_app, saas
-	TechStack         []string `json:"tech_stack"`
-	TargetPlatform    string   `json:"target_platform"`
-	EstimatedDuration string   `json:"estimated_duration"`
-	ComplexityRating  int      `json:"complexity_rating"`
+	ProjectType       string       `json:"project_type"`        // game, web_app, mobile_app, saas
+	TechStack         []string     `json:"tech_stack"`
+	TargetPlatform    string       `json:"target_platform"`
+	EstimatedDuration string       `json:"estimated_duration"`
+	ComplexityRating  int          `json:"complexity_rating"`
+	ThinkingMode      ThinkingMode `json:"thinking_mode"`       // AI reasoning depth
+}
+
+// PlanDocument represents the AI-generated implementation plan
+type PlanDocument struct {
+	ProjectID       string    `json:"project_id"`
+	GeneratedAt     time.Time `json:"generated_at"`
+	ApprovedAt      *time.Time `json:"approved_at,omitempty"`
+	RejectedAt      *time.Time `json:"rejected_at,omitempty"`
+	Approach        string    `json:"approach"`         // AI's proposed implementation strategy
+	FilesToCreate   []string  `json:"files_to_create"`  // List of files that will be created
+	FilesToModify   []string  `json:"files_to_modify"`  // List of files that will be modified
+	TechStack       []string  `json:"tech_stack"`       // Proposed technologies
+	TestingStrategy string    `json:"testing_strategy"` // How tests will be implemented
+	EstimatedTime   string    `json:"estimated_time"`   // e.g., "45 mins", "2 hours"
+	Complexity      string    `json:"complexity"`       // Low, Medium, High
+	UserFeedback    string    `json:"user_feedback"`    // User's comments on rejection
+	IsApproved      bool      `json:"is_approved"`
 }
 
 // ProjectStatus represents the overall status of a project
@@ -148,14 +177,15 @@ type ValidationResults struct {
 
 // PhaseTransitions defines valid phase transitions
 var PhaseTransitions = map[Phase][]Phase{
-	PhaseDiscovery:   {PhaseValidation},
-	PhaseValidation:  {PhasePlanning},
-	PhasePlanning:    {PhaseCodeGen},
-	PhaseCodeGen:     {PhaseReview},
-	PhaseReview:      {PhaseQA, PhaseCodeGen}, // Can re-generate code
-	PhaseQA:          {PhaseDocs, PhaseReview}, // Can re-review
-	PhaseDocs:        {PhaseComplete},
-	PhaseComplete:    {}, // Terminal state
+	PhaseDiscovery:       {PhaseValidation},
+	PhaseValidation:      {PhasePlanning},
+	PhasePlanning:        {PhaseWaitingApproval},          // Planning -> Waiting for Approval
+	PhaseWaitingApproval: {PhaseCodeGen, PhasePlanning},   // Approve -> CodeGen, or Reject -> Re-plan
+	PhaseCodeGen:         {PhaseReview},
+	PhaseReview:          {PhaseQA, PhaseCodeGen}, // Can re-generate code
+	PhaseQA:              {PhaseDocs, PhaseReview}, // Can re-review
+	PhaseDocs:            {PhaseComplete},
+	PhaseComplete:        {}, // Terminal state
 }
 
 // CanTransition checks if a phase transition is valid
@@ -181,6 +211,7 @@ func (p Phase) CanGoBackTo(targetPhase Phase) bool {
 		PhaseDiscovery,
 		PhaseValidation,
 		PhasePlanning,
+		PhaseWaitingApproval,
 		PhaseCodeGen,
 		PhaseReview,
 		PhaseQA,
@@ -206,12 +237,13 @@ func (p Phase) CanGoBackTo(targetPhase Phase) bool {
 
 // PhaseWeights defines completion percentage weights for each phase
 var PhaseWeights = map[Phase]float64{
-	PhaseDiscovery:   10.0,
-	PhaseValidation:  10.0,
-	PhasePlanning:    10.0,
-	PhaseCodeGen:     30.0, // Biggest weight - code is critical
-	PhaseReview:      20.0,
-	PhaseQA:          10.0,
-	PhaseDocs:        10.0,
-	PhaseComplete:    0.0, // Bonus weight, not base
+	PhaseDiscovery:       10.0,
+	PhaseValidation:      10.0,
+	PhasePlanning:        10.0,
+	PhaseWaitingApproval: 0.0,  // No weight - just approval step
+	PhaseCodeGen:         30.0, // Biggest weight - code is critical
+	PhaseReview:          20.0,
+	PhaseQA:              10.0,
+	PhaseDocs:            10.0,
+	PhaseComplete:        0.0, // Bonus weight, not base
 }

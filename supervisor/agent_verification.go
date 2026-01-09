@@ -37,6 +37,7 @@ type ProjectType string
 
 const (
 	ProjectTypeNodeJS   ProjectType = "nodejs"
+	ProjectTypeVite     ProjectType = "vite"
 	ProjectTypePython   ProjectType = "python"
 	ProjectTypeGo       ProjectType = "go"
 	ProjectTypeFrontend ProjectType = "frontend"
@@ -93,6 +94,14 @@ func (va *VerificationAgent) VerifyProject(projectPath string) (*VerificationRes
 
 // detectProjectType detects the type of project based on files present
 func (va *VerificationAgent) detectProjectType(projectPath string) (ProjectType, error) {
+	// Check for Vite (check before generic Node.js)
+	if _, err := os.Stat(filepath.Join(projectPath, "vite.config.js")); err == nil {
+		return ProjectTypeVite, nil
+	}
+	if _, err := os.Stat(filepath.Join(projectPath, "vite.config.ts")); err == nil {
+		return ProjectTypeVite, nil
+	}
+
 	// Check for package.json (Node.js)
 	if _, err := os.Stat(filepath.Join(projectPath, "package.json")); err == nil {
 		return ProjectTypeNodeJS, nil
@@ -133,6 +142,20 @@ func (va *VerificationAgent) detectProjectType(projectPath string) (ProjectType,
 // checkEntryPoint verifies the entry point exists
 func (va *VerificationAgent) checkEntryPoint(projectPath string, projectType ProjectType) (bool, error) {
 	switch projectType {
+	case ProjectTypeVite:
+		// Check for index.html and src/main.jsx or src/main.tsx
+		if _, err := os.Stat(filepath.Join(projectPath, "index.html")); err != nil {
+			return false, fmt.Errorf("no index.html found (required for Vite)")
+		}
+		// Check for React entry point
+		entryPoints := []string{"src/main.jsx", "src/main.tsx", "src/index.jsx", "src/index.tsx"}
+		for _, ep := range entryPoints {
+			if _, err := os.Stat(filepath.Join(projectPath, ep)); err == nil {
+				return true, nil
+			}
+		}
+		return false, fmt.Errorf("no Vite entry point found (src/main.jsx or src/main.tsx)")
+
 	case ProjectTypeNodeJS:
 		// Check for server.js, index.js, app.js, or main.js
 		entryPoints := []string{"server.js", "backend/server.js", "index.js", "app.js", "main.js"}
@@ -180,7 +203,7 @@ func (va *VerificationAgent) installDependencies(projectPath string, projectType
 	var workDir string
 
 	switch projectType {
-	case ProjectTypeNodeJS:
+	case ProjectTypeVite, ProjectTypeNodeJS:
 		// Try both root and backend directories
 		if _, err := os.Stat(filepath.Join(projectPath, "package.json")); err == nil {
 			workDir = projectPath
@@ -237,6 +260,9 @@ func (va *VerificationAgent) installDependencies(projectPath string, projectType
 // validateSyntax validates code syntax
 func (va *VerificationAgent) validateSyntax(projectPath string, projectType ProjectType) (bool, string, error) {
 	switch projectType {
+	case ProjectTypeVite:
+		return va.validateViteSyntax(projectPath)
+
 	case ProjectTypeNodeJS:
 		return va.validateNodeJSSyntax(projectPath)
 
@@ -286,6 +312,37 @@ func (va *VerificationAgent) validateNodeJSSyntax(projectPath string) (bool, str
 	}
 
 	return allValid, allOutput.String(), nil
+}
+
+// validateViteSyntax validates Vite project syntax
+func (va *VerificationAgent) validateViteSyntax(projectPath string) (bool, string, error) {
+	// For Vite projects, we run a build check
+	// This will validate JSX/TSX syntax and React components
+	var allOutput strings.Builder
+
+	// Check if vite is installed (package.json should have it after npm install)
+	packageJSONPath := filepath.Join(projectPath, "package.json")
+	if _, err := os.Stat(packageJSONPath); os.IsNotExist(err) {
+		return false, "No package.json found\n", fmt.Errorf("package.json not found")
+	}
+
+	// Try to run vite build in check mode (doesn't actually build, just validates)
+	// We use a timeout because build can be slow
+	cmd := exec.Command("npm", "run", "build", "--", "--mode", "development")
+	cmd.Dir = projectPath
+
+	output, err := va.runCommandWithTimeout(cmd, 30*time.Second)
+	allOutput.WriteString(string(output))
+
+	if err != nil {
+		// Build failed - likely syntax errors
+		allOutput.WriteString(fmt.Sprintf("Build validation failed: %v\n", err))
+		// Still return the output for debugging
+		return false, allOutput.String(), nil
+	}
+
+	allOutput.WriteString("Vite project syntax validation passed\n")
+	return true, allOutput.String(), nil
 }
 
 // validatePythonSyntax validates Python syntax

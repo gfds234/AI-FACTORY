@@ -1,7 +1,10 @@
 package validation
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -40,7 +43,7 @@ func (rv *RuntimeValidator) ValidateRuntime(projectPath string, projectType stri
 	}
 
 	switch projectType {
-	case "nodejs":
+	case "nodejs", "vite":
 		return rv.validateNodeJS(projectPath)
 	case "python":
 		return rv.validatePython(projectPath)
@@ -74,26 +77,105 @@ func (rv *RuntimeValidator) validateNodeJS(projectPath string) (*RuntimeResult, 
 		projectPath = filepath.Join(projectPath, "backend")
 	}
 
-	// Start the server
-	cmd := exec.Command("node", "server.js")
+	// Detect if this is a Vite project
+	isVite := false
+	viteConfigPath := filepath.Join(projectPath, "vite.config.js")
+	if _, err := os.Stat(viteConfigPath); err == nil {
+		isVite = true
+	}
+
+	// Also check package.json for vite dependency
+	if !isVite {
+		packageData, err := os.ReadFile(packagePath)
+		if err == nil {
+			var pkgJSON map[string]interface{}
+			if json.Unmarshal(packageData, &pkgJSON) == nil {
+				if devDeps, ok := pkgJSON["devDependencies"].(map[string]interface{}); ok {
+					if _, hasVite := devDeps["vite"]; hasVite {
+						isVite = true
+					}
+				}
+			}
+		}
+	}
+
+	// Set port and command based on project type
+	var cmd *exec.Cmd
+	if isVite {
+		// Vite dev server
+		result.Port = 5173 // Vite default port
+		cmd = exec.Command("npm", "run", "dev")
+	} else {
+		// Traditional Node.js server
+		cmd = exec.Command("node", "server.js")
+	}
 	cmd.Dir = projectPath
 
 	// Capture output
 	outputBuilder := &strings.Builder{}
-	cmd.Stdout = outputBuilder
-	cmd.Stderr = outputBuilder
 
-	// Start server
-	if err := cmd.Start(); err != nil {
-		result.Errors = append(result.Errors, fmt.Sprintf("Failed to start server: %v", err))
-		result.RuntimeLog = outputBuilder.String()
-		return result, nil
+	// For Vite, we need to monitor stdout in real-time to detect when it's ready
+	if isVite {
+		stdoutPipe, err := cmd.StdoutPipe()
+		if err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("Failed to create stdout pipe: %v", err))
+			return result, nil
+		}
+		stderrPipe, err := cmd.StderrPipe()
+		if err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("Failed to create stderr pipe: %v", err))
+			return result, nil
+		}
+
+		// Start server
+		if err := cmd.Start(); err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("Failed to start server: %v", err))
+			return result, nil
+		}
+
+		// Monitor output for Vite startup message
+		ready := make(chan bool, 1)
+		go func() {
+			scanner := bufio.NewScanner(io.MultiReader(stdoutPipe, stderrPipe))
+			for scanner.Scan() {
+				line := scanner.Text()
+				outputBuilder.WriteString(line + "\n")
+
+				// Vite outputs: "  ➜  Local:   http://localhost:5173/"
+				if strings.Contains(line, "Local:") && strings.Contains(line, "5173") {
+					result.ApplicationStarts = true
+					select {
+					case ready <- true:
+					default:
+					}
+				}
+			}
+		}()
+
+		// Wait for Vite to be ready (max 10 seconds)
+		select {
+		case <-ready:
+			// Vite is ready
+		case <-time.After(10 * time.Second):
+			result.Warnings = append(result.Warnings, "Vite server did not report ready status within 10 seconds")
+		}
+	} else {
+		// Traditional Node.js server
+		cmd.Stdout = outputBuilder
+		cmd.Stderr = outputBuilder
+
+		// Start server
+		if err := cmd.Start(); err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("Failed to start server: %v", err))
+			result.RuntimeLog = outputBuilder.String()
+			return result, nil
+		}
+
+		result.ApplicationStarts = true
+
+		// Wait for server to start
+		time.Sleep(3 * time.Second)
 	}
-
-	result.ApplicationStarts = true
-
-	// Wait for server to start
-	time.Sleep(3 * time.Second)
 
 	// Check if process is still running
 	if cmd.ProcessState != nil && cmd.ProcessState.Exited() {

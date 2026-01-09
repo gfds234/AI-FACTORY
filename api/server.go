@@ -16,7 +16,9 @@ import (
 
 	"ai-studio/orchestrator/llm"
 	"ai-studio/orchestrator/project"
+	"ai-studio/orchestrator/storage"
 	"ai-studio/orchestrator/task"
+	ws "ai-studio/orchestrator/websocket"
 )
 
 // gameDesignSystemPrompt provides expert context for chat conversations
@@ -59,6 +61,7 @@ type TaskManager interface {
 	Ping() error
 	GetHistory(taskType string) []task.Result
 	GetClient() *llm.Client
+	GetWebSocketHub() interface{} // For real-time updates
 }
 
 // Server handles HTTP API requests
@@ -69,6 +72,8 @@ type Server struct {
 	conversations    map[string]*Conversation
 	convMux          sync.RWMutex
 	discoverSessions *task.DiscoverManager
+	wsHub            *ws.Hub            // WebSocket hub for real-time updates
+	imageStore       *storage.ImageStore // Image upload storage
 }
 
 // Conversation represents a chat conversation
@@ -100,12 +105,21 @@ type ErrorResponse struct {
 
 // NewServer creates a new API server
 func NewServer(taskMgr TaskManager, port int) *Server {
+	// Create and start WebSocket hub
+	hub := ws.NewHub()
+	go hub.Run()
+
+	// Create ImageStore
+	imageStore := storage.NewImageStore("./uploads/images")
+
 	s := &Server{
 		taskMgr:          taskMgr,
 		port:             port,
 		mux:              http.NewServeMux(),
 		conversations:    make(map[string]*Conversation),
 		discoverSessions: task.NewDiscoverManager(taskMgr.GetClient()),
+		wsHub:            hub,
+		imageStore:       imageStore,
 	}
 
 	s.registerRoutes()
@@ -118,6 +132,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/", s.handleRoot)
 	s.mux.HandleFunc("/health", s.handleHealth)
 	s.mux.HandleFunc("/api", s.handleAPIInfo)
+	s.mux.HandleFunc("/ws", s.handleWebSocket) // WebSocket endpoint
 
 	// Protected endpoints (wrap with middleware)
 	s.mux.HandleFunc("/task", s.wrapMiddleware(s.handleTask))
@@ -143,6 +158,10 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/project/download", s.wrapMiddleware(s.handleDownloadProject))
 	s.mux.HandleFunc("/artifact/view", s.wrapMiddleware(s.handleViewArtifact))
 	s.mux.HandleFunc("/project/validate_schema", s.wrapMiddleware(s.handleProjectValidateSchema))
+
+	// Image upload endpoint
+	s.mux.HandleFunc("/upload/image", s.wrapMiddleware(s.handleImageUpload))
+	s.mux.HandleFunc("/image/", s.handleImageServe)
 }
 
 // Start begins listening for HTTP requests
@@ -277,6 +296,16 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.ServeFile(w, r, htmlPath)
+}
+
+// handleWebSocket handles WebSocket connections for real-time updates
+func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	ws.HandleWebSocket(s.wsHub, w, r)
+}
+
+// GetWebSocketHub returns the WebSocket hub
+func (s *Server) GetWebSocketHub() *ws.Hub {
+	return s.wsHub
 }
 
 // handleAPIInfo provides basic API info
@@ -1319,4 +1348,62 @@ func (s *Server) handleProjectValidateSchema(w http.ResponseWriter, r *http.Requ
 		"issues": issues,
 		"project_id": proj.ID,
 	})
+}
+
+// handleImageUpload handles image upload requests
+func (s *Server) handleImageUpload(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		s.respondError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse multipart form (max 10MB)
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to parse form: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Get uploaded file
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to get image: %v", err), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Save image
+	imageID, imagePath, err := s.imageStore.SaveImage(header.Filename, file)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to save image: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Image uploaded: %s (original: %s)", imageID, header.Filename)
+
+	s.respondJSON(w, map[string]interface{}{
+		"image_id": imageID,
+		"path":     imagePath,
+		"filename": header.Filename,
+		"url":      fmt.Sprintf("/image/%s", imageID),
+	})
+}
+
+// handleImageServe serves uploaded images
+func (s *Server) handleImageServe(w http.ResponseWriter, r *http.Request) {
+	// Extract image ID from path /image/{imageID}
+	imageID := strings.TrimPrefix(r.URL.Path, "/image/")
+	if imageID == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Get image path
+	imagePath, err := s.imageStore.GetImagePath(imageID)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Serve file
+	http.ServeFile(w, r, imagePath)
 }

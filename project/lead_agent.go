@@ -20,6 +20,12 @@ type LeadAgent struct {
 	qaAgent           *supervisor.QAAgent
 	testingAgent      *supervisor.TestingAgent
 	docsAgent         *supervisor.DocumentationAgent
+
+	// Plan generator
+	planGenerator     *PlanGenerator
+
+	// Complexity scorer for thinking mode selection
+	complexityScorer  *supervisor.ComplexityScorer
 }
 
 // PhaseResult contains the result of executing a phase
@@ -31,6 +37,7 @@ type PhaseResult struct {
 	AgentOutputs      map[string]*supervisor.AgentOutput
 	RequiresApproval  bool
 	RecommendedAction string
+	PlanDocument      *PlanDocument // For planning phase results
 }
 
 // NewLeadAgent creates a new lead agent
@@ -40,7 +47,8 @@ func NewLeadAgent(llmClient *llm.Client, model string,
 	scopeAgent *supervisor.ScopeAgent,
 	qaAgent *supervisor.QAAgent,
 	testingAgent *supervisor.TestingAgent,
-	docsAgent *supervisor.DocumentationAgent) *LeadAgent {
+	docsAgent *supervisor.DocumentationAgent,
+	complexityScorer *supervisor.ComplexityScorer) *LeadAgent {
 
 	return &LeadAgent{
 		llmClient:         llmClient,
@@ -51,6 +59,8 @@ func NewLeadAgent(llmClient *llm.Client, model string,
 		qaAgent:           qaAgent,
 		testingAgent:      testingAgent,
 		docsAgent:         docsAgent,
+		planGenerator:     NewPlanGenerator(llmClient, model),
+		complexityScorer:  complexityScorer,
 	}
 }
 
@@ -77,6 +87,18 @@ func (la *LeadAgent) ExecutePhase(project *Project, phase Phase) (*PhaseResult, 
 // executeDiscoveryPhase executes the Discovery phase
 func (la *LeadAgent) executeDiscoveryPhase(project *Project) (*PhaseResult, error) {
 	log.Printf("Lead Agent: Executing Discovery phase for project %s", project.Name)
+
+	// Score complexity and determine thinking mode
+	if la.complexityScorer != nil {
+		complexity := la.complexityScorer.Score("code", project.Description)
+		project.Metadata.ComplexityRating = complexity.Score
+		project.Metadata.ThinkingMode = ThinkingMode(complexity.ThinkingMode)
+		log.Printf("Lead Agent: Project complexity: %d/10, thinking mode: %s",
+			complexity.Score, complexity.ThinkingMode)
+	} else {
+		// Default to normal thinking mode if no scorer available
+		project.Metadata.ThinkingMode = ThinkingModeNormal
+	}
 
 	// Invoke Requirements Agent
 	context := map[string]interface{}{
@@ -164,37 +186,82 @@ func (la *LeadAgent) executeValidationPhase(project *Project) (*PhaseResult, err
 	return result, nil
 }
 
-// executePlanningPhase executes the Planning phase
+// executePlanningPhase executes the Planning phase and generates a structured plan
 func (la *LeadAgent) executePlanningPhase(project *Project) (*PhaseResult, error) {
 	log.Printf("Lead Agent: Executing Planning phase for project %s", project.Name)
 
-	// Build prompt for plan generation
-	prompt := la.buildPlanningPrompt(project)
-
-	// Get Lead Agent plan
-	response, err := la.llmClient.Generate(la.model, prompt)
+	// Generate structured plan document
+	planDoc, err := la.planGenerator.GeneratePlan(project)
 	if err != nil {
-		return nil, fmt.Errorf("lead agent LLM call failed: %w", err)
+		return nil, fmt.Errorf("failed to generate plan document: %w", err)
 	}
+
+	// Format plan for display
+	planSummary := la.formatPlanSummary(planDoc)
 
 	result := &PhaseResult{
 		Phase:             PhasePlanning,
 		Decision:          "PROCEED",
-		Reasoning:         "Implementation roadmap created",
-		NextSteps:         "Review plan and approve to proceed to code generation",
+		Reasoning:         fmt.Sprintf("Implementation plan created with %d files, estimated complexity: %s",
+			len(planDoc.FilesToCreate), planDoc.Complexity),
+		NextSteps:         "Plan generated and awaiting approval. Review the plan and approve to proceed to code generation.",
 		AgentOutputs:      make(map[string]*supervisor.AgentOutput),
 		RequiresApproval:  true,
-		RecommendedAction: "Human should review the plan before proceeding",
+		RecommendedAction: "Human must review and approve the implementation plan before code generation",
 	}
 
 	// Store plan in agent outputs
 	result.AgentOutputs["plan"] = &supervisor.AgentOutput{
-		Output:   response,
+		Output:   planSummary,
 		Status:   "passed",
 		Duration: 0,
 	}
 
+	// Attach the structured plan document to the result
+	result.PlanDocument = planDoc
+
 	return result, nil
+}
+
+// formatPlanSummary creates a readable summary of the plan document
+func (la *LeadAgent) formatPlanSummary(plan *PlanDocument) string {
+	summary := fmt.Sprintf(`# Implementation Plan
+
+## Approach
+%s
+
+## Technical Stack
+%s
+
+## Files to Create (%d)
+%s
+
+## Files to Modify (%d)
+%s
+
+## Testing Strategy
+%s
+
+## Complexity: %s
+## Estimated Time: %s
+`,
+		plan.Approach,
+		strings.Join(plan.TechStack, "\n- "),
+		len(plan.FilesToCreate),
+		strings.Join(plan.FilesToCreate, "\n- "),
+		len(plan.FilesToModify),
+		func() string {
+			if len(plan.FilesToModify) == 0 {
+				return "None - new project"
+			}
+			return strings.Join(plan.FilesToModify, "\n- ")
+		}(),
+		plan.TestingStrategy,
+		plan.Complexity,
+		plan.EstimatedTime,
+	)
+
+	return summary
 }
 
 // executeReviewPhase executes the Review phase

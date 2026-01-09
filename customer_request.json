@@ -1,0 +1,4 @@
+{
+  "input": "Create a modern React landing page for TaskFlow Pro, a SaaS project management tool. Include: 1) Hero section with compelling headline 'Streamline Your Projects with TaskFlow Pro' and prominent 'Start Free Trial' CTA button, 2) Features section with 3 key features displayed as cards (Task Management with icon, Team Collaboration with icon, Analytics Dashboard with icon), 3) Pricing section with 3 tiers displayed as cards (Free $0/mo with basic features, Pro $29/mo with advanced features, Enterprise $99/mo with custom solutions), 4) Contact form at bottom with fields for name, email, message, and submit button, 5) Modern gradient design with purple/blue theme, smooth scroll animations, fully mobile responsive. Tech stack: React 18 with Vite, clean component architecture (separate Hero, Features, Pricing, Contact components), Vitest tests for Hero and Features components, professional styling with modern CSS.",
+  "task_type": "code"
+}

@@ -1,12 +1,14 @@
 package project
 
 import (
+	"ai-studio/orchestrator/git"
 	"ai-studio/orchestrator/llm"
 	"ai-studio/orchestrator/supervisor"
 	"ai-studio/orchestrator/task"
 	"ai-studio/orchestrator/validation"
 	"fmt"
 	"log"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,6 +21,8 @@ type ProjectOrchestrator struct {
 	projectMgr          *ProjectManager
 	leadAgent           *LeadAgent
 	completionValidator *CompletionValidator
+	worktreeMgr         *git.WorktreeManager // Git worktree isolation
+	wsHub               interface{}          // WebSocket hub for real-time updates (imported as interface to avoid circular import)
 }
 
 // NewProjectOrchestrator creates a new project orchestrator
@@ -33,6 +37,7 @@ func NewProjectOrchestrator(
 	qaAgent *supervisor.QAAgent,
 	testingAgent *supervisor.TestingAgent,
 	docsAgent *supervisor.DocumentationAgent,
+	complexityScorer *supervisor.ComplexityScorer,
 ) (*ProjectOrchestrator, error) {
 
 	// Create ProjectManager
@@ -51,16 +56,28 @@ func NewProjectOrchestrator(
 		qaAgent,
 		testingAgent,
 		docsAgent,
+		complexityScorer,
 	)
 
 	// Create CompletionValidator
 	completionValidator := NewCompletionValidator(artifactsDir)
+
+	// Create WorktreeManager if we're in a git repository
+	var worktreeMgr *git.WorktreeManager
+	if git.IsGitRepo(".") {
+		worktreesDir := filepath.Join(projectsDir, ".worktrees")
+		worktreeMgr = git.NewWorktreeManager(".", worktreesDir)
+		log.Printf("Git Worktree: Worktree isolation enabled (worktrees dir: %s)", worktreesDir)
+	} else {
+		log.Printf("Git Worktree: Not a git repository, worktree isolation disabled")
+	}
 
 	return &ProjectOrchestrator{
 		supervisedMgr:       supervisedMgr,
 		projectMgr:          projectMgr,
 		leadAgent:           leadAgent,
 		completionValidator: completionValidator,
+		worktreeMgr:         worktreeMgr,
 	}, nil
 }
 
@@ -96,6 +113,9 @@ func (po *ProjectOrchestrator) ExecuteProjectPhase(projectID string, phase Phase
 	}
 
 	log.Printf("ProjectOrchestrator: Executing %s phase for project %s", phase, project.Name)
+
+	// Broadcast phase start
+	po.broadcastPhaseTransition(project, phase, "starting")
 
 	// Update phase status to in_progress
 	if err := po.projectMgr.UpdateProjectPhase(project, phase, PhaseStatusInProgress); err != nil {
@@ -147,11 +167,27 @@ func (po *ProjectOrchestrator) ExecuteProjectPhase(projectID string, phase Phase
 
 	log.Printf("ProjectOrchestrator: %s phase completed with decision: %s", phase, phaseResult.Decision)
 
+	// Broadcast phase completion
+	po.broadcastPhaseTransition(project, phase, fmt.Sprintf("completed - %s", phaseResult.Decision))
+
 	return phaseResult, nil
 }
 
 // executeCodeGenPhase executes the code generation phase
 func (po *ProjectOrchestrator) executeCodeGenPhase(project *Project) (*PhaseResult, error) {
+	// Create worktree for isolated development (if worktree manager is available)
+	var worktreePath string
+	if po.worktreeMgr != nil {
+		branchName := fmt.Sprintf("ai-factory/%s", project.ID)
+		var err error
+		worktreePath, err = po.worktreeMgr.CreateWorktree(project.ID, branchName)
+		if err != nil {
+			log.Printf("Warning: Failed to create worktree: %v (continuing without isolation)", err)
+		} else {
+			log.Printf("Git Worktree: Created isolated worktree at %s", worktreePath)
+		}
+	}
+
 	// Gather planning context to provide to the coder
 	fullInput := fmt.Sprintf("Project: %s\nDescription: %s\n\n", project.Name, project.Description)
 	for _, phase := range project.Phases {
@@ -199,12 +235,28 @@ func (po *ProjectOrchestrator) executeCodeGenPhase(project *Project) (*PhaseResu
 		}
 	}
 
+	// Commit changes to worktree (if worktree was created)
+	if worktreePath != "" && po.worktreeMgr != nil {
+		commitMsg := fmt.Sprintf("AI Factory: Generated code for project '%s'", project.Name)
+		if err := po.worktreeMgr.CommitChanges(worktreePath, commitMsg); err != nil {
+			log.Printf("Warning: Failed to commit changes to worktree: %v", err)
+		} else {
+			log.Printf("Git Worktree: Changes committed to branch ai-factory/%s", project.ID)
+		}
+	}
+
 	// Run Triple Guarantee System: Build + Runtime + Test verification
 	decision := "PROCEED"
 	reasoning := fmt.Sprintf("Code generated via %s (complexity: %d)", supervisedResult.ExecutionRoute, supervisedResult.ComplexityScore)
 
 	// Extract project directory and verify if it exists
-	projectDir := po.extractProjectDir(supervisedResult.Result.ArtifactPath)
+	projectDir, err := po.extractProjectDir(supervisedResult.Result.ArtifactPath)
+	if err != nil {
+		log.Printf("[WARN] Failed to extract project dir: %v", err)
+		// Continue with empty projectDir - validation will be skipped
+		projectDir = ""
+	}
+
 	var verifyResult *supervisor.VerificationResult
 	var runtimeResult *validation.RuntimeResult
 	var testResult *validation.TestResult
@@ -320,16 +372,35 @@ func (po *ProjectOrchestrator) executeCodeGenPhase(project *Project) (*PhaseResu
 }
 
 // extractProjectDir extracts project directory from artifact path
-func (po *ProjectOrchestrator) extractProjectDir(artifactPath string) string {
-	// Extract project directory from path like "artifacts\code_123.md (project: projects/generated_456)"
-	if strings.Contains(artifactPath, "(project: ") {
-		start := strings.Index(artifactPath, "(project: ") + len("(project: ")
+// Handles formats: "(project: projects/generated_123)" or "projects/generated_123"
+func (po *ProjectOrchestrator) extractProjectDir(artifactPath string) (string, error) {
+	// Try format: "(project: PATH)"
+	if strings.Contains(artifactPath, "(project:") {
+		start := strings.Index(artifactPath, "projects/")
+		if start == -1 {
+			return "", fmt.Errorf("no 'projects/' found in artifact path: %s", artifactPath)
+		}
+
 		end := strings.Index(artifactPath[start:], ")")
-		if end > 0 {
-			return artifactPath[start : start+end]
+		if end == -1 {
+			return "", fmt.Errorf("no closing ')' found in artifact path: %s", artifactPath)
+		}
+
+		projectDir := artifactPath[start : start+end]
+		return projectDir, nil
+	}
+
+	// Try direct path format: "projects/generated_123"
+	if strings.HasPrefix(artifactPath, "projects/") {
+		// Extract just the project directory part (before any additional path components)
+		parts := strings.Split(artifactPath, "/")
+		if len(parts) >= 2 {
+			projectDir := filepath.Join(parts[0], parts[1])
+			return projectDir, nil
 		}
 	}
-	return ""
+
+	return "", fmt.Errorf("unrecognized artifact path format: %s", artifactPath)
 }
 
 // executeCompletePhase finalizes the project
@@ -355,7 +426,12 @@ func (po *ProjectOrchestrator) executeCompletePhase(project *Project) (*PhaseRes
 	// Save quality report to project directory
 	projectDir := ""
 	if len(project.ArtifactPaths) > 0 {
-		projectDir = po.extractProjectDir(project.ArtifactPaths[0])
+		var err error
+		projectDir, err = po.extractProjectDir(project.ArtifactPaths[0])
+		if err != nil {
+			log.Printf("[WARN] Failed to extract project dir for quality report: %v", err)
+			projectDir = ""
+		}
 	}
 
 	if projectDir != "" {
@@ -375,6 +451,15 @@ func (po *ProjectOrchestrator) executeCompletePhase(project *Project) (*PhaseRes
 
 	if err := po.projectMgr.SaveProject(project); err != nil {
 		return nil, fmt.Errorf("failed to save project: %w", err)
+	}
+
+	// Clean up worktree (project is complete)
+	if po.worktreeMgr != nil {
+		if err := po.worktreeMgr.RemoveWorktree(project.ID); err != nil {
+			log.Printf("Warning: Failed to remove worktree: %v", err)
+		} else {
+			log.Printf("Git Worktree: Cleaned up worktree for project %s", project.ID)
+		}
 	}
 
 	phaseResult := &PhaseResult{
@@ -446,6 +531,16 @@ func (po *ProjectOrchestrator) ApprovePhase(projectID string) error {
 		return err
 	}
 
+	// Special handling for WAITING_APPROVAL phase
+	if project.CurrentPhase == PhaseWaitingApproval {
+		if project.PlanDocument != nil {
+			now := time.Now()
+			project.PlanDocument.ApprovedAt = &now
+			project.PlanDocument.IsApproved = true
+			log.Printf("ProjectOrchestrator: Plan approved for project %s", project.Name)
+		}
+	}
+
 	// Determine next phase based on current phase
 	nextPhase, err := po.getNextPhase(project.CurrentPhase)
 	if err != nil {
@@ -462,7 +557,20 @@ func (po *ProjectOrchestrator) RejectPhase(projectID string, reason string) erro
 		return err
 	}
 
-	// Mark current phase as blocked
+	// Special handling for WAITING_APPROVAL phase - go back to Planning
+	if project.CurrentPhase == PhaseWaitingApproval {
+		if project.PlanDocument != nil {
+			now := time.Now()
+			project.PlanDocument.RejectedAt = &now
+			project.PlanDocument.UserFeedback = reason
+			log.Printf("ProjectOrchestrator: Plan rejected for project %s, reverting to Planning phase", project.Name)
+		}
+
+		// Revert to Planning phase to regenerate plan
+		return po.RevertPhase(projectID, PhasePlanning, reason)
+	}
+
+	// Mark current phase as blocked for other phases
 	for i := range project.Phases {
 		if project.Phases[i].Phase == project.CurrentPhase {
 			project.Phases[i].Status = PhaseStatusBlocked
@@ -542,7 +650,7 @@ func (po *ProjectOrchestrator) RevertPhase(projectID string, targetPhase Phase, 
 // isAfter checks if phaseA comes after phaseB in the workflow
 func isAfter(phaseA Phase, phaseB Phase) bool {
 	phaseOrder := []Phase{
-		PhaseDiscovery, PhaseValidation, PhasePlanning,
+		PhaseDiscovery, PhaseValidation, PhasePlanning, PhaseWaitingApproval,
 		PhaseCodeGen, PhaseReview, PhaseQA, PhaseDocs, PhaseComplete,
 	}
 
@@ -591,6 +699,17 @@ func (po *ProjectOrchestrator) storePhaseResult(project *Project, phase Phase, r
 		}
 	}
 
+	// If this is the Planning phase, store the plan document and transition to WAITING_APPROVAL
+	if phase == PhasePlanning && result.PlanDocument != nil {
+		project.PlanDocument = result.PlanDocument
+		log.Printf("ProjectOrchestrator: Plan document stored, transitioning to %s phase", PhaseWaitingApproval)
+
+		// Automatically transition to WAITING_APPROVAL phase
+		if err := po.projectMgr.UpdateProjectPhase(project, PhaseWaitingApproval, PhaseStatusPending); err != nil {
+			return fmt.Errorf("failed to transition to waiting_approval: %w", err)
+		}
+	}
+
 	return po.projectMgr.SaveProject(project)
 }
 
@@ -631,4 +750,43 @@ func (po *ProjectOrchestrator) GetClient() *llm.Client {
 // DeleteProject deletes a project
 func (po *ProjectOrchestrator) DeleteProject(id string) error {
 	return po.projectMgr.DeleteProject(id)
+}
+
+// SetWebSocketHub sets the WebSocket hub for real-time updates
+func (po *ProjectOrchestrator) SetWebSocketHub(hub interface{}) {
+	po.wsHub = hub
+}
+
+// GetWebSocketHub returns the WebSocket hub
+func (po *ProjectOrchestrator) GetWebSocketHub() interface{} {
+	return po.wsHub
+}
+
+// broadcastEvent broadcasts a WebSocket event to connected clients
+func (po *ProjectOrchestrator) broadcastEvent(eventType, projectID, phase, data string) {
+	if po.wsHub == nil {
+		return
+	}
+
+	// Type assert to the Hub interface
+	type EventBroadcaster interface {
+		Broadcast(event interface{})
+	}
+
+	if hub, ok := po.wsHub.(EventBroadcaster); ok {
+		event := map[string]interface{}{
+			"type":       eventType,
+			"project_id": projectID,
+			"phase":      phase,
+			"data":       data,
+			"timestamp":  time.Now(),
+		}
+		hub.Broadcast(event)
+	}
+}
+
+// broadcastPhaseTransition broadcasts phase transition events
+func (po *ProjectOrchestrator) broadcastPhaseTransition(project *Project, phase Phase, status string) {
+	po.broadcastEvent("phase_transition", project.ID, string(phase),
+		fmt.Sprintf("Project '%s' transitioning to %s phase (%s)", project.Name, phase, status))
 }
