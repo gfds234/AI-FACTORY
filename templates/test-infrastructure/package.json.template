@@ -1,0 +1,36 @@
+{
+  "name": "PROJECT_NAME",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "validate": "node scripts/validate.js",
+    "prepackage": "npm run validate",
+    "prebuild:prod": "npm run validate"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@vitejs/plugin-react": "^4.0.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "eslint": "^9.39.2",
+    "jsdom": "^27.4.0",
+    "vite": "^4.3.9",
+    "vitest": "^4.0.16"
+  }
+}
